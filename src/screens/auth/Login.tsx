@@ -107,19 +107,23 @@ export default function Login(props: any) {
             color={theme._999999}
             align="center"
             style={{marginTop: getScaleSize(12)}}>
-            {STRING.dont_have_an_account}
+            {STRING.dont_have_an_account}{' '}
             <Text
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={theme._2C6587}
-              onPress={() => {}}>
+              onPress={() => {
+                props.navigation.navigate(SCREENS.SignupSelect.identifier);
+              }}>
               {STRING.sign_up}
             </Text>
           </Text>
           <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.Regular}
-            onPress={() => {}}
+            onPress={() => {
+              props.navigation.navigate(SCREENS.ResetPassword.identifier);
+            }}
             color={theme._999999}
             align="center"
             style={{marginTop: getScaleSize(24)}}>

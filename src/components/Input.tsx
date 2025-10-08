@@ -54,6 +54,7 @@ function Input(props: InputProps & TextInputProps) {
 
   return (
     <View style={continerStyle}>
+      {inputTitle && (
        <Text
           size={getScaleSize(17)}
           font={FONTS.Lato.Medium}
@@ -61,6 +62,7 @@ function Input(props: InputProps & TextInputProps) {
           style={{marginBottom: getScaleSize(8)}}>
           {inputTitle}
         </Text>
+      )}
       <Pressable
         onPress={props.onPress}
         style={[
