@@ -7,6 +7,12 @@ import SignupSelect from "./auth/SignupSelect";
 import Signup from "./auth/Signup";
 import CreatePassword from "./auth/CreatePassword";
 import AddPersonalDetails from "./auth/AddPersonalDetails";
+import ChooseYourSubscription from "./subscription/ChooseYourSubscription";
+import SelectedPlanDetails from "./subscription/SelectedPlanDetails";
+import PaymentMethod from "./subscription/PaymentMethod";
+import SubscriptionSuccessful from "./subscription/SubscriptionSuccessful";
+import AdditionalDetails from "./subscription/AdditionalDetails";
+import YearsOfExperience from "./subscription/YearsOfExperience";
 
 export const SCREENS = {
     Splash: {
@@ -41,8 +47,32 @@ export const SCREENS = {
         identifier: 'CreatePassword',
         component: CreatePassword
     },
-    AddPersonalDetails:{
+    AddPersonalDetails: {
         identifier: 'AddPersonalDetails',
         component: AddPersonalDetails
+    },
+    ChooseYourSubscription: {
+        identifier: 'ChooseYourSubscription',
+        component: ChooseYourSubscription
+    },
+    SelectedPlanDetails: {
+        identifier: 'SelectedPlanDetails',
+        component: SelectedPlanDetails
+    },
+    PaymentMethod: {
+        identifier: 'PaymentMethod',
+        component: PaymentMethod
+    },
+    SubscriptionSuccessful: {
+        identifier: 'SubscriptionSuccessful',
+        component: SubscriptionSuccessful
+    },
+    AdditionalDetails: {
+        identifier: 'AdditionalDetails',
+        component: AdditionalDetails
+    },
+    YearsOfExperience: {
+        identifier: 'YearsOfExperience',
+        component: YearsOfExperience
     }
 }

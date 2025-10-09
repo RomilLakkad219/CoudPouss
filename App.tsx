@@ -20,9 +20,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import _ from 'lodash'
 import KeyboardManager from 'react-native-keyboard-manager';
 import Toast, { BaseToast, ErrorToast, InfoToast } from 'react-native-toast-message';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-// const toastRef = useRef<Toast>(null);
 
 LogBox.ignoreAllLogs(true);
 
@@ -70,6 +67,8 @@ const { Navigator, Screen } = createStackNavigator();
 
 function App(): any {
 
+  // const toastRef = useRef<any>(null);  
+
   useEffect(() => {
     if (Platform.OS === 'ios') {
       KeyboardManager.setEnable(true);
@@ -101,7 +100,7 @@ function App(): any {
             })}
           </Navigator>
         </NavigationContainer>
-        <Toast config={toastConfig}  />
+        <Toast config={toastConfig} />
       </View>
     )
   }

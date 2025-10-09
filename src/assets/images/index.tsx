@@ -9,4 +9,13 @@ export const IMAGES = {
   profile_unselected: require('./profile_unselected.png'),
   chat_unselected: require('./chat_unselected.png'),
   request_unselected : require('./request_unselected.png'),
+  ic_check: require('./ic_check.png'),
+  ic_sealCheck: require('./ic_sealCheck.png'),
+  ic_credit_card: require('./ic_credit_card.png'),
+  ic_google_pay: require('./ic_google_pay.png'),
+  ic_apple_pay: require('./ic_apple_pay.png'),
+  ic_right: require('./ic_right.png'),
+  ic_success: require('./ic_success.png'),
+  ic_info: require('./ic_info.png'),
+  ic_file_uplord: require('./ic_file_uplord.png'),
 };

@@ -122,7 +122,7 @@ export default function Login(props: any) {
             size={getScaleSize(20)}
             font={FONTS.Lato.Regular}
             onPress={() => {
-              props.navigation.navigate(SCREENS.ResetPassword.identifier);
+              props.navigation.navigate(SCREENS.AdditionalDetails.identifier);
             }}
             color={theme._999999}
             align="center"

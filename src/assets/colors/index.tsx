@@ -19,7 +19,10 @@ export const LIGHT_THEME_COLOR = {
     _818285: "#818285",
     _F0EFF0: "#F0EFF0",
     _262B43E5: "#262B43E5",
-    _CCCCCC66: "#CCCCCC66"
+    _CCCCCC66: "#CCCCCC66",
+    _EAF0F370: "#EAF0F370",
+    _E6E6E6: "#E6E6E6",
+    _D32F2F: "#D32F2F"
 }
 
 export const DARK_THEME_COLOR = {
