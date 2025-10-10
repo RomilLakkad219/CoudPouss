@@ -18,4 +18,11 @@ export const IMAGES = {
   ic_success: require('./ic_success.png'),
   ic_info: require('./ic_info.png'),
   ic_file_uplord: require('./ic_file_uplord.png'),
+  ic_hammer_wrench: require('./ic_hammer_wrench.png'),
+  ic_radio_unselect: require('./ic_radio_unselect.png'),
+  ic_radio_select: require('./ic_radio_select.png'),
+  ic_checkBox_unSelect: require('./ic_checkBox_unSelect.png'),
+  ic_checkbox_select: require('./ic_checkbox_select.png'),
+  ic_delete: require('./ic_delete.png'),
+  accountSuccessfully: require('./accountSuccessfully.png'),
 };

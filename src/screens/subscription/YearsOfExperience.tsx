@@ -74,7 +74,7 @@ export default function YearsOfExperience(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-
+                        props.navigation.navigate(SCREENS.AddServices.identifier);
                     }}
                 />
             </View>

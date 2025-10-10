@@ -13,6 +13,10 @@ import PaymentMethod from "./subscription/PaymentMethod";
 import SubscriptionSuccessful from "./subscription/SubscriptionSuccessful";
 import AdditionalDetails from "./subscription/AdditionalDetails";
 import YearsOfExperience from "./subscription/YearsOfExperience";
+import AddServices from "./subscription/AddServices";
+import AddBankDetails from "./subscription/AddBankDetails";
+import ReviewServices from "./subscription/ReviewServices";
+import AccountCreatedSuccessfully from "./subscription/AccountCreatedSuccessfully";
 
 export const SCREENS = {
     Splash: {
@@ -74,5 +78,21 @@ export const SCREENS = {
     YearsOfExperience: {
         identifier: 'YearsOfExperience',
         component: YearsOfExperience
+    },
+    AddServices: {
+        identifier: 'AddServices',
+        component: AddServices
+    },
+    AddBankDetails:{
+        identifier: 'AddBankDetails',
+        component: AddBankDetails
+    },
+    ReviewServices: {
+        identifier: 'ReviewServices',
+        component: ReviewServices
+    },
+    AccountCreatedSuccessfully: {
+        identifier: 'AccountCreatedSuccessfully',
+        component: AccountCreatedSuccessfully
     }
 }

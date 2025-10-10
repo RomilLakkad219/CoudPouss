@@ -56,7 +56,6 @@ export default function NewPassword(props: any) {
                     <Input
                         placeholder={STRING.enter_new_password}
                         placeholderTextColor={theme._939393}
-                        inputColor={theme.primary}
                         value={password}
                         passwordIcon={true}
                         secureTextEntry={show}
@@ -72,7 +71,6 @@ export default function NewPassword(props: any) {
                     <Input
                         placeholder={STRING.re_enter_new_password}
                         placeholderTextColor={theme._939393}
-                        inputColor={theme.primary}
                         value={confirmPassword}
                         passwordIcon={true}
                         secureTextEntry={confirmShow}

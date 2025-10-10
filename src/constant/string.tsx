@@ -104,7 +104,22 @@ export const useString = () => {
     add_services: "Add Services",
     select_a_category : "Select A Category",
     choose_a_category_that_best_matches_your_services_This_helps_us_connect_you_with_the_right_clients: "Choose a category that best matches your services. This helps us connect you with the right clients.",
-    select_category: "Select a category"
+    select_category: "Select a category",
+    select_a_service: "Select A Service",
+    thank_you_for_choosing_a_category_Now_select_the_services_you_want_to_provide_within_this_category: "Thank you for choosing a category. Now, select the services you want to provide within this category",
+    add_bank_details: "Add Bank Details",
+    account_holder_name: "Account Holder Name",
+    account_number: "Account Number",
+    bank_name: "Bank Name",
+    ifsc_code: "IFSC Code",
+    enter_bank_name: "Enter Bank Name",
+    enter_account_number: "Enter Account Number",
+    enter_ifsc_code: "Enter IFSC Code",
+    confirm_account_number: "Confirm Account Number",
+    re_enter_account_number: "Re-enter Account Number",
+    add: "Add",
+    review_your_selected_services_You_can_go_back_to_make_changes_or_continue_to_confirm_your_choices: "Review your selected services. You can go back to make changes or continue to confirm your choices.",
+    great_job_Your_account_is_now_created_successfully: "Great job! Your account is now created successfully."
   };
 };
 

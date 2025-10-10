@@ -71,7 +71,7 @@ export default function AddPersonalDetails(props: any) {
                         placeholder={STRING.enter_name}
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.name}
-                        inputColor={theme.primary}
+                        inputColor={true}
                         continerStyle={{ marginBottom: getScaleSize(16) }}
                         value={name}
                         onChangeText={text => {
@@ -84,7 +84,7 @@ export default function AddPersonalDetails(props: any) {
                         placeholder={STRING.enter_mobile_no}
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.mobile_no}
-                        inputColor={theme.primary}
+                        inputColor={true}
                         continerStyle={{ marginBottom: getScaleSize(16) }}
                         value={mobileNo}
                         onChangeText={text => {
@@ -97,7 +97,7 @@ export default function AddPersonalDetails(props: any) {
                         placeholder={STRING.enter_email}
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.email}
-                        inputColor={theme.primary}
+                        inputColor={true}
                         continerStyle={{ marginBottom: getScaleSize(16) }}
                         value={email}
                         onChangeText={text => {
@@ -110,7 +110,7 @@ export default function AddPersonalDetails(props: any) {
                         placeholder={STRING.enter_address}
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.address}
-                        inputColor={theme.primary}
+                        inputColor={true}
                         continerStyle={{ marginBottom: getScaleSize(16) }}
                         value={address}
                         onChangeText={text => {

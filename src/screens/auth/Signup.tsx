@@ -63,7 +63,7 @@ export default function Signup(props: any) {
                         placeholder={STRING.enter_email_or_mobile_number}
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.email_or_mobile_number}
-                        inputColor={theme.primary}
+                        inputColor={false}
                         continerStyle={{ marginTop: getScaleSize(82) }}
                         value={email}
                         keyboardType="email-address"

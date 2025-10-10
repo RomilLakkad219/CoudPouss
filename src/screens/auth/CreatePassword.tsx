@@ -57,7 +57,7 @@ export default function CreatePassword(props: any) {
                         placeholder={STRING.enter_new_password}
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.password}
-                        inputColor={theme.primary}
+                        inputColor={true}
                         value={password}
                         passwordIcon={true}
                         secureTextEntry={show}
@@ -74,7 +74,7 @@ export default function CreatePassword(props: any) {
                         placeholder={STRING.re_enter_new_password}
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.confirm_password}
-                        inputColor={theme.primary}
+                        inputColor={true}
                         value={confirmPassword}
                         passwordIcon={true}
                         secureTextEntry={confirmShow}

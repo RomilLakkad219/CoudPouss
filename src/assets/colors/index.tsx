@@ -22,7 +22,8 @@ export const LIGHT_THEME_COLOR = {
     _CCCCCC66: "#CCCCCC66",
     _EAF0F370: "#EAF0F370",
     _E6E6E6: "#E6E6E6",
-    _D32F2F: "#D32F2F"
+    _D32F2F: "#D32F2F",
+    _F2F2F2: "#F2F2F2"
 }
 
 export const DARK_THEME_COLOR = {
