@@ -8,11 +8,14 @@ import {ThemeContext, ThemeContextType} from '../../context';
 import {FONTS, IMAGES} from '../../assets';
 import {getScaleSize, useString} from '../../constant';
 
+//COMPONENTS
+import {Header, Input, Text, Button} from '../../components';
+
 //SCREENS
 import {SCREENS} from '..';
 
-//COMPONENTS
-import {Header, Input, Text, Button} from '../../components';
+//PACKAGES
+import { CommonActions } from '@react-navigation/native';
 
 export default function Login(props: any) {
 
@@ -26,15 +29,22 @@ export default function Login(props: any) {
   const [emailError, setEmailError] = useState('');
 
   async function onLogin() {
-    if (!email) {
-      setEmailError(STRING.please_enter_your_email);
-    } else if (!password) {
-      setPasswordError(STRING.please_enter_your_password);
-    } else {
-      setEmailError('');
-      setPasswordError('');
-      console.log('Login');
-    }
+    props.navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: SCREENS.BottomBar.identifier }],
+        }),
+      );
+    // props.navigation.navigate(SCREENS.Home.identifier);
+    // if (!email) {
+    //   setEmailError(STRING.please_enter_your_email);
+    // } else if (!password) {
+    //   setPasswordError(STRING.please_enter_your_password);
+    // } else {
+    //   setEmailError('');
+    //   setPasswordError('');
+    //   console.log('Login');
+    // }
   }
 
   return (

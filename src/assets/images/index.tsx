@@ -9,4 +9,20 @@ export const IMAGES = {
   profile_unselected: require('./profile_unselected.png'),
   chat_unselected: require('./chat_unselected.png'),
   request_unselected : require('./request_unselected.png'),
+  empty : require('./empty.png'),
+  tech_support : require('./tech_support.png'),
+  personal_care : require('./personal_care.png'),
+  transport :require('./transport.png'),
+  worker : require('./worker.png'),
+  search :require('./search.png'),
+  microphone : require('./microphone.png'),
+  service_icon : require('./service_icon.png'),
+  user_placeholder : require('./user_placeholder.jpg'),
+  like : require('./like.png'),
+  worker_background : require('./worker_background.png'),
+  notification : require('./notification.png'),
+  microphone_new : require('./microphone_new.png'),
+  radio_unfill : require('./radio_unfill.png'),
+  radio_fill : require('./radio_fill.png')
+
 };
