@@ -8,6 +8,8 @@ import Favourites from './Favourites'
 import SearchComponent from './SearchComponent'
 import Tabbar from './Tabbar'
 import ProgressSlider from './ProgressSlider'
+import CategoryDropdown from './CategoryDropdown'
+import ServiceItem from './ServiceItem'
 
 export {
     Header,
@@ -19,5 +21,7 @@ export {
     Favourites,
     SearchComponent,
     Tabbar,
-    ProgressSlider
+    ProgressSlider,
+    CategoryDropdown,
+    ServiceItem
 }

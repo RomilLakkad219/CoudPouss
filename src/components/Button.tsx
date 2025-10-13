@@ -21,19 +21,20 @@ interface ButtonProps {
   title?: string;
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
+  disabled?: boolean;
 }
 
 const Button = (props: ButtonProps) => {
   const { theme } = useContext<any>(ThemeContext)
-  const { style, title, onPress } = props;
+  const { style, title, onPress, disabled } = props;
 
   return (
-    <TouchableOpacity onPress={onPress} style={[styles(theme).gradient, style]} activeOpacity={0.8}>
+    <TouchableOpacity onPress={onPress} style={[styles(theme).gradient, { backgroundColor: disabled ? theme._DFE8ED : theme._214C65 }, style]} activeOpacity={0.8}>
       <Text
         align="center"
         font={FONTS.Lato.Bold}
         size={getScaleSize(19)}
-        color={theme.white}>
+        color={disabled ? theme._214C65 : theme.white}>
         {title}
       </Text>
     </TouchableOpacity>
@@ -44,7 +45,6 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
   gradient: {
     borderRadius: getScaleSize(12),
     paddingVertical: getScaleSize(18),
-    backgroundColor: theme._214C65,
   }
 });
 

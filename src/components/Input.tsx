@@ -10,15 +10,15 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import React, {memo, useContext} from 'react';
+import React, { memo, useContext } from 'react';
 
 //ASSETS & CONSTANT
-import {FONTS, IMAGES} from '../assets';
-import {getScaleSize} from '../constant';
+import { FONTS, IMAGES } from '../assets';
+import { getScaleSize } from '../constant';
 
 //CONTEXT
 import Text from './Text';
-import {ThemeContext, ThemeContextType} from '../context';
+import { ThemeContext, ThemeContextType } from '../context';
 
 interface InputProps {
   continerStyle?: StyleProp<ViewStyle>;
@@ -32,7 +32,7 @@ interface InputProps {
   inputContainer?: StyleProp<ViewStyle>;
   isError?: string;
   inputTitle?: string;
-  inputColor?: string;
+  inputColor?: boolean;
 }
 
 function Input(props: InputProps & TextInputProps) {
@@ -50,22 +50,24 @@ function Input(props: InputProps & TextInputProps) {
     inputColor
   } = props;
 
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
   return (
     <View style={continerStyle}>
-       <Text
+      {inputTitle && (
+        <Text
           size={getScaleSize(17)}
           font={FONTS.Lato.Medium}
-          color={inputColor ?? theme.primary}
-          style={{marginBottom: getScaleSize(8)}}>
+          color={inputColor ? theme._424242 : theme.primary}
+          style={{ marginBottom: getScaleSize(8) }}>
           {inputTitle}
         </Text>
+      )}
       <Pressable
         onPress={props.onPress}
         style={[
           styles(theme).container,
-          {borderColor: isError ? theme._EF5350 : theme._D5D5D5},
+          { borderColor: isError ? theme._EF5350 : theme._D5D5D5 },
         ]}>
         {searchBox && (
           <View>
@@ -75,7 +77,7 @@ function Input(props: InputProps & TextInputProps) {
               resizeMode={'contain'}
             />
           </View>
-        )}       
+        )}
         <TextInput
           {...props}
           style={[styles(theme).input, inputContainer]}
@@ -83,8 +85,8 @@ function Input(props: InputProps & TextInputProps) {
             isError
               ? theme._EF5350
               : placeholderTextColor
-              ? placeholderTextColor
-              : theme._939393
+                ? placeholderTextColor
+                : theme._939393
           }
           multiline={props?.multiline ?? false}
           numberOfLines={props?.numberOfLines ?? 1}
@@ -106,7 +108,7 @@ function Input(props: InputProps & TextInputProps) {
               source={secureTextEntry ? IMAGES.ic_hide : IMAGES.ic_show}
               style={[
                 styles(theme).rightIcon,
-                {tintColor: isError ? theme._EF5350 : theme._2C6587},
+                { tintColor: isError ? theme._EF5350 : theme._2C6587 },
               ]}
               resizeMode={'contain'}
             />
@@ -115,7 +117,7 @@ function Input(props: InputProps & TextInputProps) {
       </Pressable>
       {isError && (
         <Text
-          style={{marginTop: getScaleSize(4)}}
+          style={{ marginTop: getScaleSize(4) }}
           size={getScaleSize(16)}
           font={FONTS.Lato.SemiBold}
           color={theme._EF5350}>

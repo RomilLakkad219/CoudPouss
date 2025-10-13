@@ -23,6 +23,21 @@ export const IMAGES = {
   notification : require('./notification.png'),
   microphone_new : require('./microphone_new.png'),
   radio_unfill : require('./radio_unfill.png'),
-  radio_fill : require('./radio_fill.png')
-
+  radio_fill : require('./radio_fill.png'),
+  ic_check: require('./ic_check.png'),
+  ic_sealCheck: require('./ic_sealCheck.png'),
+  ic_credit_card: require('./ic_credit_card.png'),
+  ic_google_pay: require('./ic_google_pay.png'),
+  ic_apple_pay: require('./ic_apple_pay.png'),
+  ic_right: require('./ic_right.png'),
+  ic_success: require('./ic_success.png'),
+  ic_info: require('./ic_info.png'),
+  ic_file_uplord: require('./ic_file_uplord.png'),
+  ic_hammer_wrench: require('./ic_hammer_wrench.png'),
+  ic_radio_unselect: require('./ic_radio_unselect.png'),
+  ic_radio_select: require('./ic_radio_select.png'),
+  ic_checkBox_unSelect: require('./ic_checkBox_unSelect.png'),
+  ic_checkbox_select: require('./ic_checkbox_select.png'),
+  ic_delete: require('./ic_delete.png'),
+  accountSuccessfully: require('./accountSuccessfully.png'),
 };
