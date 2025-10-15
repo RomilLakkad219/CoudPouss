@@ -19,6 +19,15 @@ import AddServices from './subscription/AddServices';
 import AddBankDetails from './subscription/AddBankDetails';
 import ReviewServices from './subscription/ReviewServices';
 import AccountCreatedSuccessfully from './subscription/AccountCreatedSuccessfully';
+import ChatDetails from './chat/ChatDetails';
+import Thankyou from './request/Thankyou';
+import RequestDetails from './request/RequestDetails';
+import OtherUserProfile from './profile/OtherUserProfile';
+import ServiceConfirmed from './request/ServiceConfirmed';
+import Notification from './notification/Notification';
+import TaskDetails from './task/TaskDetails';
+import WriteReview from './review/WriteReview';
+import TaskStatus from './task/TaskStatus';
 
 //BOTTOMBAR
 import Home from './home/Home';
@@ -39,10 +48,7 @@ export const SCREENS = {
     identifier: 'BottomBar',
     component: BottomBar,
   },
-  CreateRequest: {
-    identifier: 'CreateRequest',
-    component: CreateRequest,
-  },
+
   ResetPassword: {
     identifier: 'ResetPassword',
     component: ResetPassword,
@@ -111,6 +117,42 @@ export const SCREENS = {
     identifier: 'AccountCreatedSuccessfully',
     component: AccountCreatedSuccessfully,
   },
+  ChatDetails: {
+    identifier: 'ChatDetails',
+    component: ChatDetails,
+  },
+  Thankyou: {
+    identifier: 'Thankyou',
+    component: Thankyou,
+  },
+  RequestDetails: {
+    identifier: 'RequestDetails',
+    component: RequestDetails,
+  },
+  OtherUserProfile: {
+    identifier: 'OtherUserProfile',
+    component: OtherUserProfile,
+  },
+  ServiceConfirmed: {
+    identifier: 'ServiceConfirmed',
+    component: ServiceConfirmed,
+  },
+  Notification: {
+    identifier: 'Notification',
+    component: Notification,
+  },
+  TaskDetails: {
+    identifier: 'TaskDetails',
+    component: TaskDetails,
+  },
+  WriteReview: {
+    identifier: 'WriteReview',
+    component: WriteReview,
+  },
+  TaskStatus: {
+    identifier: 'TaskStatus',
+    component: TaskStatus,
+  },
 };
 
 export const TABS = {
@@ -121,6 +163,10 @@ export const TABS = {
   Request: {
     identifier: 'Request',
     component: Request,
+  },
+  CreateRequest: {
+    identifier: 'CreateRequest',
+    component: CreateRequest,
   },
   Chat: {
     identifier: 'Chat',

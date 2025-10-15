@@ -24,7 +24,7 @@ const Header = (props: HeaderProps) => {
             <SafeAreaView />
             <View style={styles(theme).statusBar}>
                 <StatusBar
-                    translucent={true}
+                    translucent={false}
                     backgroundColor={'transparent'}
                     barStyle={'dark-content'} />
             </View>
@@ -58,6 +58,7 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
     container: {
         paddingHorizontal: getScaleSize(24),
         paddingVertical: getScaleSize(8),
+        // alignSelf:'center'
     },
     mainContainer: {
         flexDirection: 'row',

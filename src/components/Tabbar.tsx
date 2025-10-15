@@ -16,16 +16,17 @@ import {IMAGES} from '../assets/images';
 import {FONTS} from '../assets';
 import {ThemeContext, ThemeContextType} from '../context';
 import Text from './Text';
+import { head } from 'lodash';
 
 const images = [
   IMAGES.home_unselected,
   IMAGES.request_unselected,
-  // IMAGES.plus,
+  IMAGES.plus,
   IMAGES.chat_unselected,
   IMAGES.profile_unselected,
 ];
 
-const names = ['Home', 'Request', 'Chat', 'Profile'];
+const names = ['Home', 'Request', '', 'Chat', 'Profile'];
 
 function Tabbar(props: any) {
   const {theme} = useContext<any>(ThemeContext);
@@ -62,65 +63,71 @@ const Item = (props: any) => {
 
   const STRING = useString();
 
-  // const images = [
-  //   IMAGES.home_unselected,
-  //   IMAGES.request_unselected,
-  //   IMAGES.plus,
-  //   IMAGES.chat_unselected,
-  //   IMAGES.profile_unselected,
-  // ];
-
-  return (
-    <TouchableOpacity
-      onPress={props.onPress}
-      style={styles(theme).itemContainer}>
-      <View>
-        {/*  */}
-        {props?.selected ? (
-          <View style={{alignSelf: 'center'}}>
-            <Image
-              style={
-                props.selected
-                  ? styles(theme).itemImageSelected
-                  : styles(theme).itemImage
-              }
-              resizeMode="contain"
-              tintColor={theme.primary}
-              source={images[props.index]}
-            />
-            <Text
-              style={{marginTop: getScaleSize(8)}}
-              size={getScaleSize(14)}
-              font={FONTS.Lato.Bold}
-              color={theme.primary}
-              align="center">
-              {names[props.index]}
-            </Text>
-          </View>
-        ) : (
-          <View style={{alignSelf: 'center'}}>
-            <Image
-              style={
-                props.selected
-                  ? styles(theme).itemImageSelected
-                  : styles(theme).itemImage
-              }
-              resizeMode="contain"
-              source={images[props.index]}
-            />
-            <Text
-              style={{marginTop: getScaleSize(8)}}
-              size={getScaleSize(12)}
-              font={FONTS.Lato.Medium}
-              color={'#E6E6E6'}
-              align="center">
-              {names[props.index]}
-            </Text>
-          </View>
-        )}
+  if (props?.index == 2) {
+    return (
+      <View style={{alignSelf: 'center'}}>
+        <Image
+          style={
+           {height:66, width:66, marginTop:-62}
+          }
+          resizeMode="contain"          
+          source={IMAGES.plus}
+        />
       </View>
-    </TouchableOpacity>
-  );
+    );
+  } else {
+    return (
+      <TouchableOpacity
+        onPress={props.onPress}
+        style={styles(theme).itemContainer}>
+        <View>
+          {/*  */}
+          {props?.selected ? (
+            <View style={{alignSelf: 'center'}}>
+              <Image
+                style={
+                  props.selected
+                    ? styles(theme).itemImageSelected
+                    : styles(theme).itemImage
+                }
+                resizeMode="contain"
+                tintColor={theme.primary}
+                source={images[props.index]}
+              />
+              <Text
+                style={{marginTop: getScaleSize(8)}}
+                size={getScaleSize(14)}
+                font={FONTS.Lato.Bold}
+                color={theme.primary}
+                align="center">
+                {names[props.index]}
+              </Text>
+            </View>
+          ) : (
+            <View style={{alignSelf: 'center'}}>
+              <Image
+                style={
+                  props.selected
+                    ? styles(theme).itemImageSelected
+                    : styles(theme).itemImage
+                }
+                resizeMode="contain"
+                source={images[props.index]}
+              />
+              <Text
+                style={{marginTop: getScaleSize(8)}}
+                size={getScaleSize(12)}
+                font={FONTS.Lato.Medium}
+                color={'#E6E6E6'}
+                align="center">
+                {names[props.index]}
+              </Text>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  }
 };
 
 const styles = (theme: ThemeContextType['theme']) =>

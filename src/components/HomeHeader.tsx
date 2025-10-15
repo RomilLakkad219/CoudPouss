@@ -25,16 +25,15 @@ import {flatMap, head} from 'lodash';
 
 const HEADER_HEIGHT = 260;
 
-
 const HomeHeader = (props: any) => {
   const STRING = useString();
   const {theme} = useContext(ThemeContext);
 
   return (
     <View style={styles(theme).container}>
-      <View style={styles(theme).searchView}>
+      <View style={styles(theme).headerView}>
         <Text
-          style={{alignSelf: 'center', flex: 1.0}}
+          style={{flex: 1.0}}
           size={getScaleSize(16)}
           font={FONTS.Lato.Medium}
           color={theme.white}>
@@ -49,7 +48,9 @@ const HomeHeader = (props: any) => {
         <TouchableOpacity
           style={styles(theme).notificationContainer}
           activeOpacity={1}
-          onPress={() => {}}>
+          onPress={() => {
+            props?.onPressNotification();
+          }}>
           <Image
             style={styles(theme).notificationContainer}
             source={IMAGES.notification}
@@ -103,19 +104,17 @@ const HomeHeader = (props: any) => {
               {'Professionals\nConnected Today'}
             </Text>
           </View>
-           <Text
-              style={{marginTop:getScaleSize(8)}}
-              size={getScaleSize(12)}
-              font={FONTS.Lato.Regular}
-              color={theme.white}>
-              {'Lorem ipsum a pharetra mattis dilt\npulvinar tortor amet vulputate.'}
-            </Text>
+          <Text
+            style={{marginTop: getScaleSize(8)}}
+            size={getScaleSize(12)}
+            font={FONTS.Lato.Regular}
+            color={theme.white}>
+            {
+              'Lorem ipsum a pharetra mattis dilt\npulvinar tortor amet vulputate.'
+            }
+          </Text>
         </View>
-      </View>
-      {/* <Image style={styles(theme).userImage} source={IMAGES.worker} /> */}
-      {/* <ImageBackground
-        style={styles(theme).userImage}
-        source={IMAGES.worker_background}></ImageBackground> */}
+      </View>      
     </View>
   );
 };
@@ -124,14 +123,18 @@ const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
     container: {
       backgroundColor: theme.primary,
-      paddingTop: getScaleSize(60),
+      paddingTop: getScaleSize(15),
       // paddingHorizontal: getScaleSize(20),
-      borderBottomLeftRadius: getScaleSize(40),
-      borderBottomRightRadius: getScaleSize(40),
-      overflow: 'hidden',      
+      borderBottomLeftRadius: getScaleSize(60),
+      borderBottomRightRadius: getScaleSize(60),
+      overflow: 'hidden',
+      height: getScaleSize(395),
+    },
+    headerView: {
+      flexDirection: 'row',
+      marginHorizontal: getScaleSize(21),
     },
     searchView: {
-      flex: 1.0,
       flexDirection: 'row',
       marginHorizontal: getScaleSize(21),
     },
@@ -143,7 +146,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(12),
       marginTop: getScaleSize(23),
       paddingHorizontal: getScaleSize(16),
-      paddingVertical: getScaleSize(4),
+      // paddingVertical: getScaleSize(4),
     },
     searchImage: {
       height: getScaleSize(24),
@@ -197,13 +200,13 @@ const styles = (theme: ThemeContextType['theme']) =>
     notificationContainer: {
       height: getScaleSize(24),
       width: getScaleSize(24),
-      alignSelf: 'center',
+      alignSelf:'center'
     },
     placeholderImage: {
       height: getScaleSize(34),
       width: getScaleSize(34),
       borderRadius: getScaleSize(17),
-      alignSelf: 'center',
+      alignSelf:'center'
     },
     bottomText: {
       flexDirection: 'row',
@@ -211,8 +214,8 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     textView: {
       justifyContent: 'center',
-      marginTop:getScaleSize(32),
-      marginLeft:getScaleSize(-40)
+      marginTop: getScaleSize(32),
+      marginLeft: getScaleSize(-40),
     },
   });
 export default HomeHeader;

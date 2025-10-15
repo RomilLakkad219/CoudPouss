@@ -31,6 +31,10 @@ function BottomBar() {
           component={TABS.Request.component}
         />
         <Tab.Screen
+          name={TABS.CreateRequest.identifier}
+          component={TABS.CreateRequest.component}
+        />
+        <Tab.Screen
           name={TABS.Chat.identifier}
           component={TABS.Chat.component}
         />

@@ -28,6 +28,10 @@ export const LIGHT_THEME_COLOR = {
   _EAF0F370: '#EAF0F370',
   _D32F2F: '#D32F2F',
   _F2F2F2: '#F2F2F2',
+  _ACADAD : '#ACADAD',
+  _F0B52C : '#F0B52C',
+  _2B2B2B : '#2B2B2B',
+  _F6F7F7 : '#F6F7F7'
 };
 
 export const DARK_THEME_COLOR = {

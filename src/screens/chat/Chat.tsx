@@ -6,147 +6,102 @@ import {
   Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Alert,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Platform,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedScrollHandler,
-  interpolate,
-  Extrapolate,
-  withTiming,
-  runOnJS,
-} from 'react-native-reanimated';
-import {ThemeContext, ThemeContextType} from '../../context';
-import {FONTS} from '../../assets';
-import {getScaleSize, useString} from '../../constant';
-import {Text, HomeHeader, SearchComponent} from '../../components';
 
-const HEADER_HEIGHT = 500;
+//ASSETS
+import {FONTS, IMAGES} from '../../assets';
+
+//CONTEXT
+import {ThemeContext, ThemeContextType} from '../../context';
+
+//CONSTANT
+import {getScaleSize, useString} from '../../constant';
+
+//COMPONENT
+import {Header, SearchComponent, Text} from '../../components';
+
+//PACKAGES
+import {useFocusEffect} from '@react-navigation/native';
+import {SCREENS} from '..';
 
 export default function Chat(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
-  const scrollY = useSharedValue(0);
-  const showNewHeader = useSharedValue(0);
 
-  const [showNextView, setShowNextView] = useState(false);
-  const [contentHeight, setContentHeight] = useState(0);
-  const [layoutHeight, setLayoutHeight] = useState(0);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      scrollY.value = event.contentOffset.y;
-
-      if (event.contentOffset.y > HEADER_HEIGHT - 80) {
-        showNewHeader.value = withTiming(1);
-      } else {
-        showNewHeader.value = withTiming(0);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (Platform.OS === 'android') {
+        StatusBar.setBackgroundColor(theme.white);
+        StatusBar.setBarStyle('dark-content');
       }
-
-      // Check if reached bottom
-      const scrollEnd =
-        event.contentOffset.y + layoutHeight >= contentHeight - 50;
-      if (scrollEnd) {
-        runOnJS(setShowNextView)(true);
-      }
-    },
-  });
-
-  // Old Header animation
-  const oldHeaderAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, HEADER_HEIGHT / 2, HEADER_HEIGHT - 80],
-      [1, 0.5, 0],
-      Extrapolate.CLAMP,
-    );
-    const translateY = interpolate(
-      scrollY.value,
-      [0, HEADER_HEIGHT - 80],
-      [0, -100],
-      Extrapolate.CLAMP,
-    );
-    return {
-      opacity,
-      transform: [{translateY}],
-    };
-  });
-
-  // New Header animation
-  const newHeaderAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: showNewHeader.value,
-    transform: [
-      {
-        translateY: interpolate(showNewHeader.value, [0, 1], [-50, 0]),
-      },
-    ],
-  }));
-
-  // Fade out current scroll content when near bottom
-  const contentFadeStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, contentHeight - layoutHeight - 100, contentHeight - layoutHeight],
-      [1, 0.3, 0],
-      Extrapolate.CLAMP,
-    );
-    return {opacity};
-  });
+    }, []),
+  );
 
   return (
     <View style={styles(theme).container}>
       <StatusBar
-        barStyle="light-content"
-        backgroundColor={theme.primary}
-        translucent
+        barStyle="dark-content"
+        backgroundColor={theme.white}
+        translucent={false}
       />
-
-      {/* HEADER */}
-      <Animated.View
-        style={[styles(theme).headerContainer, oldHeaderAnimatedStyle]}>
-        <HomeHeader />
-      </Animated.View>
-
-      {/* STICKY HEADER */}
-      <Animated.View style={[styles(theme).stickyView, newHeaderAnimatedStyle]}>
-        <SearchComponent />
-      </Animated.View>
-
-      {/* SCROLL CONTENT */}
-      <Animated.ScrollView
-        onScroll={scrollHandler}        
-        // style={{paddingTop: HEADER_HEIGHT}}
-        onContentSizeChange={(w, h) => setContentHeight(h)}
-        onLayout={e => setLayoutHeight(e.nativeEvent.layout.height)}
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        contentContainerStyle={{
-          paddingTop:HEADER_HEIGHT,
-          // paddingTop: Dimensions.get('window').height / 50,
+      <Text
+        size={getScaleSize(24)}
+        font={FONTS.Lato.Bold}
+        color={theme.primary}
+        style={{
+          marginTop: getScaleSize(8),
+          marginHorizontal: getScaleSize(22),
         }}>
-        <Animated.View style={contentFadeStyle}>
-          {[...Array(33)].map((_, i) => (
-            <Text
-              key={i}
-              style={{
-                alignSelf: 'center',
-                flex: 1.0,
-                marginTop: getScaleSize(50),
-              }}
-              size={getScaleSize(16)}
-              font={FONTS.Lato.Medium}
-              color={'green'}>
-              {'Hello! James\n'}
-              <Text
-                size={getScaleSize(24)}
-                font={FONTS.Lato.Bold}
-                color={'green'}>
-                {STRING.welcome_to_coudpouss}
-              </Text>
-            </Text>
-          ))}
-        </Animated.View>
-      </Animated.ScrollView>
+        {STRING.Chat}
+      </Text>
+      <ScrollView
+        style={styles(theme).scrolledContainer}
+        showsVerticalScrollIndicator={false}>
+        <SearchComponent />
+        {['', '', '', '', ''].map((item: any, index: number) => {
+          return (
+            <TouchableOpacity
+              style={styles(theme).itemContainer}
+              activeOpacity={1}
+              onPress={() => {
+                props.navigation.navigate(SCREENS.ChatDetails.identifier)
+              }}>
+              <Image
+                style={styles(theme).userImage}
+                source={IMAGES.user_placeholder}
+              />
+              <View style={{alignSelf:'center', marginLeft:getScaleSize(12), flex:1.0}}>
+                <Text
+                  size={getScaleSize(16)}
+                  font={FONTS.Lato.Medium}
+                  color={theme._2B2B2B}>
+                  {'Emily Johnson'}
+                </Text>
+                 <Text
+                  size={getScaleSize(12)}
+                  font={FONTS.Lato.Regular}
+                  color={theme._ACADAD}>
+                  {'I really appreciated your feedback on the project;'}
+                </Text>
+              </View>
+              <View style={styles(theme).messageContainer}>
+                <Text
+                  size={getScaleSize(12)}
+                  font={FONTS.Lato.Medium}
+                  color={theme.white}>
+                  {'1'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
@@ -154,22 +109,28 @@ export default function Chat(props: any) {
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
     container: {flex: 1, backgroundColor: theme.white},
-    headerContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 10,
+    scrolledContainer: {
+      marginHorizontal: getScaleSize(22),
+      marginTop: getScaleSize(24),
+      flex: 1.0,
     },
-    stickyView: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      // backgroundColor: '#2B5D73',
-      // paddingVertical: 15,
-      // alignItems: 'center',
-      // justifyContent: 'center',
-      zIndex: 20,
-    },    
+    userImage: {
+      height: getScaleSize(60),
+      width: getScaleSize(60),
+      borderRadius: getScaleSize(30),
+    },
+    itemContainer: {
+      marginTop: getScaleSize(24),
+      flexDirection: 'row',
+    },
+    messageContainer:{
+      height:getScaleSize(24),
+      width:getScaleSize(24),
+      borderRadius:getScaleSize(12),
+      alignSelf:'center',
+      backgroundColor:theme._F0B52C,
+      justifyContent:'center',
+      alignItems:'center',
+      marginRight:getScaleSize(2)
+    }
   });

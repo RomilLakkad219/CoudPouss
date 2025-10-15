@@ -27,8 +27,8 @@ export default function Splash(props: any) {
             <SafeAreaView />
             <View style={styles(theme).statusBar}>
                 <StatusBar
-                    translucent={true}
-                    backgroundColor={'transparent'}
+                    translucent={false}
+                    backgroundColor={theme.primary}
                     barStyle={'light-content'} />
             </View>
             <Image source={IMAGES.ic_logo} style={styles(theme).logo} />
