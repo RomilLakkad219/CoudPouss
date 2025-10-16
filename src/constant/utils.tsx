@@ -11,6 +11,15 @@ export const CATEGORY_DATA = [
     { id: 8, label: 'Homecare', value: 'homecare', icon: IMAGES.ic_hammer_wrench },
 ];
 
+export const ASSITANCEDATA = [
+    { id: 1, label: 'DIY', value: 'diy', icon: IMAGES.ic_hammer_wrench },
+    { id: 2, label: 'Gardening', value: 'gardening', icon: IMAGES.ic_hammer_wrench },
+    { id: 3, label: 'Housekeeping', value: 'Housekeeping', icon: IMAGES.ic_hammer_wrench },
+    { id: 5, label: 'Childcare', value: 'childcare', icon: IMAGES.ic_hammer_wrench },
+    { id: 6, label: 'Pets', value: 'pets', icon: IMAGES.ic_hammer_wrench },
+    { id: 8, label: 'Homecare', value: 'homecare', icon: IMAGES.ic_hammer_wrench },
+];
+
 export const SERVICES_DATA = [
     { id: 1, name: 'Furniture Assembly'},
     { id: 2, name: 'Interior Painting'},

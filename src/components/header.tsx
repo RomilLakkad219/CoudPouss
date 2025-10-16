@@ -24,7 +24,7 @@ const Header = (props: HeaderProps) => {
             <SafeAreaView />
             <View style={styles(theme).statusBar}>
                 <StatusBar
-                    translucent={false}
+                    translucent={true}
                     backgroundColor={'transparent'}
                     barStyle={'dark-content'} />
             </View>

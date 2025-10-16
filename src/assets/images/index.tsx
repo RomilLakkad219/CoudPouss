@@ -69,5 +69,7 @@ export const IMAGES = {
   status_green: require('./status_green.png'),
   empty_view: require('./empty_view.png'),
   service_running : require('./service_running.png'),
-  home_assitance : require('./home_assitance.png')
+  home_assitance : require('./home_assitance.png'),
+  notification_professional : require('./notification_professional.png'),
+  quate_message : require('./quate_message.png')
 };

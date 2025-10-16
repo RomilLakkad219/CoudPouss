@@ -18,6 +18,8 @@ import  RejectBottomPopup  from './RejectBottomPopup'
 import AcceptBottomPopup from './AcceptBottomPopup'
 import PaymentBottomPopup from './PaymentBottomPopup'
 import StatusItem from './StatusItem'
+import ServiceRequest from './ServiceRequest'
+import TaskItem from './TaskItem'
 
 export {
     Header,
@@ -39,5 +41,7 @@ export {
     RejectBottomPopup,
     AcceptBottomPopup,
     PaymentBottomPopup,
-    StatusItem
+    StatusItem,
+    ServiceRequest,
+    TaskItem
 }

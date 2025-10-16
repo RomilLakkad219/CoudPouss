@@ -23,56 +23,50 @@ import {FONTS, IMAGES} from '../assets';
 import Text from './Text';
 import {flatMap, head} from 'lodash';
 
-
-
 const SearchComponent = (props: any) => {
   const STRING = useString();
   const {theme} = useContext(ThemeContext);
 
   return (
-    <View style={styles(theme).container}>      
-      <View style={styles(theme).searchView}>
-        <View style={styles(theme).searchBox}>
-          <Image style={styles(theme).searchImage} source={IMAGES.search} />
-          <TextInput
-            style={styles(theme).searchInput}
-            placeholderTextColor={'#939393'}
-            placeholder={STRING.Search}
-          />
-        </View>
-        <TouchableOpacity style={styles(theme).microPhoneContainer}>
-          <Image
-            style={styles(theme).microPhoneImage}
-            source={IMAGES.microphone_new}
-          />
-        </TouchableOpacity>
-      </View>     
+    <View style={styles(theme).searchView}>
+      <View style={styles(theme).searchBox}>
+        <Image style={styles(theme).searchImage} source={IMAGES.search} />
+        <TextInput
+          style={styles(theme).searchInput}
+          placeholderTextColor={'#939393'}
+          placeholder={STRING.Search}
+        />
+      </View>
+      <TouchableOpacity style={styles(theme).microPhoneContainer}>
+        <Image
+          style={styles(theme).microPhoneImage}
+          source={IMAGES.microphone_new}
+        />
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {            
-      // paddingHorizontal: getScaleSize(20),      
-      
-      
+    container: {
+      // paddingHorizontal: getScaleSize(20),
     },
     searchView: {
-      flex: 1.0,
-      flexDirection: 'row',      
+      flexDirection: 'row',
     },
     searchBox: {
       flexDirection: 'row',
       flex: 1.0,
       alignItems: 'center' as FlexAlignType,
       backgroundColor: theme.white,
-      borderWidth:1,
-      borderColor:'#BECFDA',
+      borderWidth: 1,
+      borderColor: '#BECFDA',
       borderRadius: getScaleSize(12),
       // marginTop: getScaleSize(23),
       paddingHorizontal: getScaleSize(16),
-      paddingVertical: getScaleSize(4),
+      // paddingVertical: getScaleSize(4),
+      height: getScaleSize(53),
     },
     searchImage: {
       height: getScaleSize(24),
@@ -87,19 +81,20 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     searchInput: {
       fontFamily: FONTS.Lato.Regular,
-      fontSize: getScaleSize(20),
+      fontSize: getScaleSize(18),
       color: theme.black,
       marginLeft: getScaleSize(12),
     },
     microPhoneContainer: {
       backgroundColor: theme.white,
-      borderRadius: getScaleSize(12),      
+      borderRadius: getScaleSize(12),
       paddingHorizontal: getScaleSize(16),
       paddingVertical: getScaleSize(4),
       marginLeft: getScaleSize(16),
       justifyContent: 'center',
-       borderWidth:1,
-      borderColor:'#BECFDA',
+      borderWidth: 1,
+      borderColor: '#BECFDA',
+      height: getScaleSize(53),
     },
     microPhoneImage: {
       height: getScaleSize(24),
@@ -141,8 +136,8 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     textView: {
       justifyContent: 'center',
-      marginTop:getScaleSize(32),
-      marginLeft:getScaleSize(-24)
+      marginTop: getScaleSize(32),
+      marginLeft: getScaleSize(-24),
     },
   });
 export default SearchComponent;

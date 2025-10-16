@@ -31,7 +31,8 @@ export const LIGHT_THEME_COLOR = {
   _ACADAD : '#ACADAD',
   _F0B52C : '#F0B52C',
   _2B2B2B : '#2B2B2B',
-  _F6F7F7 : '#F6F7F7'
+  _F6F7F7 : '#F6F7F7',
+  _787878 : '#787878'
 };
 
 export const DARK_THEME_COLOR = {

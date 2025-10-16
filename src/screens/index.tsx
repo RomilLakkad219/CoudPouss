@@ -28,12 +28,20 @@ import Notification from './notification/Notification';
 import TaskDetails from './task/TaskDetails';
 import WriteReview from './review/WriteReview';
 import TaskStatus from './task/TaskStatus';
+import Assistance from './houseAssistance/Assistance';
+import Transport from './houseAssistance/Transport';
+import ServicePreview from './service/ServicePreview';
+import AddQuote from './service/AddQuote';
+import Success from './service/Success';
+import ProfessionalTaskDetails from './task/ProfessionalTaskDetails';
 
 //BOTTOMBAR
 import Home from './home/Home';
 import Request from './request/Request';
 import Chat from './chat/Chat';
 import Profile from './profile/Profile';
+import ProfessionalHome from './home/ProfessionalHome';
+import Task from './task/Task';
 
 export const SCREENS = {
   Splash: {
@@ -153,6 +161,30 @@ export const SCREENS = {
     identifier: 'TaskStatus',
     component: TaskStatus,
   },
+  Assistance: {
+    identifier: 'Assistance',
+    component: Assistance,
+  },
+  Transport: {
+    identifier: 'Transport',
+    component: Transport,
+  },
+  ServicePreview: {
+    identifier: 'ServicePreview',
+    component: ServicePreview,
+  },
+  AddQuote: {
+    identifier: 'AddQuote',
+    component: AddQuote,
+  },
+  Success: {
+    identifier: 'Success',
+    component: Success,
+  },
+  ProfessionalTaskDetails: {
+    identifier: 'ProfessionalTaskDetails',
+    component: ProfessionalTaskDetails,
+  },
 };
 
 export const TABS = {
@@ -175,5 +207,13 @@ export const TABS = {
   Profile: {
     identifier: 'Profile',
     component: Profile,
+  },
+  ProfessionalHome: {
+    identifier: 'ProfessionalHome',
+    component: ProfessionalHome,
+  },
+  Task: {
+    identifier: 'Task',
+    component: Task,
   },
 };

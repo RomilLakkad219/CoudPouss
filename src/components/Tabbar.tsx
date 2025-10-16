@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import {
+  Alert,
   Image,
   ImageBackground,
   ImageSourcePropType,
@@ -14,22 +15,38 @@ import {
 import {getScaleSize, useString} from '../constant';
 import {IMAGES} from '../assets/images';
 import {FONTS} from '../assets';
-import {ThemeContext, ThemeContextType} from '../context';
+import {AuthContext, ThemeContext, ThemeContextType} from '../context';
 import Text from './Text';
-import { head } from 'lodash';
-
-const images = [
-  IMAGES.home_unselected,
-  IMAGES.request_unselected,
-  IMAGES.plus,
-  IMAGES.chat_unselected,
-  IMAGES.profile_unselected,
-];
-
-const names = ['Home', 'Request', '', 'Chat', 'Profile'];
+import {head} from 'lodash';
 
 function Tabbar(props: any) {
   const {theme} = useContext<any>(ThemeContext);
+
+  const {userType} = useContext<any>(AuthContext);
+
+  let images: any = [];
+  let names: any = [];
+
+  if (userType === 'Professional') {
+    images = [
+      IMAGES.home_unselected,
+      IMAGES.request_unselected,
+      IMAGES.chat_unselected,
+      IMAGES.profile_unselected,
+    ];
+
+    names = ['Home', 'Task',  'Chat', 'Profile'];
+  } else {
+    images = [
+      IMAGES.home_unselected,
+      IMAGES.request_unselected,
+      IMAGES.plus,
+      IMAGES.chat_unselected,
+      IMAGES.profile_unselected,
+    ];
+
+    names = ['Home', 'Request', '', 'Chat', 'Profile'];
+  }
 
   const STRING = useString();
 
@@ -61,21 +78,34 @@ function Tabbar(props: any) {
 const Item = (props: any) => {
   const {theme} = useContext<any>(ThemeContext);
 
-  const STRING = useString();
+  const {userType} = useContext<any>(AuthContext);
 
-  if (props?.index == 2) {
-    return (
-      <View style={{alignSelf: 'center'}}>
-        <Image
-          style={
-           {height:66, width:66, marginTop:-62}
-          }
-          resizeMode="contain"          
-          source={IMAGES.plus}
-        />
-      </View>
-    );
+  let images: any = [];
+  let names: any = [];
+
+  if (userType === 'Professional') {
+    images = [
+      IMAGES.home_unselected,
+      IMAGES.request_unselected,
+      IMAGES.chat_unselected,
+      IMAGES.profile_unselected,
+    ];
+
+    names = ['Home', 'Task', 'Chat', 'Profile'];
   } else {
+    images = [
+      IMAGES.home_unselected,
+      IMAGES.request_unselected,
+      IMAGES.plus,
+      IMAGES.chat_unselected,
+      IMAGES.profile_unselected,
+    ];
+
+    names = ['Home', 'Request', '', 'Chat', 'Profile'];
+  }
+
+  const STRING = useString();
+  if (userType === 'Professional') {
     return (
       <TouchableOpacity
         onPress={props.onPress}
@@ -127,6 +157,70 @@ const Item = (props: any) => {
         </View>
       </TouchableOpacity>
     );
+  } else {
+    if (props?.index == 2) {
+      return (
+        <View style={{alignSelf: 'center'}}>
+          <Image
+            style={{height: 66, width: 66, marginTop: -62}}
+            resizeMode="contain"
+            source={IMAGES.plus}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <TouchableOpacity
+          onPress={props.onPress}
+          style={styles(theme).itemContainer}>
+          <View>
+            {/*  */}
+            {props?.selected ? (
+              <View style={{alignSelf: 'center'}}>
+                <Image
+                  style={
+                    props.selected
+                      ? styles(theme).itemImageSelected
+                      : styles(theme).itemImage
+                  }
+                  resizeMode="contain"
+                  tintColor={theme.primary}
+                  source={images[props.index]}
+                />
+                <Text
+                  style={{marginTop: getScaleSize(8)}}
+                  size={getScaleSize(14)}
+                  font={FONTS.Lato.Bold}
+                  color={theme.primary}
+                  align="center">
+                  {names[props.index]}
+                </Text>
+              </View>
+            ) : (
+              <View style={{alignSelf: 'center'}}>
+                <Image
+                  style={
+                    props.selected
+                      ? styles(theme).itemImageSelected
+                      : styles(theme).itemImage
+                  }
+                  resizeMode="contain"
+                  source={images[props.index]}
+                />
+                <Text
+                  style={{marginTop: getScaleSize(8)}}
+                  size={getScaleSize(12)}
+                  font={FONTS.Lato.Medium}
+                  color={'#E6E6E6'}
+                  align="center">
+                  {names[props.index]}
+                </Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    }
   }
 };
 
