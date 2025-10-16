@@ -152,7 +152,6 @@ export default function AddPersonalDetails(props: any) {
       />
     </View>
   );
-
 }
 
 const styles = (theme: ThemeContextType['theme']) =>

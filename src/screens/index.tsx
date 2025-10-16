@@ -34,6 +34,7 @@ import ServicePreview from './service/ServicePreview';
 import AddQuote from './service/AddQuote';
 import Success from './service/Success';
 import ProfessionalTaskDetails from './task/ProfessionalTaskDetails';
+import ProfessionalTaskStatus from './task/ProfessionalTaskStatus';
 
 //BOTTOMBAR
 import Home from './home/Home';
@@ -131,6 +132,22 @@ export const SCREENS = {
     identifier: 'AccountCreatedSuccessfully',
     component: AccountCreatedSuccessfully,
   },
+  MyProfile: {
+    identifier: 'MyProfile',
+    component: MyProfile,
+  },
+  RatingsReviews: {
+    identifier: 'RatingsReviews',
+    component: RatingsReviews,
+  },
+  Transactions: {
+    identifier: 'Transactions',
+    component: Transactions,
+  },
+  Notifications: {
+    identifier: 'Notifications',
+    component: Notifications,
+  },
   ChatDetails: {
     identifier: 'ChatDetails',
     component: ChatDetails,
@@ -191,21 +208,9 @@ export const SCREENS = {
     identifier: 'ProfessionalTaskDetails',
     component: ProfessionalTaskDetails,
   },
-  MyProfile: {
-    identifier: 'MyProfile',
-    component: MyProfile,
-  },
-  RatingsReviews: {
-    identifier: 'RatingsReviews',
-    component: RatingsReviews,
-  },
-  Transactions: {
-    identifier: 'Transactions',
-    component: Transactions,
-  },
-  Notifications: {
-    identifier: 'Notifications',
-    component: Notifications,
+  ProfessionalTaskStatus: {
+    identifier: 'ProfessionalTaskStatus',
+    component: ProfessionalTaskStatus,
   },
 };
 

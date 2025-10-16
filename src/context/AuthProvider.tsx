@@ -15,8 +15,9 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
     //Elder , Professional
         //Elder , Professional
     const [myPlan, setMyPlan] = useState<any>(null)
-    //professional_certified, non_certified_provider
+    //professional_certified, non_certified_provider   
 
+    //Elder , Professional
 
     return (
         <AuthContext.Provider value={{

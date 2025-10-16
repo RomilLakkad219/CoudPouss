@@ -206,7 +206,6 @@ export const useString = () => {
     Shortvideos: 'Short videos',
     Reject: 'Reject',
     Accept: 'Accept',
-    Aboutprofessional: 'About professional',
     Overallrating: 'Overall rating',
     Certified: 'Certified',
     Clients: 'Clients',
@@ -275,7 +274,7 @@ export const useString = () => {
     Addpersonalizedshortmessage: 'Add personalized short message',
     Attachsupportingdocuments: 'Attach supporting documents',
     Uploadashortvideo: ' Upload a short video (max 2 minutes)',
-    SubmitQuote :'Submit Quote',   
+    SubmitQuote :'Submit Quote',       
     non_certified_provider_details: "Non-Certified Provider Details",
     service_or_item_exchanges_only : "Service or item exchanges only",
     No_money_transactions_Barter_only: "No money transactions (Barter only)",
@@ -298,7 +297,7 @@ export const useString = () => {
     recent_works_reviews: "Recent works reviews",
     read_more: "Read More",
     show_less: "Show Less",
-    my_earnings: "My Earnings",
+    my_earnings: "My Earnings",    
   };
 };
 

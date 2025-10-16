@@ -18,7 +18,7 @@ import {
 import {FONTS, IMAGES} from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import {AuthContext, ThemeContext, ThemeContextType} from '../../context';
 
 //CONSTANT
 import {getScaleSize, useString} from '../../constant';
@@ -41,6 +41,8 @@ import {SCREENS} from '..';
 export default function Notification(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
+
+  const {userType} = useContext<any>(AuthContext);
 
   const list = ['accept', 'service_started', 'task_status', 'task_details'];
 
@@ -150,7 +152,15 @@ export default function Notification(props: any) {
                     style={styles(theme).nextButtonContainer}
                     activeOpacity={1}
                     onPress={() => {
-                      props.navigation.navigate(SCREENS.TaskStatus.identifier);
+                      if (userType === 'Professional') {
+                        props.navigation.navigate(
+                          SCREENS.ProfessionalTaskStatus.identifier,
+                        );
+                      } else {
+                        props.navigation.navigate(
+                          SCREENS.TaskStatus.identifier,
+                        );
+                      }
                     }}>
                     <Text
                       size={getScaleSize(14)}

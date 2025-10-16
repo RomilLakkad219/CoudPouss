@@ -145,6 +145,9 @@ export default function ProfessionalHome(props: any) {
         {['', ''].map(item => {
           return (
             <TaskItem
+              onPressItem={() => {
+                props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier);
+              }}
               onPressStatus={() => {
                 props.navigation.navigate(SCREENS.TaskStatus.identifier);
               }}

@@ -36,7 +36,7 @@ export const LIGHT_THEME_COLOR = {
   _77777733: "#77777733",
   _131313: "#131313",
   _436A00: "#436A00",
-  _707D85: "#707D85"
+  _707D85: "#707D85", 
 };
 
 export const DARK_THEME_COLOR = {
