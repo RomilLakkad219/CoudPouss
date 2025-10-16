@@ -37,13 +37,19 @@ export default function AddPersonalDetails(props: any) {
   const [address, setAddress] = useState('');
   const [addressError, setAddressError] = useState('');
 
+  console.log('userType=====>', userType);
+
   async function onLogin() {
-    props.navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{name: SCREENS.BottomBar.identifier}],
-      }),
-    );
+    if (userType == 'professional') {
+      props.navigation.navigate(SCREENS.ChooseYourSubscription.identifier);
+    } else {
+      props.navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: SCREENS.BottomBar.identifier}],
+        }),
+      );
+    }
   }
 
   return (
@@ -146,6 +152,7 @@ export default function AddPersonalDetails(props: any) {
       />
     </View>
   );
+
 }
 
 const styles = (theme: ThemeContextType['theme']) =>

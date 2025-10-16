@@ -47,7 +47,7 @@ export default function SignupSelect(props: any) {
                         style={{ marginTop: getScaleSize(108) }}
                         onPress={() => {
                             props.navigation.navigate(SCREENS.Signup.identifier)
-                            setUserType('Elder')
+                            setUserType('elder')
                         }}
                     />
                     <View style={styles(theme).orView}>
@@ -67,7 +67,7 @@ export default function SignupSelect(props: any) {
                      activeOpacity={0.5}
                      onPress={() => {
                         props.navigation.navigate(SCREENS.Signup.identifier)
-                        setUserType('Professional')
+                        setUserType('professional')
                      }}>
                         <Text
                             size={getScaleSize(19)}

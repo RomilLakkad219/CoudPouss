@@ -18,7 +18,6 @@ import { Header, Input, Text, Button } from '../../components';
 export default function AdditionalDetails(props: any) {
 
     const STRING = useString();
-
     const { theme } = useContext<any>(ThemeContext);
 
 

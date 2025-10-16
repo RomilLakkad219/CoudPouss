@@ -43,6 +43,12 @@ import Profile from './profile/Profile';
 import ProfessionalHome from './home/ProfessionalHome';
 import Task from './task/Task';
 
+//PROFILE
+import MyProfile from './profile/MyProfile';
+import RatingsReviews from './profile/RatingsReviews';
+import Transactions from './profile/Transactions';
+import Notifications from './profile/Notifications';
+
 export const SCREENS = {
   Splash: {
     identifier: 'Splash',
@@ -184,6 +190,22 @@ export const SCREENS = {
   ProfessionalTaskDetails: {
     identifier: 'ProfessionalTaskDetails',
     component: ProfessionalTaskDetails,
+  },
+  MyProfile: {
+    identifier: 'MyProfile',
+    component: MyProfile,
+  },
+  RatingsReviews: {
+    identifier: 'RatingsReviews',
+    component: RatingsReviews,
+  },
+  Transactions: {
+    identifier: 'Transactions',
+    component: Transactions,
+  },
+  Notifications: {
+    identifier: 'Notifications',
+    component: Notifications,
   },
 };
 

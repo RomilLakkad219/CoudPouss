@@ -2,7 +2,7 @@ import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } fro
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -20,6 +20,7 @@ export default function ChooseYourSubscription(props: any) {
     const STRING = useString();
 
     const { theme } = useContext<any>(ThemeContext);
+    const { setMyPlan } = useContext<any>(AuthContext);
 
     const [selectedPlan, setSelectedPlan] = useState('');
 
@@ -155,6 +156,7 @@ export default function ChooseYourSubscription(props: any) {
                     if (!selectedPlan) {
                         SHOW_TOAST(STRING.please_select_a_plan, 'error');
                     } else {
+                        setMyPlan(selectedPlan);
                         props.navigation.navigate(SCREENS.SelectedPlanDetails.identifier);
                     }
                 }}

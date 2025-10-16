@@ -71,5 +71,16 @@ export const IMAGES = {
   service_running : require('./service_running.png'),
   home_assitance : require('./home_assitance.png'),
   notification_professional : require('./notification_professional.png'),
-  quate_message : require('./quate_message.png')
+  quate_message : require('./quate_message.png'),
+  ic_my_profile: require('./ic_my_profile.png'),
+  ic_transactions: require('./ic_transactions.png'),
+  ic_ratings_reviews: require('./ic_ratings_reviews.png'),
+  ic_notifications: require('./ic_notifications.png'),
+  ic_logout: require('./ic_logout.png'),
+  ic_delete_profile: require('./ic_delete_profile.png'),
+  ic_alart: require('./ic_alart.png'),
+  ic_star: require('./ic_star.png'),
+  ic_star_blank: require('./ic_star_blank.png'),
+  ic_thumbsDown: require('./ic_thumbsDown.png'),
+  ic_thumbsUp: require('./ic_thumbsUp.png'),
 };

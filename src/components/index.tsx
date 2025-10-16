@@ -20,6 +20,7 @@ import PaymentBottomPopup from './PaymentBottomPopup'
 import StatusItem from './StatusItem'
 import ServiceRequest from './ServiceRequest'
 import TaskItem from './TaskItem'
+import BottomSheet from './BottomSheet'
 
 export {
     Header,
@@ -43,5 +44,6 @@ export {
     PaymentBottomPopup,
     StatusItem,
     ServiceRequest,
-    TaskItem
+    TaskItem,
+    BottomSheet
 }
