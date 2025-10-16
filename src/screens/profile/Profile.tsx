@@ -1,175 +1,122 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
-  StatusBar,
   StyleSheet,
-  Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedScrollHandler,
-  interpolate,
-  Extrapolate,
-  withTiming,
-  runOnJS,
-} from 'react-native-reanimated';
-import {ThemeContext, ThemeContextType} from '../../context';
-import {FONTS} from '../../assets';
-import {getScaleSize, useString} from '../../constant';
-import {Text, HomeHeader, SearchComponent} from '../../components';
 
-const HEADER_HEIGHT = 500;
+//CONTEXT
+import { ThemeContext, ThemeContextType } from '../../context';
+
+//CONSTANT & ASSETS
+import { FONTS, IMAGES } from '../../assets';
+import { getScaleSize, useString } from '../../constant';
+
+//COMPONENTS
+import { Text, HomeHeader, SearchComponent, Header } from '../../components';
+import { SCREENS } from '..';
+
 
 export default function Profile(props: any) {
+
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
-  const scrollY = useSharedValue(0);
-  const showNewHeader = useSharedValue(0);
+  const { theme } = useContext<any>(ThemeContext);
 
-  const [showNextView, setShowNextView] = useState(false);
-  const [contentHeight, setContentHeight] = useState(0);
-  const [layoutHeight, setLayoutHeight] = useState(0);
+  const profileItem = [
+    { id: 1, title: STRING.my_profile, icon: IMAGES.ic_my_profile, onPress: SCREENS.MyProfile.identifier },
+    { id: 2, title: STRING.transactions, icon: IMAGES.ic_transactions, onPress: SCREENS.Transactions.identifier },
+    { id: 3, title: STRING.ratings_reviews, icon: IMAGES.ic_ratings_reviews, onPress: SCREENS.RatingsReviews.identifier },
+    { id: 4, title: STRING.notifications, icon: IMAGES.ic_notifications, onPress: SCREENS.Notifications.identifier },
+  ]
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      scrollY.value = event.contentOffset.y;
+  const profieItemsProfessional = [
+    { id: 1, title: STRING.my_profile, icon: IMAGES.ic_my_profile, onPress: SCREENS.MyProfile.identifier },
+    { id: 2, title: STRING.my_earnings, icon: IMAGES.ic_transactions, onPress: SCREENS.Transactions.identifier },
+    { id: 3, title: STRING.ratings_reviews, icon: IMAGES.ic_ratings_reviews, onPress: SCREENS.RatingsReviews.identifier },
+    { id: 4, title: STRING.notifications, icon: IMAGES.ic_notifications, onPress: SCREENS.Notifications.identifier },
+  ]
 
-      if (event.contentOffset.y > HEADER_HEIGHT - 80) {
-        showNewHeader.value = withTiming(1);
-      } else {
-        showNewHeader.value = withTiming(0);
-      }
-
-      // Check if reached bottom
-      const scrollEnd =
-        event.contentOffset.y + layoutHeight >= contentHeight - 50;
-      if (scrollEnd) {
-        runOnJS(setShowNextView)(true);
-      }
-    },
-  });
-
-  // Old Header animation
-  const oldHeaderAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, HEADER_HEIGHT / 2, HEADER_HEIGHT - 80],
-      [1, 0.5, 0],
-      Extrapolate.CLAMP,
-    );
-    const translateY = interpolate(
-      scrollY.value,
-      [0, HEADER_HEIGHT - 80],
-      [0, -100],
-      Extrapolate.CLAMP,
-    );
-    return {
-      opacity,
-      transform: [{translateY}],
-    };
-  });
-
-  // New Header animation
-  const newHeaderAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: showNewHeader.value,
-    transform: [
-      {
-        translateY: interpolate(showNewHeader.value, [0, 1], [-50, 0]),
-      },
-    ],
-  }));
-
-  // Fade out current scroll content when near bottom
-  const contentFadeStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, contentHeight - layoutHeight - 100, contentHeight - layoutHeight],
-      [1, 0.3, 0],
-      Extrapolate.CLAMP,
-    );
-    return {opacity};
-  });
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={theme.primary}
-        translucent
+      <Header
+        type="profile"
+        rightIcon={{ icon: IMAGES.ic_logout, title: STRING.logout }}
+        onPress={() => { }}
+        screenName={STRING.my_account}
       />
-
-      {/* HEADER */}
-      <Animated.View
-        style={[styles(theme).headerContainer, oldHeaderAnimatedStyle]}>
-        <HomeHeader />
-      </Animated.View>
-
-      {/* STICKY HEADER */}
-      <Animated.View style={[styles(theme).stickyView, newHeaderAnimatedStyle]}>
-        <SearchComponent />
-      </Animated.View>
-
-      {/* SCROLL CONTENT */}
-      <Animated.ScrollView
-        onScroll={scrollHandler}        
-        // style={{paddingTop: HEADER_HEIGHT}}
-        onContentSizeChange={(w, h) => setContentHeight(h)}
-        onLayout={e => setLayoutHeight(e.nativeEvent.layout.height)}
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        contentContainerStyle={{
-          paddingTop:HEADER_HEIGHT,
-          // paddingTop: Dimensions.get('window').height / 50,
-        }}>
-        <Animated.View style={contentFadeStyle}>
-          {[...Array(33)].map((_, i) => (
-            <Text
-              key={i}
-              style={{
-                alignSelf: 'center',
-                flex: 1.0,
-                marginTop: getScaleSize(50),
-              }}
-              size={getScaleSize(16)}
-              font={FONTS.Lato.Medium}
-              color={'green'}>
-              {'Hello! James\n'}
-              <Text
-                size={getScaleSize(24)}
-                font={FONTS.Lato.Bold}
-                color={'green'}>
-                {STRING.welcome_to_coudpouss}
-              </Text>
-            </Text>
-          ))}
-        </Animated.View>
-      </Animated.ScrollView>
+      <View style={styles(theme).mainContainer}>
+        <View style={styles(theme).profileContainer} />
+        <Text
+          size={getScaleSize(22)}
+          font={FONTS.Lato.SemiBold}
+          align="center"
+          color={theme._2B2B2B}>
+          {'Bessie Cooper'}
+        </Text>
+        <View style={styles(theme).itemsContainer}>
+          {profileItem.map((item: any, index: number) => {
+            return (
+              <TouchableOpacity key={index}
+                onPress={() => { props.navigation.navigate(item.onPress) }}
+                style={styles(theme).profileItemContainer}>
+                <Image
+                  source={item.icon}
+                  style={styles(theme).profileItemIcon}
+                />
+                <Text
+                  style={{ flex: 1.0 }}
+                  size={getScaleSize(22)}
+                  font={FONTS.Lato.SemiBold}
+                  color={theme._2C6587}>
+                  {item.title}
+                </Text>
+                <Image source={IMAGES.ic_right} style={styles(theme).profileItemRightIcon} />
+              </TouchableOpacity>
+            )
+          })}
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
-    headerContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 10,
+    container: {
+      flex: 1,
+      backgroundColor: theme.white
     },
-    stickyView: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      // backgroundColor: '#2B5D73',
-      // paddingVertical: 15,
-      // alignItems: 'center',
-      // justifyContent: 'center',
-      zIndex: 20,
-    },    
+    mainContainer: {
+      flex: 1,
+      marginHorizontal: getScaleSize(24),
+      marginTop: getScaleSize(42),
+    },
+    profileContainer: {
+      width: getScaleSize(126),
+      height: getScaleSize(126),
+      backgroundColor: theme._F0EFF0,
+      borderRadius: getScaleSize(126),
+      alignSelf: 'center',
+      marginBottom: getScaleSize(12),
+    },
+    profileItemContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: getScaleSize(16),
+    },
+    profileItemIcon: {
+      width: getScaleSize(56),
+      height: getScaleSize(56),
+      marginRight: getScaleSize(20),
+    },
+    profileItemRightIcon: {
+      width: getScaleSize(24),
+      height: getScaleSize(24),
+      marginHorizontal: getScaleSize(12),
+    },
+    itemsContainer: {
+      marginTop: getScaleSize(40),
+    },
   });

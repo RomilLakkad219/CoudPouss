@@ -2,7 +2,7 @@ import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } fro
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -20,6 +20,8 @@ export default function PaymentMethod(props: any) {
     const STRING = useString();
 
     const { theme } = useContext<any>(ThemeContext);
+
+    const { myPlan } = useContext<any>(AuthContext);
 
     const paymentMethods = [
         { id: 1, title: 'Google Pay', icon: IMAGES.ic_google_pay },
@@ -50,7 +52,7 @@ export default function PaymentMethod(props: any) {
                                 size={getScaleSize(19)}
                                 font={FONTS.Lato.Bold}
                                 color={theme._214C65}>
-                                {STRING.professional_certified}
+                                {myPlan === 'professional_certified' ? STRING.professional_certified : STRING.non_certified_provider}
                             </Text>
                             <Image source={IMAGES.ic_check} style={styles(theme).selectedView} />
                         </View>
@@ -123,7 +125,7 @@ export default function PaymentMethod(props: any) {
                     title={STRING.proceed_to_pay}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        props.navigation.navigate(SCREENS.SubscriptionSuccessful.identifier);
+                            props.navigation.navigate(SCREENS.SubscriptionSuccessful.identifier)
                     }}
                 />
             </View>

@@ -33,6 +33,8 @@ interface InputProps {
   isError?: string;
   inputTitle?: string;
   inputColor?: boolean;
+  countryCode?: string;
+  onPressCountryCode?: () => void;
 }
 
 function Input(props: InputProps & TextInputProps) {
@@ -47,7 +49,9 @@ function Input(props: InputProps & TextInputProps) {
     searchBox,
     isError,
     inputTitle,
-    inputColor
+    inputColor,
+    countryCode,
+    onPressCountryCode
   } = props;
 
   const { theme } = useContext<any>(ThemeContext);
@@ -63,58 +67,88 @@ function Input(props: InputProps & TextInputProps) {
           {inputTitle}
         </Text>
       )}
-      <Pressable
-        onPress={props.onPress}
-        style={[
-          styles(theme).container,
-          { borderColor: isError ? theme._EF5350 : theme._D5D5D5 },
-        ]}>
-        {searchBox && (
-          <View>
+      <View style={[styles(theme).flexView,{flex: 1.0}]}>
+        {countryCode && (
+          <Pressable
+          onPress={onPressCountryCode}
+           style={[styles(theme).container,
+          {
+            borderColor: isError ? theme._EF5350 : theme._D5D5D5,
+            height: Platform.OS == 'ios' ? getScaleSize(56) : getScaleSize(56),
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginRight: getScaleSize(14),
+          },
+          ]}>
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.Medium}
+              color={theme._2B2B2B}
+            >
+              {countryCode}
+            </Text>
             <Image
-              source={searchBox}
-              style={styles(theme).leftIcon}
-              resizeMode={'contain'}
-            />
-          </View>
-        )}
-        <TextInput
-          {...props}
-          style={[styles(theme).input, inputContainer]}
-          placeholderTextColor={
-            isError
-              ? theme._EF5350
-              : placeholderTextColor
-                ? placeholderTextColor
-                : theme._939393
-          }
-          multiline={props?.multiline ?? false}
-          numberOfLines={props?.numberOfLines ?? 1}
-          value={props.value}
-          secureTextEntry={secureTextEntry}
-        />
-        {icon && (
-          <View>
-            <Image
-              source={icon}
-              style={[styles(theme).rightIcon]}
-              resizeMode={'contain'}
-            />
-          </View>
-        )}
-        {passwordIcon && (
-          <Pressable onPress={onChnageIcon}>
-            <Image
-              source={secureTextEntry ? IMAGES.ic_hide : IMAGES.ic_show}
-              style={[
-                styles(theme).rightIcon,
-                { tintColor: isError ? theme._EF5350 : theme._2C6587 },
-              ]}
+              source={IMAGES.ic_down}
+              style={styles(theme).downIcon}
               resizeMode={'contain'}
             />
           </Pressable>
         )}
-      </Pressable>
+        <Pressable
+          onPress={props.onPress}
+          style={[
+            styles(theme).container,
+            { borderColor: isError ? theme._EF5350 : theme._D5D5D5,
+              flex: 1.0,
+             },
+          ]}>
+          {searchBox && (
+            <View>
+              <Image
+                source={searchBox}
+                style={styles(theme).leftIcon}
+                resizeMode={'contain'}
+              />
+            </View>
+          )}
+          <TextInput
+            {...props}
+            style={[styles(theme).input, inputContainer]}
+            placeholderTextColor={
+              isError
+                ? theme._EF5350
+                : placeholderTextColor
+                  ? placeholderTextColor
+                  : theme._939393
+            }
+            multiline={props?.multiline ?? false}
+            numberOfLines={props?.numberOfLines ?? 1}
+            value={props.value}
+            secureTextEntry={secureTextEntry}
+          />
+          {icon && (
+            <View>
+              <Image
+                source={icon}
+                style={[styles(theme).rightIcon]}
+                resizeMode={'contain'}
+              />
+            </View>
+          )}
+          {passwordIcon && (
+            <Pressable onPress={onChnageIcon}>
+              <Image
+                source={secureTextEntry ? IMAGES.ic_hide : IMAGES.ic_show}
+                style={[
+                  styles(theme).rightIcon,
+                  { tintColor: isError ? theme._EF5350 : theme._2C6587 },
+                ]}
+                resizeMode={'contain'}
+              />
+            </Pressable>
+          )}
+        </Pressable>
+      </View>
       {isError && (
         <Text
           style={{ marginTop: getScaleSize(4) }}
@@ -154,5 +188,14 @@ const styles = (theme: ThemeContextType['theme']) =>
       width: getScaleSize(16),
       height: getScaleSize(16),
       marginRight: getScaleSize(10),
+    },
+    downIcon: {
+      width: getScaleSize(20),
+      height: getScaleSize(20),
+      marginLeft: getScaleSize(10),
+    },
+    flexView: {
+      flexDirection: 'row',
+      alignItems: 'center',
     },
   });

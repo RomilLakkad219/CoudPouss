@@ -2,7 +2,7 @@ import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } fro
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -20,6 +20,7 @@ export default function SubscriptionSuccessful(props: any) {
     const STRING = useString();
 
     const { theme } = useContext<any>(ThemeContext);
+    const { myPlan } = useContext<any>(AuthContext);
 
     return (
         <View style={styles(theme).container}>
@@ -56,7 +57,7 @@ export default function SubscriptionSuccessful(props: any) {
                             <Text size={getScaleSize(16)}
                                 font={FONTS.Lato.Bold}
                                 color={theme._424242}>
-                                {"Professional Monthly"}
+                                {myPlan == 'professional_certified' ? STRING.professional_certified : STRING.non_certified_provider}
                             </Text>
                         </View>
                         <View style={[styles(theme).flexView, { marginBottom: getScaleSize(16) }]}>

@@ -10,6 +10,7 @@ import Tabbar from './Tabbar'
 import ProgressSlider from './ProgressSlider'
 import CategoryDropdown from './CategoryDropdown'
 import ServiceItem from './ServiceItem'
+import BottomSheet from './BottomSheet'
 
 export {
     Header,
@@ -23,5 +24,6 @@ export {
     Tabbar,
     ProgressSlider,
     CategoryDropdown,
-    ServiceItem
+    ServiceItem,
+    BottomSheet
 }

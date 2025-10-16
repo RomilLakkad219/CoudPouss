@@ -14,42 +14,97 @@ import Text from './Text'
 interface HeaderProps {
     onBack?: () => void
     screenName?: string,
+    type?: string,
+    rightIcon?: {
+        icon: any,
+        title: string
+    },
+    onPress?: () => void
 }
 
 const Header = (props: HeaderProps) => {
 
     const { theme } = useContext(ThemeContext)
-    return (
-        <View>
-            <SafeAreaView />
-            <View style={styles(theme).statusBar}>
-                <StatusBar
-                    translucent={true}
-                    backgroundColor={'transparent'}
-                    barStyle={'dark-content'} />
-            </View>
-            <View style={[styles(theme).container, { zIndex: 99999 }]}>
-                <View style={styles(theme).mainContainer}>
-                    {props.onBack &&
-                        <TouchableOpacity onPress={props.onBack}>
-                            <Image source={IMAGES.ic_back} style={styles(theme).backIcon} />
-                        </TouchableOpacity>
-                    }
-                    {props.screenName &&
-                        <TouchableOpacity onPress={props.onBack}>
+    if (props.type == 'profile') {
+        return (
+            <View>
+                <SafeAreaView />
+                <View style={styles(theme).statusBar}>
+                    <StatusBar
+                        translucent={true}
+                        backgroundColor={'transparent'}
+                        barStyle={'dark-content'} />
+                </View>
+                <View style={[styles(theme).container, { zIndex: 99999 }]}>
+                    <View style={styles(theme).mainContainer}>
+                        {props.screenName &&
                             <Text
-                                size={getScaleSize(20)}
-                                font={FONTS.Lato.SemiBold}
-                                color={theme._323232}
-                                style={{ textTransform: 'capitalize' }}>
+                                size={getScaleSize(24)}
+                                style={{ flex: 1.0 }}
+                                font={FONTS.Lato.Bold}
+                                color={theme._2C6587}>
                                 {props.screenName}
                             </Text>
-                        </TouchableOpacity>
-                    }
+                        }
+                        {props.rightIcon &&
+                            <TouchableOpacity style={styles(theme).flexRow} onPress={props.onPress}>
+                                <Image source={props.rightIcon.icon} style={styles(theme).rightIcon} />
+                                <Text
+                                    size={getScaleSize(16)}
+                                    font={FONTS.Lato.SemiBold}
+                                    color={theme._D32F2F}>
+                                    {props.rightIcon.title}
+                                </Text>
+                            </TouchableOpacity>
+                        }
+                    </View>
                 </View>
             </View>
-        </View>
-    )
+        )
+    } else {
+        return (
+            <View>
+                <SafeAreaView />
+                <View style={styles(theme).statusBar}>
+                    <StatusBar
+                        translucent={true}
+                        backgroundColor={'transparent'}
+                        barStyle={'dark-content'} />
+                </View>
+                <View style={[styles(theme).container, { zIndex: 99999 }]}>
+                    <View style={styles(theme).mainContainer}>
+                        {props.onBack &&
+                            <TouchableOpacity onPress={props.onBack}>
+                                <Image source={IMAGES.ic_back} style={styles(theme).backIcon} />
+                            </TouchableOpacity>
+                        }
+                        {props.screenName &&
+                            <TouchableOpacity style={{ flex: 1.0 }} onPress={props.onBack}>
+                                <Text
+                                    size={getScaleSize(20)}
+                                    font={FONTS.Lato.SemiBold}
+                                    color={theme._323232}
+                                    style={{ textTransform: 'capitalize' }}>
+                                    {props.screenName}
+                                </Text>
+                            </TouchableOpacity>
+                        }
+                        {props.rightIcon &&
+                            <TouchableOpacity style={styles(theme).flexRow} onPress={props.onPress}>
+                                <Image source={props.rightIcon.icon} style={styles(theme).rightIcon} />
+                                <Text
+                                    size={getScaleSize(16)}
+                                    font={FONTS.Lato.SemiBold}
+                                    color={theme._D32F2F}>
+                                    {props.rightIcon.title}
+                                </Text>
+                            </TouchableOpacity>
+                        }
+                    </View>
+                </View>
+            </View>
+        )
+    }
 }
 
 export default Header
@@ -70,5 +125,14 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
         width: getScaleSize(40),
         height: getScaleSize(40),
         marginRight: getScaleSize(16)
+    },
+    rightIcon: {
+        width: getScaleSize(24),
+        height: getScaleSize(24),
+        marginRight: getScaleSize(4)
+    },
+    flexRow: {
+        flexDirection: 'row',
+        alignItems: 'center'
     }
 })

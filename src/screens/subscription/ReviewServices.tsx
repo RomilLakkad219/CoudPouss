@@ -2,7 +2,7 @@ import { Dimensions, FlatList, Image, ScrollView, SectionList, StyleSheet, Touch
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -20,7 +20,8 @@ export default function ReviewServices(props: any) {
     const STRING = useString();
 
     const { theme } = useContext<any>(ThemeContext);
-
+    const { myPlan } = useContext<any>(AuthContext);
+    
     const SECTIONS_DATA = [
         {
             title: 'DIY',
@@ -140,7 +141,11 @@ export default function ReviewServices(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        props.navigation.navigate(SCREENS.AddBankDetails.identifier);
+                        if (myPlan === 'professional_certified') {
+                            props.navigation.navigate(SCREENS.AddBankDetails.identifier);
+                        } else {
+                            props.navigation.navigate(SCREENS.AccountCreatedSuccessfully.identifier);
+                        }
                     }}
                 />
             </View>

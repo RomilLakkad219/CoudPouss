@@ -26,6 +26,12 @@ import Request from './request/Request';
 import Chat from './chat/Chat';
 import Profile from './profile/Profile';
 
+//PROFILE
+import MyProfile from './profile/MyProfile';
+import RatingsReviews from './profile/RatingsReviews';
+import Transactions from './profile/Transactions';
+import Notifications from './profile/Notifications';
+
 export const SCREENS = {
   Splash: {
     identifier: 'Splash',
@@ -110,6 +116,22 @@ export const SCREENS = {
   AccountCreatedSuccessfully: {
     identifier: 'AccountCreatedSuccessfully',
     component: AccountCreatedSuccessfully,
+  },
+  MyProfile: {
+    identifier: 'MyProfile',
+    component: MyProfile,
+  },
+  RatingsReviews: {
+    identifier: 'RatingsReviews',
+    component: RatingsReviews,
+  },
+  Transactions: {
+    identifier: 'Transactions',
+    component: Transactions,
+  },
+  Notifications: {
+    identifier: 'Notifications',
+    component: Notifications,
   },
 };
 

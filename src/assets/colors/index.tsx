@@ -28,6 +28,11 @@ export const LIGHT_THEME_COLOR = {
   _EAF0F370: '#EAF0F370',
   _D32F2F: '#D32F2F',
   _F2F2F2: '#F2F2F2',
+  _2B2B2B: "#2B2B2B",
+  _77777733: "#77777733",
+  _131313: "#131313",
+  _436A00: "#436A00",
+  _707D85: "#707D85"
 };
 
 export const DARK_THEME_COLOR = {

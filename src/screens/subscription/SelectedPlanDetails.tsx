@@ -2,7 +2,7 @@ import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpaci
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -18,8 +18,8 @@ import { Header, Input, Text, Button } from '../../components';
 export default function SelectedPlanDetails(props: any) {
 
     const STRING = useString();
-
     const { theme } = useContext<any>(ThemeContext);
+    const { setMyPlan, myPlan } = useContext<any>(AuthContext);
 
     const subscriptionDetails = [
         { title: STRING.earn_money_through_coudPouss_secure_escrow_payments, id: 1 },
@@ -28,6 +28,21 @@ export default function SelectedPlanDetails(props: any) {
         { title: STRING.subscription_billed_via_Bank_Card_Google_Pay_or_Apple_Pay, id: 4 },
         { title: STRING.profile_reviewed_within_72_hours_by_an_administrator, id: 5 },
     ]
+    const nonCertifiedSubscriptionDetails = [
+        { title: STRING.non_certified_provider_details, id: 1 },
+        { title: STRING.service_or_item_exchanges_only, id: 2 },
+        { title: STRING.includes_1_service_category_1_per_extra_category, id: 3 },
+        { title: STRING.subscription_billed_via_Bank_Card_Google_Pay_or_Apple_Pay, id: 4 },
+        { title: STRING.No_money_transactions_Barter_only, id: 5 },
+    ]
+
+    const getSubscriptionDetails = () => {
+        if (myPlan === 'professional_certified') {
+            return subscriptionDetails;
+        } else {
+            return nonCertifiedSubscriptionDetails;
+        }
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -58,7 +73,7 @@ export default function SelectedPlanDetails(props: any) {
                                 size={getScaleSize(19)}
                                 font={FONTS.Lato.Bold}
                                 color={theme._214C65}>
-                                {STRING.professional_certified}
+                                {myPlan === 'non_certified_provider' ? STRING.non_certified_provider : STRING.professional_certified}
                             </Text>
                             <Image source={IMAGES.ic_check} style={styles(theme).selectedView} />
                         </View>
@@ -77,7 +92,7 @@ export default function SelectedPlanDetails(props: any) {
                         </Text>
                         <View style={styles(theme).divider} />
                         <View style={{ flex: 1.0 }}>
-                            {subscriptionDetails.map((e, index) => {
+                            {(getSubscriptionDetails()).map((e, index) => {
                                 return (
                                     <View key={index} style={styles(theme).itemContainer} >
                                         <Image source={IMAGES.ic_sealCheck} style={styles(theme).itemIcon} />
