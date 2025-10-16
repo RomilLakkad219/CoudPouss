@@ -1,25 +1,32 @@
-import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import {
+  Alert,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
 
 //CONTEXT
 import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
-import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import {FONTS, IMAGES} from '../../assets';
+import {getScaleSize, useString} from '../../constant';
 
 //SCREENS
-import { SCREENS } from '..';
+import {SCREENS} from '..';
 
 //COMPONENTS
-import { Header, Input, Text, Button } from '../../components';
+import {Header, Input, Text, Button} from '../../components';
+import {CommonActions} from '@react-navigation/native';
 
 export default function AddPersonalDetails(props: any) {
+  const STRING = useString();
 
-    const STRING = useString();
-
-    const { theme } = useContext<any>(ThemeContext);
-    const { userType } = useContext<any>(AuthContext);
+  const {theme} = useContext<any>(ThemeContext);
+  const {userType} = useContext<any>(AuthContext);
 
     const [name, setName] = useState('');
     const [nameError, setNameError] = useState('');
@@ -138,33 +145,33 @@ export default function AddPersonalDetails(props: any) {
             />
         </View>
     );
-}
+  }
 
 const styles = (theme: ThemeContextType['theme']) =>
-    StyleSheet.create({
-        container: {
-            flex: 1.0,
-            backgroundColor: theme.white,
-            justifyContent: 'center'
-        },
-        mainContainer: {
-            flex: 1.0,
-            marginHorizontal: getScaleSize(24),
-            marginVertical: getScaleSize(18),
-            justifyContent: 'center'
-        },
-        imageContainer: {
-            alignItems: 'center',
-            marginTop: getScaleSize(20),
-            marginBottom: getScaleSize(16)
-        },
-        image: {
-            backgroundColor: theme._F0EFF0,
-            width: getScaleSize(126),
-            height: getScaleSize(126),
-            borderRadius: getScaleSize(126),
-            marginBottom: getScaleSize(12),
-            alignItems: 'center',
-            justifyContent: 'center'
-        }
-    });
+  StyleSheet.create({
+    container: {
+      flex: 1.0,
+      backgroundColor: theme.white,
+      justifyContent: 'center',
+    },
+    mainContainer: {
+      flex: 1.0,
+      marginHorizontal: getScaleSize(24),
+      marginVertical: getScaleSize(18),
+      justifyContent: 'center',
+    },
+    imageContainer: {
+      alignItems: 'center',
+      marginTop: getScaleSize(20),
+      marginBottom: getScaleSize(16),
+    },
+    image: {
+      backgroundColor: theme._F0EFF0,
+      width: getScaleSize(126),
+      height: getScaleSize(126),
+      borderRadius: getScaleSize(126),
+      marginBottom: getScaleSize(12),
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });

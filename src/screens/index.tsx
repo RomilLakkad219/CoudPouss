@@ -19,12 +19,29 @@ import AddServices from './subscription/AddServices';
 import AddBankDetails from './subscription/AddBankDetails';
 import ReviewServices from './subscription/ReviewServices';
 import AccountCreatedSuccessfully from './subscription/AccountCreatedSuccessfully';
+import ChatDetails from './chat/ChatDetails';
+import Thankyou from './request/Thankyou';
+import RequestDetails from './request/RequestDetails';
+import OtherUserProfile from './profile/OtherUserProfile';
+import ServiceConfirmed from './request/ServiceConfirmed';
+import Notification from './notification/Notification';
+import TaskDetails from './task/TaskDetails';
+import WriteReview from './review/WriteReview';
+import TaskStatus from './task/TaskStatus';
+import Assistance from './houseAssistance/Assistance';
+import Transport from './houseAssistance/Transport';
+import ServicePreview from './service/ServicePreview';
+import AddQuote from './service/AddQuote';
+import Success from './service/Success';
+import ProfessionalTaskDetails from './task/ProfessionalTaskDetails';
 
 //BOTTOMBAR
 import Home from './home/Home';
 import Request from './request/Request';
 import Chat from './chat/Chat';
 import Profile from './profile/Profile';
+import ProfessionalHome from './home/ProfessionalHome';
+import Task from './task/Task';
 
 //PROFILE
 import MyProfile from './profile/MyProfile';
@@ -45,10 +62,7 @@ export const SCREENS = {
     identifier: 'BottomBar',
     component: BottomBar,
   },
-  CreateRequest: {
-    identifier: 'CreateRequest',
-    component: CreateRequest,
-  },
+
   ResetPassword: {
     identifier: 'ResetPassword',
     component: ResetPassword,
@@ -133,6 +147,66 @@ export const SCREENS = {
     identifier: 'Notifications',
     component: Notifications,
   },
+  ChatDetails: {
+    identifier: 'ChatDetails',
+    component: ChatDetails,
+  },
+  Thankyou: {
+    identifier: 'Thankyou',
+    component: Thankyou,
+  },
+  RequestDetails: {
+    identifier: 'RequestDetails',
+    component: RequestDetails,
+  },
+  OtherUserProfile: {
+    identifier: 'OtherUserProfile',
+    component: OtherUserProfile,
+  },
+  ServiceConfirmed: {
+    identifier: 'ServiceConfirmed',
+    component: ServiceConfirmed,
+  },
+  Notification: {
+    identifier: 'Notification',
+    component: Notification,
+  },
+  TaskDetails: {
+    identifier: 'TaskDetails',
+    component: TaskDetails,
+  },
+  WriteReview: {
+    identifier: 'WriteReview',
+    component: WriteReview,
+  },
+  TaskStatus: {
+    identifier: 'TaskStatus',
+    component: TaskStatus,
+  },
+  Assistance: {
+    identifier: 'Assistance',
+    component: Assistance,
+  },
+  Transport: {
+    identifier: 'Transport',
+    component: Transport,
+  },
+  ServicePreview: {
+    identifier: 'ServicePreview',
+    component: ServicePreview,
+  },
+  AddQuote: {
+    identifier: 'AddQuote',
+    component: AddQuote,
+  },
+  Success: {
+    identifier: 'Success',
+    component: Success,
+  },
+  ProfessionalTaskDetails: {
+    identifier: 'ProfessionalTaskDetails',
+    component: ProfessionalTaskDetails,
+  },
 };
 
 export const TABS = {
@@ -144,6 +218,10 @@ export const TABS = {
     identifier: 'Request',
     component: Request,
   },
+  CreateRequest: {
+    identifier: 'CreateRequest',
+    component: CreateRequest,
+  },
   Chat: {
     identifier: 'Chat',
     component: Chat,
@@ -151,5 +229,13 @@ export const TABS = {
   Profile: {
     identifier: 'Profile',
     component: Profile,
+  },
+  ProfessionalHome: {
+    identifier: 'ProfessionalHome',
+    component: ProfessionalHome,
+  },
+  Task: {
+    identifier: 'Task',
+    component: Task,
   },
 };

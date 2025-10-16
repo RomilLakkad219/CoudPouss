@@ -24,7 +24,9 @@ function RequestItem(props: any) {
   const {theme} = useContext(ThemeContext);
 
   return (
-    <View style={styles(theme).container}>
+    <TouchableOpacity style={styles(theme).container} onPress={()=>{
+      props.onPress()
+    }}>
       <View style={styles(theme).horizontalContainer}>
         <Image
           source={IMAGES.service_icon}
@@ -93,7 +95,7 @@ function RequestItem(props: any) {
           </Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

@@ -13,6 +13,7 @@ import {
   Image,
   Platform,
   SafeAreaView,
+  TextInput,
 } from 'react-native';
 
 //ASSETS
@@ -22,14 +23,28 @@ import {FONTS, IMAGES} from '../../assets';
 import {ThemeContext, ThemeContextType} from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import {CATEGORY_DATA, getScaleSize, useString} from '../../constant';
 
 //COMPONENT
-import {Header, ProgressSlider, SearchComponent, Text} from '../../components';
+import {
+  AssistanceItems,
+  CalendarComponent,
+  CategoryDropdown,
+  Header,
+  Input,
+  ProgressSlider,
+  SearchComponent,
+  ServiceItem,
+  Text,
+  TimePicker,
+} from '../../components';
 
 //PACKAGES
 import {useFocusEffect} from '@react-navigation/native';
-import {Dropdown} from 'react-native-element-dropdown';
+import { SCREENS } from '..';
+
+const {width} = Dimensions.get('window');
+const cellSize = (width - 30) / 7;
 
 export default function CreateRequest(props: any) {
   const STRING = useString();
@@ -37,6 +52,22 @@ export default function CreateRequest(props: any) {
 
   const [selectedProgress, setSelectedProgress] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(1);
+  const [selectedCategoryItem, setSelectedCategoryItem] = useState<any>(null);
+  const [description, setDescription] = useState('');
+  const [valuation, setValuation] = useState('');
+
+  const servicesData = [
+    {
+      id: '1',
+      title: 'Furniture Assembly',
+      image: 'https://picsum.photos/id/1/200/300',
+    },
+    {
+      id: '2',
+      title: 'Interior Painting',
+      image: 'https://picsum.photos/id/1/200/300',
+    },
+  ];
 
   useFocusEffect(
     React.useCallback(() => {
@@ -52,14 +83,32 @@ export default function CreateRequest(props: any) {
       setSelectedProgress(2);
     } else if (selectedProgress === 2) {
       setSelectedProgress(3);
+    } else if (selectedProgress === 3) {
+      setSelectedProgress(4);
+    } else if (selectedProgress === 4) {
+      setSelectedProgress(5);
+    } else if (selectedProgress == 5) {
+      setSelectedProgress(6);
+    } else if (selectedProgress == 6) {
+      props.navigation.replace(SCREENS.Thankyou.identifier)
     }
   }
 
   function onBack() {
-     if (selectedProgress === 1) {
-      props.navigation.goBack()
+    if (selectedProgress === 1) {
+      props.navigation.goBack();
     } else if (selectedProgress === 2) {
-      setSelectedProgress(1)
+      setSelectedProgress(1);
+    } else if (selectedProgress === 3) {
+      setSelectedProgress(2);
+    } else if (selectedProgress === 4) {
+      setSelectedProgress(3);
+    } else if (selectedProgress == 5) {
+      setSelectedProgress(4);
+    } else if (selectedProgress === 6) {
+      setSelectedProgress(5);
+    } else if (selectedProgress === 7) {
+      setSelectedProgress(5);
     }
   }
 
@@ -68,7 +117,297 @@ export default function CreateRequest(props: any) {
       return renderServiceProviderView();
     } else if (selectedProgress === 2) {
       return renderCategoryView();
+    } else if (selectedProgress === 3) {
+      return renderServiceView();
+    } else if (selectedProgress === 4) {
+      return renderDescriptionView();
+    } else if (selectedProgress === 5) {
+      return renderValuationOfJOB();
+    } else if (selectedProgress === 6) {
+      return renderPreview();
     }
+  }
+
+  function renderPreview() {
+    return (
+      <View style={styles(theme).serviceProviderCotainer}>
+        <Text
+          size={getScaleSize(24)}
+          font={FONTS.Lato.Bold}
+          color={theme.primary}>
+          {STRING.Preview}
+        </Text>
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(16)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._939393}>
+          {STRING.Preview_message}
+        </Text>
+        <Text
+          style={{marginTop: getScaleSize(16)}}
+          size={getScaleSize(24)}
+          font={FONTS.Lato.Bold}
+          color={theme.primary}>
+          {'DIY Service'}
+        </Text>
+        <View style={styles(theme).categoryView}>
+          <Image
+            style={styles(theme).imageView}
+            source={{uri: 'https://picsum.photos/id/1/200/300'}}
+          />
+          <Text
+            style={{
+              marginTop: getScaleSize(16),
+              marginHorizontal: getScaleSize(12),
+            }}
+            size={getScaleSize(20)}
+            font={FONTS.Lato.SemiBold}
+            color={theme.primary}>
+            {'Furniture Assembly'}
+          </Text>
+        </View>
+        <Text
+          style={{marginTop: getScaleSize(24)}}
+          size={getScaleSize(18)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._323232}>
+          {STRING.JobDetails}
+        </Text>
+        <View style={styles(theme).detailsView}>
+          <View style={styles(theme).itemView}>
+            <Text
+              size={getScaleSize(18)}
+              font={FONTS.Lato.SemiBold}
+              color={theme._989898}>
+              {STRING.Valuation}
+            </Text>
+            <Text
+              style={{marginTop: getScaleSize(6)}}
+              size={getScaleSize(20)}
+              font={FONTS.Lato.SemiBold}
+              color={theme.primary}>
+              {'€449.20'}
+            </Text>
+          </View>
+          <View style={styles(theme).deviderView} />
+          <View style={styles(theme).itemView}>
+            <Text
+              size={getScaleSize(18)}
+              font={FONTS.Lato.SemiBold}
+              color={theme._989898}>
+              {STRING.JobDate}
+            </Text>
+            <Text
+              style={{marginTop: getScaleSize(6)}}
+              size={getScaleSize(20)}
+              font={FONTS.Lato.SemiBold}
+              color={theme.primary}>
+              {'16 Aug'}
+            </Text>
+          </View>
+          <View style={styles(theme).deviderView} />
+          <View style={styles(theme).itemView}>
+            <Text
+              size={getScaleSize(18)}
+              font={FONTS.Lato.SemiBold}
+              color={theme._989898}>
+              {STRING.JobTime}
+            </Text>
+            <Text
+              style={{marginTop: getScaleSize(6)}}
+              size={getScaleSize(20)}
+              font={FONTS.Lato.SemiBold}
+              color={theme.primary}>
+              {'10:00 Am'}
+            </Text>
+          </View>
+        </View>
+        <Text
+          style={{marginTop: getScaleSize(24)}}
+          size={getScaleSize(18)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._323232}>
+          {STRING.Servicedescription}
+        </Text>
+        <View style={styles(theme).serviceDescriptionView}>
+          <Text
+            size={getScaleSize(18)}
+            font={FONTS.Lato.Regular}
+            color={theme._555555}>
+            {
+              'Transform your space with our expert furniture assembly services. Our skilled team will handle everything from unpacking to setup, ensuring your new pieces are perfectly assembled and ready for use. We specialize in a wide range of furniture types, including flat-pack items, complex modular systems, and custom installations. Enjoy a hassle-free experience as we take care of the details, allowing you to focus on enjoying your newly furnished area. Schedule your assembly today and let us help you create the perfect environment!'
+            }
+          </Text>
+        </View>
+        <Text
+          style={{marginTop: getScaleSize(24)}}
+          size={getScaleSize(18)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._323232}>
+          {STRING.Jobphotos}
+        </Text>
+        <FlatList
+          data={['']}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          renderItem={(item: any, index: number) => {
+            return (
+              <Image
+                style={[
+                  styles(theme).photosView,
+                  
+                ]}
+                source={{uri: 'https://picsum.photos/id/1/200/300'}}
+              />
+            );
+          }}
+        />
+        <View style={{height:16}}/>
+      </View>
+    );
+  }
+
+  function renderValuationOfJOB() {
+    return (
+      <View style={styles(theme).serviceProviderCotainer}>
+        <Text
+          size={getScaleSize(24)}
+          font={FONTS.Lato.Bold}
+          color={theme.primary}>
+          {STRING.ValuationofJob}
+        </Text>
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(16)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._939393}>
+          {STRING.valuation_message}
+        </Text>
+        <View style={styles(theme).textInputContainer}>
+          <Input
+            placeholder={STRING.EnterValuation}
+            placeholderTextColor={theme._939393}
+            inputTitle={STRING.EnterValuation}
+            inputColor={theme._555555}
+            value={`${'€'}${valuation}`}
+            keyboardType="numeric"
+            autoCapitalize="none"
+            onChangeText={text => {
+              const cleaned = text.replace(/[^0-9.]/g, '');
+              const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
+              setValuation(formatted);
+            }}
+          />
+        </View>
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(16)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._555555}>
+          {STRING.ChooseDate}
+        </Text>
+        <CalendarComponent />
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(16)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._555555}>
+          {STRING.ChooseTime}
+        </Text>
+        <TimePicker />
+        <View style={{height: 16}} />
+      </View>
+    );
+  }
+
+  function renderDescriptionView() {
+    return (
+      <View style={styles(theme).serviceProviderCotainer}>
+        <Text
+          size={getScaleSize(24)}
+          font={FONTS.Lato.Bold}
+          color={theme.primary}>
+          {STRING.DescribeAboutService}
+        </Text>
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(16)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._939393}>
+          {STRING.descriptionMessage}
+        </Text>
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(17)}
+          font={FONTS.Lato.Medium}
+          color={theme._424242}>
+          {STRING.EnterServicedescription}
+        </Text>
+        <View style={styles(theme).inputContainer}>
+          <TextInput
+            style={styles(theme).textInput}
+            value={description}
+            onChangeText={setDescription}
+            placeholder={STRING.Enterdescriptionhere}
+            placeholderTextColor="#999"
+            multiline={true}
+            numberOfLines={8}
+            textAlignVertical="top"
+            blurOnSubmit={true}
+            returnKeyType="default"
+          />
+        </View>
+        <Text
+          style={{marginTop: getScaleSize(20)}}
+          size={getScaleSize(17)}
+          font={FONTS.Lato.Medium}
+          color={theme._424242}>
+          {STRING.UploadPhotosofaJob}
+        </Text>
+        <View style={styles(theme).imageUploadContent}>
+          <TouchableOpacity
+            style={[styles(theme).uploadButton, {marginRight: getScaleSize(9)}]}
+            activeOpacity={1}
+            onPress={() => {}}>
+            <Image
+              style={styles(theme).attachmentIcon}
+              source={IMAGES.upload_attachment}
+            />
+            <Text
+              style={{marginTop: getScaleSize(8)}}
+              size={getScaleSize(15)}
+              font={FONTS.Lato.Regular}
+              color={theme._818285}>
+              {STRING.upload_from_device}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles(theme).uploadButton, {marginLeft: getScaleSize(9)}]}
+            activeOpacity={1}
+            onPress={() => {}}>
+            <Image
+              style={styles(theme).attachmentIcon}
+              source={IMAGES.upload_attachment}
+            />
+            <Text
+              style={{marginTop: getScaleSize(8)}}
+              size={getScaleSize(15)}
+              font={FONTS.Lato.Regular}
+              color={theme._818285}>
+              {STRING.upload_from_device}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <Text
+          style={{marginTop: getScaleSize(8)}}
+          size={getScaleSize(18)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._939393}>
+          {STRING.upload_message}
+        </Text>
+      </View>
+    );
   }
 
   function renderCategoryView() {
@@ -87,13 +426,23 @@ export default function CreateRequest(props: any) {
           color={theme._939393}>
           {STRING.category_message}
         </Text>
-         <Text
+        <Text
           style={{marginTop: getScaleSize(12)}}
           size={getScaleSize(17)}
           font={FONTS.Lato.Medium}
           color={theme._424242}>
           {STRING.Selectacategory}
         </Text>
+        <View style={{marginTop: getScaleSize(8)}}>
+          <CategoryDropdown
+            onChange={item => {
+              setSelectedCategoryItem(item);
+            }}
+            selectedItem={selectedCategoryItem}
+            container={{}}
+            data={CATEGORY_DATA}
+          />
+        </View>
       </View>
     );
   }
@@ -158,6 +507,47 @@ export default function CreateRequest(props: any) {
     );
   }
 
+  function renderServiceView() {
+    return (
+      <View style={styles(theme).serviceProviderCotainer}>
+        <Text
+          size={getScaleSize(24)}
+          font={FONTS.Lato.Bold}
+          color={theme.primary}>
+          {STRING.SelectAService}
+        </Text>
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(16)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._939393}>
+          {STRING.serviceMessage}
+        </Text>
+        <Text
+          style={{marginTop: getScaleSize(12)}}
+          size={getScaleSize(17)}
+          font={FONTS.Lato.Medium}
+          color={theme._555555}>
+          {STRING.Choose_a_Service}
+        </Text>
+        <View style={{marginTop: getScaleSize(18)}}>
+          <SearchComponent />
+        </View>
+        <FlatList
+          data={servicesData}
+          renderItem={({item, index}) => (
+            <AssistanceItems item={item} index={index} />
+          )}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={() => {
+            return <View style={{height: 16}} />;
+          }}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles(theme).container}>
       <StatusBar
@@ -188,14 +578,14 @@ export default function CreateRequest(props: any) {
           style={styles(theme).backButtonContainer}
           activeOpacity={1}
           onPress={() => {
-            onBack()
+            onBack();
           }}>
           <Text
             size={getScaleSize(19)}
             font={FONTS.Lato.Bold}
             color={theme.primary}
             style={{alignSelf: 'center'}}>
-            {STRING.Back}
+            {selectedProgress === 6 ? 'Edit' : STRING.Back}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -209,7 +599,7 @@ export default function CreateRequest(props: any) {
             font={FONTS.Lato.Bold}
             color={theme.white}
             style={{alignSelf: 'center'}}>
-            {STRING.Next}
+            {selectedProgress === 6 ? 'Submit' : STRING.Next}
           </Text>
         </TouchableOpacity>
       </View>
@@ -267,5 +657,98 @@ const styles = (theme: ThemeContextType['theme']) =>
       height: getScaleSize(24),
       width: getScaleSize(24),
       alignSelf: 'center',
+    },
+    listContainer: {
+      marginTop: getScaleSize(16),
+    },
+    inputContainer: {
+      borderWidth: 1,
+      borderColor: theme._D5D5D5,
+      borderRadius: getScaleSize(12),
+      marginTop: getScaleSize(12),
+    },
+    textInput: {
+      fontSize: getScaleSize(18),
+      color: theme._323232,
+      padding: getScaleSize(16),
+      minHeight: getScaleSize(240),
+      textAlignVertical: 'top',
+      fontFamily: FONTS.Lato.Regular,
+    },
+    imageUploadContent: {
+      marginTop: getScaleSize(12),
+      flexDirection: 'row',
+    },
+    uploadButton: {
+      flex: 1.0,
+      borderWidth: 1,
+      borderColor: theme._818285,
+      borderStyle: 'dashed',
+      borderRadius: getScaleSize(8),
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: getScaleSize(160),
+    },
+    attachmentIcon: {
+      height: getScaleSize(24),
+      width: getScaleSize(24),
+      alignSelf: 'center',
+    },
+    textInputContainer: {
+      marginTop: getScaleSize(12),
+    },
+    calenderHeader: {
+      marginTop: getScaleSize(12),
+      paddingVertical: getScaleSize(8),
+      paddingHorizontal: getScaleSize(12),
+      borderRadius: getScaleSize(18),
+      backgroundColor: '#FBFBFB',
+      flexDirection: 'row',
+    },
+    nextImage: {
+      height: getScaleSize(24),
+      width: getScaleSize(24),
+    },
+    categoryView: {
+      height: getScaleSize(228),
+      backgroundColor: '#EAF0F3',
+      borderRadius: getScaleSize(20),
+      marginTop: getScaleSize(18),
+    },
+    imageView: {
+      height: getScaleSize(172),
+      borderRadius: getScaleSize(20),
+    },
+    detailsView: {
+      paddingVertical: getScaleSize(21),
+      flexDirection: 'row',
+      borderRadius: getScaleSize(16),
+      backgroundColor: '#FBFBFB',
+      marginTop: getScaleSize(18),
+    },
+    itemView: {
+      flex: 1.0,
+      alignSelf: 'center',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    deviderView: {
+      width: 1,
+      backgroundColor: '#D6D6D6',
+    },
+    serviceDescriptionView: {
+      marginTop: getScaleSize(18),
+      borderWidth: 1,
+      borderColor: theme._D5D5D5,
+      borderRadius: 12,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+    },
+    photosView: {
+      height: getScaleSize(144),
+      width: getScaleSize(180),
+      borderRadius: 8,
+      resizeMode: 'cover',
+      marginTop: getScaleSize(18),
     },
   });

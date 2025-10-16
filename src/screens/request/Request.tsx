@@ -23,7 +23,7 @@ import {ThemeContext, ThemeContextType} from '../../context';
 import {getScaleSize, useString} from '../../constant';
 
 //COMPONENT
-import {Header, SearchComponent, Text} from '../../components';
+import {Header, RequestItem, SearchComponent, Text} from '../../components';
 
 //PACKAGES
 import {useFocusEffect} from '@react-navigation/native';
@@ -69,10 +69,15 @@ export default function Request(props: any) {
       <ScrollView
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
-        <SearchComponent />
+        <View style={{marginHorizontal:getScaleSize(22)}}>
+          <SearchComponent />
+        </View>
         <FlatList
           data={data}
           keyExtractor={item => item.id}
+          ListHeaderComponent={() => {
+            return <View style={{width: getScaleSize(22)}} />;
+          }}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
@@ -104,7 +109,12 @@ export default function Request(props: any) {
             </TouchableOpacity>
           )}
         />
-        <View style={styles(theme).emptyView}>
+        {['', '', '', '', ''].map((item: any) => {
+          return <RequestItem onPress={()=>{
+              props.navigation.navigate(SCREENS.RequestDetails.identifier)
+          }} />;
+        })}
+        {/* <View style={styles(theme).emptyView}>
           <Image style={styles(theme).emptyImage} source={IMAGES.empty} />
           <Text
             size={getScaleSize(16)}
@@ -131,7 +141,7 @@ export default function Request(props: any) {
               {STRING.Requestaservice}
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
@@ -141,7 +151,7 @@ const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
     container: {flex: 1, backgroundColor: theme.white},
     scrolledContainer: {
-      marginHorizontal: getScaleSize(22),
+      // marginHorizontal: getScaleSize(22),
       marginTop: getScaleSize(24),
       flex: 1.0,
     },

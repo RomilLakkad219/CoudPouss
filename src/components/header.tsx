@@ -113,6 +113,7 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
     container: {
         paddingHorizontal: getScaleSize(24),
         paddingVertical: getScaleSize(8),
+        // alignSelf:'center'
     },
     mainContainer: {
         flexDirection: 'row',

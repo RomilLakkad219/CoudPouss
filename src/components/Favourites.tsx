@@ -33,12 +33,23 @@ function Favourites(props: any) {
         color={theme._323232}>
         {'Wade Warren'}
       </Text>
-       <Text
-        size={getScaleSize(17)}
-        font={FONTS.Lato.Medium}
-        color={theme._6D6D6D}>
-        {'4.2'}
-      </Text>
+      <View style={{flexDirection:'row'}}>
+        <Text
+          size={getScaleSize(17)}
+          font={FONTS.Lato.Medium}
+          color={theme._6D6D6D}>
+          {'4.2'}
+        </Text>
+        <Image style={styles(theme).starImage} source={IMAGES.star}/>
+        <View style={{flex:1.0}}/>
+         <Text
+          size={getScaleSize(11)}
+          style={{alignSelf:'center'}}
+          font={FONTS.Lato.Regular}
+          color={theme._999999}>
+          {'(499 Reviews)'}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -67,6 +78,13 @@ const styles = (theme: ThemeContextType['theme']) =>
       right: getScaleSize(14),
       top: getScaleSize(16),
     },
+    starImage:{
+      height:getScaleSize(16),
+      width:getScaleSize(16),
+      alignSelf:'center',
+      tintColor:'#F0B52C',
+      marginLeft:getScaleSize(4)
+    }
   });
 
 export default Favourites;
