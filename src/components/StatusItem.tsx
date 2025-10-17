@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,24 +10,28 @@ import {
   Easing,
   Text,
 } from 'react-native';
-import {ThemeContext, ThemeContextType} from '../context';
-import {getScaleSize, useString} from '../constant';
-import {FONTS, IMAGES} from '../assets';
-import {constant} from 'lodash';
+import { ThemeContext, ThemeContextType } from '../context';
+import { getScaleSize, useString } from '../constant';
+import { FONTS, IMAGES } from '../assets';
+import { constant } from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 const StatusItem = (props: any) => {
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
   function getImage() {
     if (props?.item?.serviceRunning) {
       return IMAGES.service_running;
     } else {
-      if (props?.item?.completed) {
-        return IMAGES.status_green;
+      if (props?.item?.isRejected) {
+        return IMAGES.ic_rejected;
       } else {
-        return IMAGES.empty_view;
+        if (props?.item?.completed) {
+          return IMAGES.status_green;
+        } else {
+          return IMAGES.empty_view;
+        }
       }
     }
   }
@@ -36,13 +40,6 @@ const StatusItem = (props: any) => {
     <View style={[styles(theme).statusItem, {}]}>
       {/* Timeline line */}
       <View style={styles(theme).timelineContainer}>
-        {/* <View
-          style={[
-            styles(theme).timelineDot,
-            props?.item?.completed ? styles(theme).completedDot : styles(theme).pendingDot,
-          ]}>
-          {props?.item?.completed && <View style={styles(theme).innerDot} />}
-        </View> */}
         <Image
           style={{
             height: getScaleSize(24),
@@ -56,7 +53,7 @@ const StatusItem = (props: any) => {
             style={[
               styles(theme).timelineLine,
               {
-                backgroundColor: props?.item?.completed ? '#2E7D32' : '#424242',
+                backgroundColor: props?.item?.isRejected ? 'red' : props?.item?.completed ? '#2E7D32' : '#424242',
               },
             ]}
           />
@@ -74,10 +71,13 @@ const StatusItem = (props: any) => {
           ]}>
           {props?.item?.title}
         </Text>
-        <Text style={styles(theme).date}>{props?.item?.date}</Text>
+        <Text
+          style={styles(theme).date}>
+          {props?.item?.date}
+        </Text>
         {props?.item?.serviceRunning && (
           <>
-            <Text style={[styles(theme).date, {marginTop: getScaleSize(8)}]}>
+            <Text style={[styles(theme).date, { marginTop: getScaleSize(8) }]}>
               {
                 'Please keep this security code safe — it will be required to confirm completion and release payment.'
               }
@@ -101,9 +101,9 @@ const StatusItem = (props: any) => {
                     fontFamily: FONTS.Lato.Bold,
                     fontSize: 24,
                     color: '#2C6587',
-                    marginTop:getScaleSize(2),
-                    textAlign:'center',
-                    alignSelf:'center'
+                    marginTop: getScaleSize(2),
+                    textAlign: 'center',
+                    alignSelf: 'center'
                   },
                 ]}>
                 {'7    9    6'}

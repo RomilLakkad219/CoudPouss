@@ -7,7 +7,7 @@ import { FONTS, IMAGES } from '../assets';
 
 export default function ServiceItem(props: any) {
 
-    const { item, itemContainer, isSelected, onPress, isReview } = props;
+    const { item, itemContainer, isSelected, onPress, isReview, isSelectedBox, isManage } = props;
     const { theme } = useContext<any>(ThemeContext);
 
     return (
@@ -16,7 +16,15 @@ export default function ServiceItem(props: any) {
                 onPress(item);
             }}
             style={[styles(theme).container, itemContainer]}>
-            <View style={isReview ? styles(theme).reviewIcon: styles(theme).iconView} />
+            {isSelectedBox &&
+                <View style={styles(theme).iconView} />
+            }
+            {isReview &&
+                <View style={styles(theme).reviewIcon} />
+            }
+            {isManage &&
+                <View style={styles(theme).iconView} />
+            }
             <Text
                 style={styles(theme).nameView}
                 size={getScaleSize(18)}
@@ -25,12 +33,15 @@ export default function ServiceItem(props: any) {
             >
                 {item.name}
             </Text>
-            {isReview ? (
-                <Image
-                    source={IMAGES.ic_delete}
-                    style={styles(theme).deleteIcon}
-                />
-            ) : (
+            {isReview &&
+                (
+                    <Image
+                        source={IMAGES.ic_delete}
+                        style={styles(theme).deleteIcon}
+                    />
+                )
+            }
+            {isSelectedBox &&
                 <>
                     {isSelected ? (
                         <Image
@@ -44,7 +55,13 @@ export default function ServiceItem(props: any) {
                         />
                     )}
                 </>
-            )}
+            }
+            {isManage &&
+                <Image
+                    source={IMAGES.ic_dott_line}
+                    style={styles(theme).icon}
+                />
+            }
         </TouchableOpacity>
     )
 }
@@ -65,7 +82,7 @@ const styles = (theme: ThemeContextType['theme']) =>
             overflow: 'hidden',
             backgroundColor: theme._D5D5D5,
         },
-        reviewIcon:{
+        reviewIcon: {
             width: getScaleSize(80),
             height: getScaleSize(70),
             borderRadius: getScaleSize(12),
@@ -74,16 +91,16 @@ const styles = (theme: ThemeContextType['theme']) =>
         },
         nameView: {
             flex: 1.0,
-            marginLeft: getScaleSize(22),
+            marginLeft: getScaleSize(16),
         },
         icon: {
             width: getScaleSize(24),
             height: getScaleSize(24),
             marginHorizontal: getScaleSize(10)
         },
-        deleteIcon:{
+        deleteIcon: {
             width: getScaleSize(20),
             height: getScaleSize(20),
             marginHorizontal: getScaleSize(10)
-        }
+        },
     })

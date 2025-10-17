@@ -37,33 +37,24 @@ import {
 import {useFocusEffect} from '@react-navigation/native';
 import {SCREENS} from '..';
 
-export default function OtherUserProfile(props: any) {
+export default function MyProfileProfessional(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
 
   const [showMore, setShowMore] = useState(false);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(theme.white);
-        StatusBar.setBarStyle('dark-content');
-      }
-    }, []),
-  );
+  const [showMoreExperience, setShowMoreExperience] = useState(false);
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
+        icon={IMAGES.ic_edit}
+        onPress={() => {
+          props.navigation.navigate(SCREENS.EditProfile.identifier);
+        }}
         onBack={() => {
           props.navigation.goBack();
         }}
-        screenName={STRING.Aboutprofessional}
+        screenName={STRING.my_profile}
       />
       <ScrollView
         style={styles(theme).scrolledContainer}
@@ -154,7 +145,7 @@ export default function OtherUserProfile(props: any) {
             size={getScaleSize(16)}
             font={FONTS.Lato.Medium}
             color={'#2C6587'}>
-            {STRING.Bio}
+            {STRING.about_me}
           </Text>
           <Text
             size={getScaleSize(14)}
@@ -176,18 +167,20 @@ export default function OtherUserProfile(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
+            numberOfLines={showMoreExperience ? undefined : 3}
             style={{marginTop: getScaleSize(8)}}
             color={theme._323232}>
             {
               'Hi, I’m Bessie — with over 6 years of experience in expert TV mounting and reliable plumbing solutions. I specialize in mounting TVs, shelves, mirrors with precision and care Mounting Expert You Can Trust Over 6 of experience in securely mounting TVs, shelves, mirrors, artwork, and more Reliable & On-Time I value your time and ready to get the job done right the first time Clean Work, Solid Results Every project is done with attention to detail, safety, and durability Respect for Your Space I treat your home like it’s my own. Friendly, professional, and focused on delivering quality you’ll love. Client Satisfaction First I’m proud of my 5-star service and happy clients '
             }
           </Text>
-          <TouchableOpacity style={{marginTop: getScaleSize(8)}}>
+          <TouchableOpacity style={{marginTop: getScaleSize(8)}}
+           onPress={() => setShowMoreExperience(!showMoreExperience)}>
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.Medium}
               color={'#2C6587'}>
-              {STRING.ReadMore}
+              {showMoreExperience ? STRING.show_less : STRING.read_more}
             </Text>
           </TouchableOpacity>
         </View>
@@ -320,13 +313,13 @@ export default function OtherUserProfile(props: any) {
           </Text>
           {['', ''].map((item: any, index: number) => {
             return (
-              <RatingsReviewsItem
-              itemContainer={{ marginTop: index === 0 ? getScaleSize(20) : getScaleSize(16) }}
-              onPressShowMore={() => {
-                  setShowMore(!showMore);
-              }}
-              showMore={showMore}
-              />
+                <RatingsReviewsItem
+                itemContainer={{ marginTop: index === 0 ? getScaleSize(20) : getScaleSize(16) }}
+                onPressShowMore={() => {
+                    setShowMore(!showMore);
+                }}
+                showMore={showMore}
+                />
             );
           })}
         </View>
@@ -340,7 +333,6 @@ const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
     container: {flex: 1, backgroundColor: theme.white},
     scrolledContainer: {
-      marginTop: getScaleSize(19),
       marginHorizontal: getScaleSize(24),
     },
     informationContainer: {

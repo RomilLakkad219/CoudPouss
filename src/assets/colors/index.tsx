@@ -36,7 +36,19 @@ export const LIGHT_THEME_COLOR = {
   _ACADAD : '#ACADAD',
   _F0B52C : '#F0B52C',
   _F6F7F7 : '#F6F7F7',
-  _787878 : '#787878'
+  _787878 : '#787878',
+  _F7F7F7: "#F7F7F7",
+  _C1C1C1: "#C1C1C1",
+  _4CAF50: "#4CAF50",
+  _DCDDDD: "#DCDDDD",
+  _DBE0E5: "#DBE0E5",
+  _FFBB4E: "#FFBB4E",
+  _00B500: "#00B500",
+  _0E1B27: "#0E1B27",
+  _0E1B2780: "#0E1B2780",
+  _FEF8EA: "#FEF8EA",
+  _BECFDA: "#BECFDA",
+  
 };
 
 export const DARK_THEME_COLOR = {

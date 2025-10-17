@@ -9,12 +9,11 @@ export const AuthContext = createContext<any>(null);
 export function AuthProvider(props: Readonly<AuthProviderProps>): any {
 
     const [user, setUser] = useState<any>(null)
-    const [userType, setUserType] = useState<any>(null)
-        //Elder , Professional
+    const [userType, setUserType] = useState<any>('professional')
+    //elder , professional
     const [myPlan, setMyPlan] = useState<any>(null)
     //professional_certified, non_certified_provider   
 
-    //Elder , Professional
 
     return (
         <AuthContext.Provider value={{
