@@ -275,7 +275,6 @@ export default function ProfessionalTaskDetails(props: any) {
               color={theme._323232}>
               {'About client'}
             </Text>
-            
           </View>
           <View
             style={[
@@ -295,7 +294,7 @@ export default function ProfessionalTaskDetails(props: any) {
                 {'Bessie Cooper'}
               </Text>
               <Text
-                style={{ marginLeft:getScaleSize(16) }}
+                style={{marginLeft: getScaleSize(16)}}
                 size={getScaleSize(12)}
                 font={FONTS.Lato.Medium}
                 color={'#595959'}>
@@ -311,10 +310,13 @@ export default function ProfessionalTaskDetails(props: any) {
               }}
               source={IMAGES.verify}
             /> */}
-            <View style={{flex:1.0}}/>
-             <TouchableOpacity
+            <View style={{flex: 1.0}} />
+            <TouchableOpacity
               activeOpacity={1}
-              style={[styles(theme).newButton, {marginRight: getScaleSize(6), width:getScaleSize(86)}]}
+              style={[
+                styles(theme).newButton,
+                {marginRight: getScaleSize(6), width: getScaleSize(86)},
+              ]}
               onPress={() => {
                 props.navigation.navigate(SCREENS.ChatDetails.identifier);
               }}>
@@ -325,7 +327,29 @@ export default function ProfessionalTaskDetails(props: any) {
                 {STRING.Chat}
               </Text>
             </TouchableOpacity>
-          </View>          
+          </View>
+        </View>
+        <View style={styles(theme).profileContainer}>
+          <Text
+            style={{flex: 1.0}}
+            size={getScaleSize(18)}
+            font={FONTS.Lato.Medium}
+            color={theme._323232}>
+            {'Address'}
+          </Text>
+          <View style={{flexDirection: 'row', marginTop: getScaleSize(12)}}>
+            <Image
+              style={{height: getScaleSize(24), width: getScaleSize(24)}}
+              source={IMAGES.map_pin}
+            />
+            <Text
+              style={{flex: 1.0, marginLeft:getScaleSize(4)}}
+              size={getScaleSize(14)}
+              font={FONTS.Lato.SemiBold}
+              color={'#595959'}>
+              {'4517 Washington Ave. Manchester, Kentucky 39495'}
+            </Text>
+          </View>
         </View>
         <View
           style={[
@@ -515,7 +539,7 @@ export default function ProfessionalTaskDetails(props: any) {
           </View>
         </View>
       </ScrollView>
-      <Button
+      {/* <Button
         title={STRING.WriteaReview}
         style={{
           marginHorizontal: getScaleSize(22),
@@ -524,7 +548,7 @@ export default function ProfessionalTaskDetails(props: any) {
         onPress={() => {
           props.navigation.navigate(SCREENS.WriteReview.identifier);
         }}
-      />
+      /> */}
     </View>
   );
 }
@@ -606,7 +630,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       height: getScaleSize(38),
       justifyContent: 'center',
       alignItems: 'center',
-      width:86
+      width: 86,
     },
     serviceDescriptionView: {
       marginTop: getScaleSize(12),

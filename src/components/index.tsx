@@ -10,7 +10,6 @@ import Tabbar from './Tabbar'
 import ProgressSlider from './ProgressSlider'
 import CategoryDropdown from './CategoryDropdown'
 import ServiceItem from './ServiceItem'
-import BottomSheet from './BottomSheet'
 import AssistanceItems from './AssistanceItems'
 import CalendarComponent from './CalendarComponent'
 import TimePicker from './TimePicker'
@@ -25,6 +24,7 @@ import RatingsReviewsItem from './RatingsReviewsItem'
 import UploadDocumentsSheet from './UploadDocumentsSheet'
 import TransactionItem from './TransactionItem'
 
+import BottomSheet from './BottomSheet'
 
 export {
     Header,
@@ -39,7 +39,6 @@ export {
     ProgressSlider,
     CategoryDropdown,
     ServiceItem,
-    BottomSheet,
     AssistanceItems,
     CalendarComponent,
     TimePicker,
@@ -52,5 +51,6 @@ export {
     TaskItem,
     RatingsReviewsItem,
     UploadDocumentsSheet,
-    TransactionItem
+    TransactionItem,
+    BottomSheet
 }

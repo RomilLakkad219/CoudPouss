@@ -96,4 +96,6 @@ export const IMAGES = {
   ic_up: require('./ic_up.png'),
   ic_calander: require('./ic_calander.png'),
   ic_card: require('./ic_card.png'),
+  map_pin: require('./map_pin.png'),
+  location_map : require('./location_map.png')
 };

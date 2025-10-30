@@ -34,6 +34,7 @@ import ServicePreview from './service/ServicePreview';
 import AddQuote from './service/AddQuote';
 import Success from './service/Success';
 import ProfessionalTaskDetails from './task/ProfessionalTaskDetails';
+import ProfessionalTaskStatus from './task/ProfessionalTaskStatus';
 
 //BOTTOMBAR
 import Home from './home/Home';
@@ -251,7 +252,11 @@ export const SCREENS = {
   ManageSubscription:{
     identifier: 'ManageSubscription',
     component: ManageSubscription,
-  }
+  },
+  ProfessionalTaskStatus: {
+    identifier: 'ProfessionalTaskStatus',
+    component: ProfessionalTaskStatus,
+  },
 };
 
 export const TABS = {

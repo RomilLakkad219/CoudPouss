@@ -45,6 +45,8 @@ export default function Task(props: any) {
   const tabs = ['Quote Sent', 'Accepted', 'Completed'];
   const translateX = new Animated.Value(activeTab * 120);
 
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   const handleTabPress = (index: number) => {
     setActiveTab(index);
     Animated.spring(translateX, {
@@ -59,6 +61,17 @@ export default function Task(props: any) {
       StatusBar.setBarStyle('dark-content');
     }, []),
   );
+
+  function getType() {
+    if (selectedIndex === 0) {
+      return 'quate_sent';
+    } else if (selectedIndex === 1) {
+      return 'quate_accepted';
+    }
+    else if (selectedIndex === 2) {
+      return 'quate_completed';
+    }
+  }
 
   return (
     <View style={styles(theme).container}>
@@ -77,14 +90,62 @@ export default function Task(props: any) {
         }}>
         {'Task Management'}
       </Text>
+      <View style={styles(theme).tabContainer}>
+        <TouchableOpacity
+          style={styles(theme).tabItem}
+          activeOpacity={1}
+          onPress={() => {
+            setSelectedIndex(0);
+          }}>
+          <Text
+            size={getScaleSize(18)}
+            font={FONTS.Lato.Medium}
+            color={selectedIndex === 0 ? theme._2C6587 : theme._595959}
+            style={{}}>
+            {'Quote Sent'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles(theme).tabItem}
+          activeOpacity={1}
+          onPress={() => {
+            setSelectedIndex(1);
+          }}>
+          <Text
+            size={getScaleSize(18)}
+            font={FONTS.Lato.Medium}
+            color={selectedIndex === 1 ? theme._2C6587 : theme._595959}
+            style={{}}>
+            {'Accepted'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles(theme).tabItem}
+          activeOpacity={1}
+          onPress={() => {
+            setSelectedIndex(2);
+          }}>
+          <Text
+            size={getScaleSize(18)}
+            font={FONTS.Lato.Medium}
+            color={selectedIndex === 2 ? theme._2C6587 : theme._595959}
+            style={{}}>
+            {'Completed'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {/* <View style={styles(theme).bottomStrip}></View> */}
+      <View style={styles(theme).deviderView}></View>
       <View style={{marginHorizontal: getScaleSize(22)}}>
         {['', ''].map(item => {
           return (
             <TaskItem
               onPressItem={() => {
-                props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier);
+                props.navigation.navigate(
+                  SCREENS.ProfessionalTaskDetails.identifier,
+                );
               }}
-              type={'quate_sent'}
+              type={getType()}
               onPressStatus={() => {
                 props.navigation.navigate(SCREENS.TaskStatus.identifier);
               }}
@@ -110,6 +171,28 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     itemView: {
       flex: 1.0,
+      alignSelf: 'center',
+    },
+    tabContainer: {
+      marginTop: getScaleSize(25),
+      flexDirection: 'row',
+    },
+    tabItem: {
+      flex: 1.0,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    deviderView: {
+      height: 1,
+      backgroundColor: '#EAF0F3',
+      marginTop: getScaleSize(24),
+    },
+    bottomStrip: {
+      height: getScaleSize(3),
+      backgroundColor: theme._2C6587,
+      width: 80,
+      position: 'absolute',
+      top: 85,
       alignSelf: 'center',
     },
   });

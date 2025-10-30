@@ -12,6 +12,10 @@ export default function TaskItem(props: any) {
   function getMessage() {
     if (props?.type === 'quate_sent') {
       return 'Quote Submitted';
+    } else if (props?.type === 'quate_accepted') {
+      return 'Quote Accepted';
+    } else if (props?.type === 'quate_completed') {
+      return 'Task Completed'
     } else {
       return 'Quote Submitted';
     }
@@ -21,7 +25,9 @@ export default function TaskItem(props: any) {
     <TouchableOpacity
       style={styles(theme).container}
       activeOpacity={1}
-      onPress={() => {props?.onPressItem()}}>
+      onPress={() => {
+        props?.onPressItem();
+      }}>
       <View style={styles(theme).headerContainer}>
         <Text
           size={getScaleSize(16)}
@@ -155,7 +161,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     deviderView: {
       height: 1,
-      flex: 1.0,
+      // flex: 1.0,
       backgroundColor: '#F2F2F2',
       marginTop: getScaleSize(16),
     },
