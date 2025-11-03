@@ -329,7 +329,7 @@ export default function RequestDetails(props: any) {
           data={['']}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={(item: any, index: number) => {
+          renderItem={({item, index}) => {
             return (
               <Image
                 style={[styles(theme).photosView]}
@@ -369,7 +369,15 @@ export default function RequestDetails(props: any) {
           </Text>
         </TouchableOpacity>
       </View>
-      <RejectBottomPopup onRef={rejectRef} />
+      <RejectBottomPopup 
+      rejectRef={rejectRef} 
+      onClose={() => {
+        rejectRef.current.close();
+      }}
+      onReject={() => {
+        rejectRef.current.close();
+      }}
+      />
       <AcceptBottomPopup
         onRef={acceptRef}
         onClose={() => {

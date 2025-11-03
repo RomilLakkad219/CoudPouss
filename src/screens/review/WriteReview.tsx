@@ -27,6 +27,7 @@ import {getScaleSize, useString} from '../../constant';
 //COMPONENT
 import {
   AcceptBottomPopup,
+  BottomSheet,
   Button,
   Header,
   PaymentBottomPopup,
@@ -38,7 +39,7 @@ import {
 } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
+import {CommonActions, useFocusEffect} from '@react-navigation/native';
 import {Rating} from 'react-native-ratings';
 
 import {SCREENS} from '..';
@@ -49,6 +50,8 @@ export default function WriteReview(props: any) {
 
   const [ratting, setRatting] = useState(0);
   const [review, setReview] = useState('');
+
+  const successBottomSheetRef = useRef<any>(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -61,11 +64,6 @@ export default function WriteReview(props: any) {
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
         onBack={() => {
           props.navigation.goBack();
@@ -252,7 +250,29 @@ export default function WriteReview(props: any) {
           marginBottom: getScaleSize(16),
         }}
         onPress={() => {
+          successBottomSheetRef.current?.open();
         }}
+      />
+      <BottomSheet
+       bottomSheetRef={successBottomSheetRef}
+       height={300}
+       type="review"
+       title={STRING.thank_you_for_your_review}
+       description={STRING.we_appreciated_you_taking_the_time_to_reflect_on_your_experience}
+       buttonTitle={STRING.back_to_home}
+       onPressButton={() => {
+        successBottomSheetRef.current?.close();
+        props.navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [
+              {
+                name: SCREENS.BottomBar.identifier
+              },
+            ],
+          }),
+        );
+       }}
       />
     </View>
   );

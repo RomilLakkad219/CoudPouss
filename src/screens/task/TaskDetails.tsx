@@ -240,6 +240,7 @@ export default function TaskDetails(props: any) {
           <FlatList
             data={['1', '2', '3', '4', '5', '6', '.', '.', '.']}
             horizontal
+            showsHorizontalScrollIndicator={false}
             renderItem={({item, index}) => {
               return (
                 <View
@@ -442,7 +443,7 @@ export default function TaskDetails(props: any) {
                 data={['']}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                renderItem={(item: any, index: number) => {
+                renderItem={({item, index}) => {
                   return (
                     <Image
                       style={[styles(theme).photosView]}
@@ -488,7 +489,7 @@ export default function TaskDetails(props: any) {
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
-              {'€4'}
+              {'€99.00'}
             </Text>
           </View>
           <View style={styles(theme).newHorizontalView}>
@@ -503,11 +504,11 @@ export default function TaskDetails(props: any) {
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
-              {'€12'}
+              {'€12.0'}
             </Text>
           </View>
           <View style={styles(theme).dotView} />
-          <View style={styles(theme).newHorizontalView}>
+          <View style={[styles(theme).newHorizontalView,{marginBottom: getScaleSize(16)}]}>
             <Text
               style={{flex: 1.0}}
               size={getScaleSize(20)}
@@ -519,14 +520,14 @@ export default function TaskDetails(props: any) {
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={theme.primary}>
-              {'€560.9'}
+              {'€388.00'}
             </Text>
           </View>
         </View>
       </ScrollView>
       <Button
         title={STRING.WriteaReview}
-        style={{marginHorizontal:getScaleSize(22), marginBottom:getScaleSize(16)}}
+        style={{marginHorizontal:getScaleSize(22), marginVertical:getScaleSize(16)}}
         onPress={() => {
          props.navigation.navigate(SCREENS.WriteReview.identifier)
         }}

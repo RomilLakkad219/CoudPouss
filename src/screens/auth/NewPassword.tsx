@@ -32,7 +32,7 @@ export default function NewPassword(props: any) {
             setPasswordError(STRING.please_enter_your_password);
         } else {
             setPasswordError('');
-            props.navigation.navigate(SCREENS.Otp.identifier);
+            props.navigation.navigate(SCREENS.Login.identifier);
         }
     }
 

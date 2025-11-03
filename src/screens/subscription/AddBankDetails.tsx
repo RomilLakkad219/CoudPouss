@@ -18,7 +18,9 @@ import { Header, Input, Text, Button } from '../../components';
 export default function AddBankDetails(props: any) {
 
     const STRING = useString();
-    const { isEdit, isProfile } = props.route.params;
+
+    const isEdit = props.route.params?.isEdit || false;
+    const isProfile = props.route.params?.isProfile || false;
 
     const { theme } = useContext<any>(ThemeContext);
     const [accountHolderName, setAccountHolderName] = useState('');

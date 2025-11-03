@@ -54,8 +54,8 @@ export const useString = () => {
     resend_code: 'Resend code',
     Your_new_password_must_be_different_from_previously_used_passwords:
       'Your new password must be different from previously used passwords',
-    enter_new_password: 'Enter New Password',
-    re_enter_new_password: 'Re-enter New Password',
+    enter_new_password: 'Enter Password',
+    re_enter_new_password: 'Re-enter Password',
     set_new_password: 'Set New Password',
     coudPouss: 'CoudPouss',
     Empowering_seniors_with_easy_access_to_trusted_help_care_and_companionship_whenever_needed:
@@ -107,9 +107,9 @@ export const useString = () => {
     certified_badge_visible_to_all_clients:
       'Certified Badge visible to all clients',
     includes_1_service_category_1_per_extra_category:
-      'Includes 1 service category, +€1 per extra category:',
+      'Includes 1 service category, +€1 per extra category',
     subscription_billed_via_Bank_Card_Google_Pay_or_Apple_Pay:
-      'Subscription billed via Bank Card, Google Pay, or Apple Pay:',
+      'Subscription billed via Bank Card, Google Pay, or Apple Pay',
     profile_reviewed_within_72_hours_by_an_administrator:
       'Profile reviewed within 72 hours by an administrator',
     back: 'Back',
@@ -232,7 +232,7 @@ export const useString = () => {
       'Once the payment is done, the funds will be held securely in escrow. After the service is rendered, the payment will be released to the provider upon entering the security code',
     FinalPaymentBreakdown: 'Final Payment Breakdown',
     FinalizedQuoteAmount: 'Finalized Quote Amount ',
-    PlatformFee: 'Platform Fee (10%)',
+    PlatformFee: 'Platform Fee',
     Taxes: 'Taxes',
     Total: 'Total',
     ProceedtoPay: 'Proceed to Pay',
@@ -334,7 +334,11 @@ export const useString = () => {
     recent_works_reviews: "Recent works reviews",
     read_more: "Read More",
     show_less: "Show Less",
-    my_earnings: "My Earnings",    
+    my_earnings: "My Earnings",  
+    thank_you_for_your_review: "Thank you for your review!",  
+    back_to_home: "Back to Home",
+    we_appreciated_you_taking_the_time_to_reflect_on_your_experience: "We appreciated you taking the time to reflect on your experience",
+    write_your_reason_here: "Write your reason here…",
   };
 };
 

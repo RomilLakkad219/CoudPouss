@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -20,9 +20,9 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
-import {ThemeContext, ThemeContextType} from '../../context';
-import {FONTS, IMAGES} from '../../assets';
-import {getScaleSize, useString} from '../../constant';
+import { ThemeContext, ThemeContextType } from '../../context';
+import { FONTS, IMAGES } from '../../assets';
+import { getScaleSize, useString } from '../../constant';
 import {
   Text,
   HomeHeader,
@@ -30,14 +30,14 @@ import {
   RequestItem,
   Favourites,
 } from '../../components';
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS, TABS} from '..';
+import { useFocusEffect } from '@react-navigation/native';
+import { SCREENS, TABS } from '..';
 
 const HEADER_HEIGHT = 500;
 
 export default function Home(props: any) {
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -79,12 +79,12 @@ export default function Home(props: any) {
           {STRING.explore_all_service}
         </Text>
         <TouchableOpacity style={styles(theme).bannerContainer}
-        activeOpacity={1}
-        onPress={()=>{
+          activeOpacity={1}
+          onPress={() => {
             props.navigation.navigate(SCREENS.Assistance.identifier)
-        }}>
+          }}>
           <Text
-            style={{flex: 1.0, alignSelf: 'center'}}
+            style={{ flex: 1.0, alignSelf: 'center' }}
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme._323232}>
@@ -99,17 +99,20 @@ export default function Home(props: any) {
           <TouchableOpacity
             style={[
               styles(theme).imageContainer,
-              {borderTopLeftRadius: getScaleSize(40)},
+              { borderTopLeftRadius: getScaleSize(40) },
             ]}
             activeOpacity={1}
             onPress={() => {
               props.navigation.navigate(SCREENS.Transport.identifier)
             }}>
-            <Image style={styles(theme).iconImage} source={IMAGES.transport} />
+            <Image
+              resizeMode="contain"
+              style={styles(theme).iconImage}
+              source={IMAGES.transport} />
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.Medium}
-              style={{marginTop: getScaleSize(8)}}
+              style={{ marginTop: getScaleSize(8) }}
               color={theme._787878}>
               {STRING.Transport}
             </Text>
@@ -117,7 +120,7 @@ export default function Home(props: any) {
           <TouchableOpacity
             style={[
               styles(theme).imageContainer,
-              {marginHorizontal: getScaleSize(12)},
+              { marginHorizontal: getScaleSize(12) },
             ]}
             activeOpacity={1}
             onPress={() => {
@@ -125,12 +128,13 @@ export default function Home(props: any) {
             }}>
             <Image
               style={styles(theme).iconImage}
+              resizeMode="contain"
               source={IMAGES.personal_care}
             />
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.Medium}
-              style={{marginTop: getScaleSize(8)}}
+              style={{ marginTop: getScaleSize(8) }}
               color={theme._787878}>
               {STRING.PersonalCare}
             </Text>
@@ -138,20 +142,21 @@ export default function Home(props: any) {
           <TouchableOpacity
             style={[
               styles(theme).imageContainer,
-              {borderTopRightRadius: getScaleSize(40)},
+              { borderTopRightRadius: getScaleSize(40) },
             ]}
             activeOpacity={1}
             onPress={() => {
               props.navigation.navigate(SCREENS.Transport.identifier)
             }}>
             <Image
+              resizeMode="contain"
               style={styles(theme).iconImage}
               source={IMAGES.tech_support}
             />
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.Medium}
-              style={{marginTop: getScaleSize(8)}}
+              style={{ marginTop: getScaleSize(8) }}
               color={theme._787878}>
               {STRING.TechSupport}
             </Text>
@@ -167,7 +172,7 @@ export default function Home(props: any) {
           <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
-            style={{flex: 1.0}}
+            style={{ flex: 1.0 }}
             color={theme._323232}>
             {STRING.ResentRequests}
           </Text>
@@ -177,7 +182,7 @@ export default function Home(props: any) {
             onPress={() => {
               props.navigation.navigate(TABS.Request.identifier);
             }}
-            style={{alignSelf: 'center'}}
+            style={{ alignSelf: 'center' }}
             color={theme._999999}>
             {STRING.ViewAll}
           </Text>
@@ -200,32 +205,32 @@ export default function Home(props: any) {
           <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
-            style={{flex: 1.0}}
+            style={{ flex: 1.0 }}
             color={theme._323232}>
             {STRING.FavoriteProfessionals}
           </Text>
           <Text
             size={getScaleSize(16)}
             font={FONTS.Lato.Regular}
-            onPress={() => {}}
-            style={{alignSelf: 'center'}}
+            onPress={() => { }}
+            style={{ alignSelf: 'center' }}
             color={theme._999999}>
             {STRING.ViewAll}
           </Text>
         </View>
         <FlatList
-          data={['','']}
+          data={['', '']}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={(item: any, index: number) => {
+          renderItem={({item, index}) => {
             return (
-              <View style={{marginTop:getScaleSize(26)}}>
+              <View style={{ marginTop: getScaleSize(26) }}>
                 <Favourites />
               </View>
             );
           }}
         />
-        <View style={{height: 32}}></View>
+        <View style={{ height: 32 }}></View>
       </ScrollView>
     </View>
   );
@@ -233,7 +238,7 @@ export default function Home(props: any) {
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     bannerContainer: {
       height: getScaleSize(105),
       flex: 1.0,

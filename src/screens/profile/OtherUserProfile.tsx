@@ -42,6 +42,7 @@ export default function OtherUserProfile(props: any) {
   const {theme} = useContext<any>(ThemeContext);
 
   const [showMore, setShowMore] = useState(false);
+  const [showMoreExperience, setShowMoreExperience] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -136,7 +137,7 @@ export default function OtherUserProfile(props: any) {
                   font={FONTS.Lato.Bold}
                   color={'#1D7885'}
                   style={{alignSelf: 'center'}}>
-                  {'4.6'}
+                  {'18'}
                 </Text>
                 <Text
                   size={getScaleSize(12)}
@@ -159,7 +160,7 @@ export default function OtherUserProfile(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
-            style={{marginTop: getScaleSize(8)}}
+            style={{marginTop: getScaleSize(16)}}
             color={theme._323232}>
             {
               'With a passion for home improvement, I have dedicated over 8 years to perfecting my craft. My expertise spans from intricate plumbing tasks to seamless TV installations. I pride myself on delivering quality service with a personal touch, ensuring every client feels valued and satisfied.'
@@ -176,18 +177,21 @@ export default function OtherUserProfile(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
-            style={{marginTop: getScaleSize(8)}}
+            numberOfLines={showMoreExperience ? undefined : 5}
+            style={{marginTop: getScaleSize(20)}}
             color={theme._323232}>
             {
               'Hi, I’m Bessie — with over 6 years of experience in expert TV mounting and reliable plumbing solutions. I specialize in mounting TVs, shelves, mirrors with precision and care Mounting Expert You Can Trust Over 6 of experience in securely mounting TVs, shelves, mirrors, artwork, and more Reliable & On-Time I value your time and ready to get the job done right the first time Clean Work, Solid Results Every project is done with attention to detail, safety, and durability Respect for Your Space I treat your home like it’s my own. Friendly, professional, and focused on delivering quality you’ll love. Client Satisfaction First I’m proud of my 5-star service and happy clients '
             }
           </Text>
-          <TouchableOpacity style={{marginTop: getScaleSize(8)}}>
+          <TouchableOpacity 
+          onPress={() => setShowMoreExperience(!showMoreExperience)}
+          style={{marginTop: getScaleSize(16)}}>
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.Medium}
               color={'#2C6587'}>
-              {STRING.ReadMore}
+              {showMoreExperience ? STRING.show_less : STRING.read_more}
             </Text>
           </TouchableOpacity>
         </View>
@@ -201,7 +205,7 @@ export default function OtherUserProfile(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
-            style={{marginTop: getScaleSize(8)}}
+            style={{marginTop: getScaleSize(16)}}
             color={theme._323232}>
             {
               'Bessie Cooper has successfully completed over 150 projects, showcasing her expertise in TV mounting and plumbing. Her dedication to quality and customer satisfaction has earned her numerous accolades, including the "Best Service Provider" award in 2022. Clients consistently praise her attention to detail and professionalism, making her a top choice for home improvement services.'

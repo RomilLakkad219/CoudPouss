@@ -97,5 +97,7 @@ export const IMAGES = {
   ic_calander: require('./ic_calander.png'),
   ic_card: require('./ic_card.png'),
   map_pin: require('./map_pin.png'),
-  location_map : require('./location_map.png')
+  location_map : require('./location_map.png'),
+  ic_review: require('./ic_review.png'),
+  ic_phone: require('./ic_phone.png'),
 };

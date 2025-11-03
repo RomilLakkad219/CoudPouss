@@ -75,7 +75,7 @@ export default function SelectedPlanDetails(props: any) {
                                 color={theme._214C65}>
                                 {myPlan === 'non_certified_provider' ? STRING.non_certified_provider : STRING.professional_certified}
                             </Text>
-                            <Image source={IMAGES.ic_check} style={styles(theme).selectedView} />
+                            {/* <Image source={IMAGES.ic_check} style={styles(theme).selectedView} /> */}
                         </View>
                         <Text
                             size={getScaleSize(27)}

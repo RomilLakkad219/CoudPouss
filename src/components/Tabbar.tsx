@@ -160,13 +160,15 @@ const Item = (props: any) => {
   } else {
     if (props?.index == 2) {
       return (
-        <View style={{alignSelf: 'center'}}>
+        <TouchableOpacity
+         onPress={() => {props.onPress}}
+         style={{alignSelf: 'center'}}>
           <Image
-            style={{height: 66, width: 66, marginTop: -62}}
+            style={{height:getScaleSize(98), width: getScaleSize(98), marginTop: getScaleSize(-90)}}
             resizeMode="contain"
             source={IMAGES.plus}
           />
-        </View>
+        </TouchableOpacity>
       );
     } else {
       return (

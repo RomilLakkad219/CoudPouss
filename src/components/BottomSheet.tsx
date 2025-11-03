@@ -19,12 +19,13 @@ interface BottomSheetProps {
     onPressSecondButton?: () => void,
     isInfo?: boolean;
     addMoreServices?: boolean;
+    type?: string;
 }
 
 export default function BottomSheet(props: BottomSheetProps) {
     const { theme } = useContext<any>(ThemeContext);
 
-    const { bottomSheetRef, height, title, description, buttonTitle, isInfo, onPressButton, addMoreServices, isStatus, secondButtonTitle, onPressSecondButton } = props;
+    const { bottomSheetRef, height, title, description, buttonTitle, isInfo, onPressButton, addMoreServices, isStatus, secondButtonTitle, onPressSecondButton, type } = props;
     return (
         <RBSheet
             ref={bottomSheetRef}
@@ -58,6 +59,26 @@ export default function BottomSheet(props: BottomSheetProps) {
                         </Text>
                     </View>
                 )}
+                {type === 'review' && (
+                    <View style={styles(theme).statusContainer}>
+                        <Image source={IMAGES.ic_review} style={[styles(theme).alartIcon, { marginBottom: getScaleSize(16) }]} />
+                        <Text
+                            size={getScaleSize(24)}
+                            font={FONTS.Lato.SemiBold}
+                            align="center"
+                            color={theme._323232}>
+                            {title}
+                        </Text>
+                        <Text
+                            size={getScaleSize(19)}
+                            style={{ marginTop: getScaleSize(16) }}
+                            font={FONTS.Lato.Medium}
+                            align="center"
+                            color={theme._424242}>
+                            {description}
+                        </Text>
+                    </View>
+                )}
                 {isInfo && (
                     <View style={styles(theme).mainContainer}>
                         <Image source={IMAGES.ic_alart} style={[styles(theme).alartIcon, { marginBottom: getScaleSize(24) }]} />
@@ -79,7 +100,7 @@ export default function BottomSheet(props: BottomSheetProps) {
                     </View>
                 )}
                 {addMoreServices && (
-                    <View style={[styles(theme).mainContainer, {marginHorizontal: getScaleSize(50)}]}>
+                    <View style={[styles(theme).mainContainer, { marginHorizontal: getScaleSize(50) }]}>
                         <Image source={IMAGES.add_service} style={[styles(theme).alartIcon, { marginBottom: getScaleSize(12) }]} />
                         <Text
                             size={getScaleSize(18)}

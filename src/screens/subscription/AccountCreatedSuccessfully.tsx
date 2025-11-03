@@ -16,7 +16,7 @@ import { Header, Input, Text, Button } from '../../components';
 
 export default function AccountCreatedSuccessfully(props: any) {
 
-    const { isWithdrawal } = props.route.params;
+    const isWithdrawal = props.route.params?.isWithdrawal || false;
     const STRING = useString();
     const { theme } = useContext<any>(ThemeContext);
 
