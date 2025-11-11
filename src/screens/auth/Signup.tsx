@@ -6,13 +6,15 @@ import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button } from '../../components';
+import { CommonActions } from '@react-navigation/native';
+import { API } from '../../api';
 
 export default function Signup(props: any) {
 
@@ -20,20 +22,37 @@ export default function Signup(props: any) {
 
     const { theme } = useContext<any>(ThemeContext);
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [show, setShow] = useState(true);
-    const [passwordError, setPasswordError] = useState('');
     const [emailError, setEmailError] = useState('');
+    const [isLoading, setLoading] = useState(false);
 
-    async function onLogin() {
+    async function onSignup() {
         if (!email) {
             setEmailError(STRING.please_enter_your_email);
-        } else if (!password) {
-            setPasswordError(STRING.please_enter_your_password);
         } else {
             setEmailError('');
-            setPasswordError('');
-            console.log('Login');
+            const params = {
+                email: email,
+            };
+            try {
+                setLoading(true);
+                const result = await API.Instance.post(API.API_ROUTES.signup, params);
+                setLoading(false);
+                console.log('result', result.status, result)
+                if (result.status) {
+                    SHOW_TOAST(result?.data?.message ?? '', 'success')
+                    props.navigation.navigate(SCREENS.Otp.identifier, {
+                        isFromSignup: true,
+                        email: email
+                    });
+                } else {
+                    SHOW_TOAST(result?.data?.message ?? '', 'error')
+                    console.log('error==>', result?.data?.message)
+                }
+            } catch (error: any) {
+                setLoading(false);
+                SHOW_TOAST(error?.message ?? '', 'error');
+                console.log(error?.message)
+            }
         }
     }
 
@@ -78,9 +97,7 @@ export default function Signup(props: any) {
                         title={STRING.continue}
                         style={{ marginTop: getScaleSize(32) }}
                         onPress={() => {
-                            props.navigation.navigate(SCREENS.Otp.identifier,{
-                                isFromSignup: true
-                            });
+                            onSignup();
                         }}
                     />
                     <Text

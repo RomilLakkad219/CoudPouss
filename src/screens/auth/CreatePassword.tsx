@@ -6,13 +6,14 @@ import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button } from '../../components';
+import { API } from '../../api';
 
 export default function CreatePassword(props: any) {
 
@@ -31,8 +32,8 @@ export default function CreatePassword(props: any) {
         // if (!password) {
         //     setPasswordError(STRING.please_enter_your_password);
         // } else {
-            setPasswordError('');
-            props.navigation.navigate(SCREENS.AddPersonalDetails.identifier);
+        setPasswordError('');
+        props.navigation.navigate(SCREENS.AddPersonalDetails.identifier);
         // }
     }
 
@@ -78,7 +79,7 @@ export default function CreatePassword(props: any) {
                         value={confirmPassword}
                         passwordIcon={true}
                         secureTextEntry={confirmShow}
-                        continerStyle={{marginTop: getScaleSize(16)}}
+                        continerStyle={{ marginTop: getScaleSize(16) }}
                         onChnageIcon={() => {
                             setConfirmShow(!confirmShow);
                         }}

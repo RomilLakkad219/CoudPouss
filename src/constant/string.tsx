@@ -339,6 +339,7 @@ export const useString = () => {
     back_to_home: "Back to Home",
     we_appreciated_you_taking_the_time_to_reflect_on_your_experience: "We appreciated you taking the time to reflect on your experience",
     write_your_reason_here: "Write your reason here…",
+    please_enter_your_otp: "Please enter your OTP",
   };
 };
 
