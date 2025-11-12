@@ -2,7 +2,7 @@ import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } fro
 import React, { useContext, useEffect, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -21,6 +21,8 @@ export default function Signup(props: any) {
     const STRING = useString();
 
     const { theme } = useContext<any>(ThemeContext);
+    const { userType } = useContext<any>(AuthContext);
+
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
     const [isLoading, setLoading] = useState(false);
@@ -32,6 +34,7 @@ export default function Signup(props: any) {
             setEmailError('');
             const params = {
                 email: email,
+                role: userType
             };
             try {
                 setLoading(true);

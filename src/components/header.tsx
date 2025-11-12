@@ -53,11 +53,11 @@ const Header = (props: HeaderProps) => {
                             <TouchableOpacity style={styles(theme).flexRow} onPress={props.onPress}>
                                 <Image 
                                 source={props.rightIcon.icon} 
-                                style={[styles(theme).rightIcon,{tintColor: userType === 'professional' ? theme._F0B52C : theme._D32F2F}]} />
+                                style={[styles(theme).rightIcon,{tintColor: userType === 'service_provider' ? theme._F0B52C : theme._D32F2F}]} />
                                 <Text
                                     size={getScaleSize(16)}
                                     font={FONTS.Lato.SemiBold}
-                                    color={userType === 'professional' ? theme._F0B52C : theme._D32F2F}>
+                                    color={userType === 'service_provider' ? theme._F0B52C : theme._D32F2F}>
                                     {props.rightIcon.title}
                                 </Text>
                             </TouchableOpacity>

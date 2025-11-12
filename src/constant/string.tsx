@@ -340,6 +340,10 @@ export const useString = () => {
     we_appreciated_you_taking_the_time_to_reflect_on_your_experience: "We appreciated you taking the time to reflect on your experience",
     write_your_reason_here: "Write your reason here…",
     please_enter_your_otp: "Please enter your OTP",
+    please_enter_your_re_enter_password: "Please enter your re-enter password",
+    passwords_do_not_match: "Passwords do not match",
+    please_enter_your_address: "Please enter your address",
+    password_validation_message: "Password must be at least 8 characters and include an uppercase letter, a number, and a special character",
   };
 };
 

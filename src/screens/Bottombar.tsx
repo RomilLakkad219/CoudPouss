@@ -15,7 +15,7 @@ const Tab = createBottomTabNavigator();
 function BottomBar() {
   const {userType} = useContext<any>(AuthContext);
 
-  if (userType === 'Professional') {
+  if (userType === 'service_provider') {
     return (
     <>
       <Tab.Navigator

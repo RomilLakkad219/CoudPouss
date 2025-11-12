@@ -42,7 +42,7 @@ export default function Profile(props: any) {
   ]
 
   function getProfileItems() {
-    if (userType === 'professional') {
+    if (userType === 'service_provider') {
       return profieItemsProfessional;
     } else {
       return profileItemsElder;
@@ -68,7 +68,7 @@ export default function Profile(props: any) {
             color={theme._2B2B2B}>
             {'Bessie Cooper'}
           </Text>
-          {userType === 'professional' && (
+          {userType === 'service_provider' && (
             <View style={styles(theme).checkStatusContainer}>
               <Image source={IMAGES.ic_alart} style={styles(theme).alartIcon} />
               <Text
@@ -93,7 +93,7 @@ export default function Profile(props: any) {
               </TouchableOpacity>
             </View>
           )}
-          <View style={{ marginTop: userType === 'professional' ? getScaleSize(20) : getScaleSize(40) }}>
+          <View style={{ marginTop: userType === 'service_provider' ? getScaleSize(20) : getScaleSize(40) }}>
             {getProfileItems().map((item: any, index: number) => {
               return (
                 <TouchableOpacity key={index}

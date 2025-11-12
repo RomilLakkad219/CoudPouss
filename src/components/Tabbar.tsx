@@ -27,7 +27,7 @@ function Tabbar(props: any) {
   let images: any = [];
   let names: any = [];
 
-  if (userType === 'Professional') {
+  if (userType === 'service_provider') {
     images = [
       IMAGES.home_unselected,
       IMAGES.request_unselected,
@@ -83,7 +83,7 @@ const Item = (props: any) => {
   let images: any = [];
   let names: any = [];
 
-  if (userType === 'Professional') {
+  if (userType === 'service_provider') {
     images = [
       IMAGES.home_unselected,
       IMAGES.request_unselected,
@@ -105,7 +105,7 @@ const Item = (props: any) => {
   }
 
   const STRING = useString();
-  if (userType === 'Professional') {
+  if (userType === 'service_provider') {
     return (
       <TouchableOpacity
         onPress={props.onPress}
