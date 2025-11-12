@@ -152,7 +152,7 @@ export default function Notification(props: any) {
                     style={styles(theme).nextButtonContainer}
                     activeOpacity={1}
                     onPress={() => {
-                      if (userType === 'Professional') {
+                      if (userType === 'service_provider') {
                         props.navigation.navigate(
                           SCREENS.ProfessionalTaskStatus.identifier,
                         );

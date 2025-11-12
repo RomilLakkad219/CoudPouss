@@ -35,9 +35,43 @@ export default function Otp(props: any) {
         if (isFromSignup) {
             onSignup()
         } else {
-            props.navigation.navigate(SCREENS.NewPassword.identifier);
+            onNewPassword();
         }
     }
+
+    async function onNewPassword() {
+        if (!otp) {
+            setOtpError(STRING.please_enter_your_otp);
+        } else {
+            setOtpError('');
+            const params = {
+                email: email,
+                otp: otp,
+            };
+            try {
+                setLoading(true);
+                const result = await API.Instance.post(API.API_ROUTES.verifyResetPassword, params);
+                setLoading(false);
+                console.log('result', result.status, result)
+                if (result.status) {
+                    SHOW_TOAST(result?.data?.message ?? '', 'success')
+                    props.navigation.navigate(SCREENS.NewPassword.identifier, {
+                        email: email,
+                    });
+                } else {
+                    SHOW_TOAST(result?.data?.message ?? '', 'error')
+                    console.log('error==>', result?.data?.message)
+                }
+            } catch (error: any) {
+                setLoading(false);
+                SHOW_TOAST(error?.message ?? '', 'error');
+                console.log(error?.message)
+            } finally {
+                setLoading(false);
+            }
+        }
+    }
+
 
     async function onSignup() {
         if (!otp) {
@@ -73,31 +107,26 @@ export default function Otp(props: any) {
     }
 
     async function onResendOtp() {
-        if (!email) {
-
+        try {
+            setLoading(true);
+            const result = await API.Instance.post(API.API_ROUTES.resendOtp, { email: email });
+            setLoading(false);
+            console.log('result', result.status, result)
+            if (result.status) {
+                SHOW_TOAST(result?.data?.message ?? '', 'success')
+                otpInput.current?.clear();
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+                console.log('error==>', result?.data?.message)
+            }
         }
-        else {
-            try {
-                setLoading(true);
-                const result = await API.Instance.post(API.API_ROUTES.resendOtp, { email: email });
-                setLoading(false);
-                console.log('result', result.status, result)
-                if (result.status) {
-                    SHOW_TOAST(result?.data?.message ?? '', 'success')
-                    otpInput.current?.clear();
-                } else {
-                    SHOW_TOAST(result?.data?.message ?? '', 'error')
-                    console.log('error==>', result?.data?.message)
-                }
-            }
-            catch (error: any) {
-                setLoading(false);
-                SHOW_TOAST(error?.message ?? '', 'error');
-                console.log(error?.message)
-            }
-            finally {
-                setLoading(false);
-            }
+        catch (error: any) {
+            setLoading(false);
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        }
+        finally {
+            setLoading(false);
         }
     }
 

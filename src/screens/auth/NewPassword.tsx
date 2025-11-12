@@ -6,13 +6,15 @@ import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, REGEX, SHOW_TOAST, useString } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button } from '../../components';
+import { API } from '../../api';
+import { CommonActions } from '@react-navigation/native';
 
 export default function NewPassword(props: any) {
 
@@ -20,6 +22,9 @@ export default function NewPassword(props: any) {
 
     const { theme } = useContext<any>(ThemeContext);
 
+    const email = props?.route?.params?.email || '';
+
+    const [isLoading, setLoading] = useState(false);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,12 +32,45 @@ export default function NewPassword(props: any) {
     const [show, setShow] = useState(true);
     const [confirmShow, setConfirmShow] = useState(true);
 
-    async function onLogin() {
+    async function onNewPassword() {
         if (!password) {
             setPasswordError(STRING.please_enter_your_password);
+        }else if (!REGEX.password.test(password)) {
+            setPasswordError(STRING.password_validation_message);
+        } else if (!confirmPassword) {
+            setConfirmPasswordError(STRING.please_enter_your_re_enter_password);
         } else {
             setPasswordError('');
-            props.navigation.navigate(SCREENS.Login.identifier);
+            setConfirmPasswordError('');
+            const params = {
+                email: email,
+                password: password,
+                confirm_password: confirmPassword,
+            };
+            try {
+                setLoading(true);
+                const result = await API.Instance.post(API.API_ROUTES.createNewPassword, params);
+                setLoading(false);
+                console.log('result', result.status, result)
+                if (result.status) {
+                    SHOW_TOAST(result?.data?.message ?? '', 'success')
+                    props.navigation.dispatch(
+                        CommonActions.reset({
+                          index: 0,
+                          routes: [{ name: SCREENS.Login.identifier }],
+                        }),
+                      );
+                } else {
+                    SHOW_TOAST(result?.data?.message ?? '', 'error')
+                    console.log('error==>', result?.data?.message)
+                }
+            } catch (error: any) {
+                setLoading(false);
+                SHOW_TOAST(error?.message ?? '', 'error');
+                console.log(error?.message)
+            } finally {
+                setLoading(false);
+            }
         }
     }
 
@@ -74,7 +112,7 @@ export default function NewPassword(props: any) {
                         value={confirmPassword}
                         passwordIcon={true}
                         secureTextEntry={confirmShow}
-                        continerStyle={{marginTop: getScaleSize(16)}}
+                        continerStyle={{ marginTop: getScaleSize(16) }}
                         onChnageIcon={() => {
                             setConfirmShow(!confirmShow);
                         }}
@@ -90,7 +128,7 @@ export default function NewPassword(props: any) {
                 title={STRING.reset_password}
                 style={{ marginVertical: getScaleSize(24), marginHorizontal: getScaleSize(24) }}
                 onPress={() => {
-                    onLogin();
+                    onNewPassword();
                 }}
             />
         </View>

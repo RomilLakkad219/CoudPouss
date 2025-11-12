@@ -6,7 +6,7 @@ import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { getScaleSize, REGEX, SHOW_TOAST, useString } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
@@ -21,20 +21,55 @@ export default function CreatePassword(props: any) {
 
     const { theme } = useContext<any>(ThemeContext);
 
+    const { email } = props?.route?.params || {};
+
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     const [show, setShow] = useState(true);
     const [confirmShow, setConfirmShow] = useState(true);
+    const [isLoading, setLoading] = useState(false);
 
-    async function onLogin() {
-        // if (!password) {
-        //     setPasswordError(STRING.please_enter_your_password);
-        // } else {
-        setPasswordError('');
-        props.navigation.navigate(SCREENS.AddPersonalDetails.identifier);
-        // }
+    async function onSignup() {
+        if (!password) {
+            setPasswordError(STRING.please_enter_your_password);
+        }else if (!REGEX.password.test(password)) {
+            setPasswordError(STRING.password_validation_message);
+        } else if (!confirmPassword) {
+            setConfirmPasswordError(STRING.please_enter_your_re_enter_password);
+        } else if (password !== confirmPassword) {
+            setConfirmPasswordError(STRING.passwords_do_not_match);
+        } else {
+            setPasswordError('');
+            setConfirmPasswordError('');
+            const params = {
+                email: email,
+                password: password,
+                confirm_password: confirmPassword,
+            };
+            try {
+                setLoading(true);
+                const result = await API.Instance.post(API.API_ROUTES.createPassword, params);
+                setLoading(false);
+                console.log('result', result.status, result)
+                if (result.status) {
+                    SHOW_TOAST(result?.data?.message ?? '', 'success')
+                    props.navigation.navigate(SCREENS.AddPersonalDetails.identifier, {
+                        email: email,
+                    });
+                } else {
+                    SHOW_TOAST(result?.data?.message ?? '', 'error')
+                    console.log('error==>', result?.data?.message)
+                }
+            } catch (error: any) {
+                setLoading(false);
+                SHOW_TOAST(error?.message ?? '', 'error');
+                console.log(error?.message)
+            } finally {
+                setLoading(false);
+            }
+        }
     }
 
     return (
@@ -95,7 +130,7 @@ export default function CreatePassword(props: any) {
                 title={STRING.next}
                 style={{ marginVertical: getScaleSize(24), marginHorizontal: getScaleSize(24) }}
                 onPress={() => {
-                    onLogin();
+                    onSignup();
                 }}
             />
         </View>

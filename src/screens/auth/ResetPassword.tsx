@@ -6,13 +6,14 @@ import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button } from '../../components';
+import { API } from '../../api';
 
 export default function ResetPassword(props: any) {
 
@@ -22,15 +23,40 @@ export default function ResetPassword(props: any) {
 
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
+    const [isLoading, setLoading] = useState(false);
 
-    async function onLogin() {
+    async function onResetPassword() {
         if (!email) {
             setEmailError(STRING.please_enter_your_email);
         } else {
             setEmailError('');
-            props.navigation.navigate(SCREENS.Otp.identifier);
+            const params = {
+                email: email,
+            };
+            try {
+                setLoading(true);
+                const result = await API.Instance.post(API.API_ROUTES.resetPassword, params);
+                setLoading(false);
+                console.log('result', result.status, result)
+                if (result.status) {
+                    SHOW_TOAST(result?.data?.message ?? '', 'success')
+                    props.navigation.navigate(SCREENS.Otp.identifier, {
+                        email: email
+                    });
+                } else {
+                    SHOW_TOAST(result?.data?.message ?? '', 'error')
+                    console.log('error==>', result?.data?.message)
+                }
+            } catch (error: any) {
+                setLoading(false);
+                SHOW_TOAST(error?.message ?? '', 'error');
+                console.log(error?.message)
+            } finally {
+                setLoading(false);
+            }
         }
     }
+
 
     return (
         <View style={styles(theme).container}>
@@ -72,7 +98,7 @@ export default function ResetPassword(props: any) {
                 disabled={!email}
                 style={{ marginVertical: getScaleSize(24), marginHorizontal: getScaleSize(24) }}
                 onPress={() => {
-                    onLogin();
+                    onResetPassword();
                 }}
             />
         </View>
