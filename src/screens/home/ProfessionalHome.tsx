@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   StatusBar,
@@ -35,6 +35,7 @@ import {
 //PACKAGES
 import {useFocusEffect} from '@react-navigation/native';
 import {SCREENS} from '..';
+import SpeechToText from './SpeechToText';
 
 export default function ProfessionalHome(props: any) {
   const STRING = useString();
@@ -96,7 +97,14 @@ export default function ProfessionalHome(props: any) {
         </TouchableOpacity>
       </View>
       <View style={styles(theme).searchView}>
-        <SearchComponent />
+        <SearchComponent
+          onPressMicrophone={() => {
+            console.log('onPressMicrophone');
+          }}
+        />
+      </View>
+      <View style={{height: 400}}>
+        <SpeechToText />
       </View>
       <ScrollView
         style={styles(theme).scrolledContainer}
@@ -146,7 +154,9 @@ export default function ProfessionalHome(props: any) {
           return (
             <TaskItem
               onPressItem={() => {
-                props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier);
+                props.navigation.navigate(
+                  SCREENS.ProfessionalTaskDetails.identifier,
+                );
               }}
               onPressStatus={() => {
                 props.navigation.navigate(SCREENS.TaskStatus.identifier);

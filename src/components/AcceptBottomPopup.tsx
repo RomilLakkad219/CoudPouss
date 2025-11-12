@@ -3,9 +3,7 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Image,
-  Dimensions,
   Animated,
   Easing,
 } from 'react-native';
@@ -13,7 +11,6 @@ import {ThemeContext, ThemeContextType} from '../context';
 import {getScaleSize, useString} from '../constant';
 import {FONTS, IMAGES} from '../assets';
 import Text from './Text';
-import {constant} from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 const AcceptBottomPopup = (props: any) => {
@@ -122,7 +119,7 @@ const AcceptBottomPopup = (props: any) => {
               style={styles(theme).backButtonContainer}
               activeOpacity={1}
               onPress={() => {
-                props?.onClose()
+                props?.onClose();
               }}>
               <Text
                 size={getScaleSize(19)}
@@ -136,7 +133,7 @@ const AcceptBottomPopup = (props: any) => {
               style={styles(theme).nextButtonContainer}
               activeOpacity={1}
               onPress={() => {
-                props?.onNavigate()
+                props?.onNavigate();
               }}>
               <Text
                 size={getScaleSize(19)}

@@ -1,10 +1,6 @@
 import React, {useContext} from 'react';
 import {
-  Alert,
   Image,
-  ImageBackground,
-  ImageSourcePropType,
-  Platform,
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
@@ -17,7 +13,6 @@ import {IMAGES} from '../assets/images';
 import {FONTS} from '../assets';
 import {AuthContext, ThemeContext, ThemeContextType} from '../context';
 import Text from './Text';
-import {head} from 'lodash';
 
 function Tabbar(props: any) {
   const {theme} = useContext<any>(ThemeContext);
@@ -35,7 +30,7 @@ function Tabbar(props: any) {
       IMAGES.profile_unselected,
     ];
 
-    names = ['Home', 'Task',  'Chat', 'Profile'];
+    names = ['Home', 'Task', 'Chat', 'Profile'];
   } else {
     images = [
       IMAGES.home_unselected,

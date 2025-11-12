@@ -37,7 +37,9 @@ const SearchComponent = (props: any) => {
           placeholder={STRING.Search}
         />
       </View>
-      <TouchableOpacity style={styles(theme).microPhoneContainer}>
+      <TouchableOpacity
+        onPress={props.onPressMicrophone}
+        style={styles(theme).microPhoneContainer}>
         <Image
           style={styles(theme).microPhoneImage}
           source={IMAGES.microphone_new}

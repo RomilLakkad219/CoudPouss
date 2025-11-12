@@ -1,12 +1,4 @@
-import {
-  Image,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useContext} from 'react';
 
 //CONTEXT
@@ -24,9 +16,11 @@ function RequestItem(props: any) {
   const {theme} = useContext(ThemeContext);
 
   return (
-    <TouchableOpacity style={styles(theme).container} onPress={()=>{
-      props.onPress()
-    }}>
+    <TouchableOpacity
+      style={styles(theme).container}
+      onPress={() => {
+        props.onPress();
+      }}>
       <View style={styles(theme).horizontalContainer}>
         <Image
           source={IMAGES.service_icon}
@@ -57,14 +51,18 @@ function RequestItem(props: any) {
             color={theme._989898}>
             {STRING.Valuation}
           </Text>
-           <Text
+          <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>
             {'€449.20'}
           </Text>
         </View>
-        <View style={[styles(theme).horizontalContainer, {marginTop: getScaleSize(3)}]}>
+        <View
+          style={[
+            styles(theme).horizontalContainer,
+            {marginTop: getScaleSize(3)},
+          ]}>
           <Text
             style={{flex: 1.0}}
             size={getScaleSize(18)}
@@ -72,14 +70,18 @@ function RequestItem(props: any) {
             color={theme._989898}>
             {STRING.JobDate}
           </Text>
-           <Text
+          <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>
             {'16 Aug'}
           </Text>
         </View>
-        <View style={[styles(theme).horizontalContainer, {marginTop: getScaleSize(3)}]}>
+        <View
+          style={[
+            styles(theme).horizontalContainer,
+            {marginTop: getScaleSize(3)},
+          ]}>
           <Text
             style={{flex: 1.0}}
             size={getScaleSize(18)}
@@ -87,7 +89,7 @@ function RequestItem(props: any) {
             color={theme._989898}>
             {STRING.JobTime}
           </Text>
-           <Text
+          <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>

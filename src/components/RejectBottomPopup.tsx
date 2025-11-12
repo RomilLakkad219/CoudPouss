@@ -3,9 +3,7 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Image,
-  Dimensions,
   Animated,
   Easing,
 } from 'react-native';
@@ -13,7 +11,6 @@ import {ThemeContext, ThemeContextType} from '../context';
 import {getScaleSize, useString} from '../constant';
 import {FONTS, IMAGES} from '../assets';
 import Text from './Text';
-import {constant} from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 const RejectBottomPopup = (props: any) => {
@@ -169,23 +166,19 @@ const RejectBottomPopup = (props: any) => {
             <TouchableOpacity
               style={styles(theme).backButtonContainer}
               activeOpacity={1}
-              onPress={() => {
-                
-              }}>
+              onPress={() => {}}>
               <Text
                 size={getScaleSize(19)}
                 font={FONTS.Lato.Bold}
                 color={theme.primary}
                 style={{alignSelf: 'center'}}>
-                { STRING.Cancel}
+                {STRING.Cancel}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles(theme).nextButtonContainer}
               activeOpacity={1}
-              onPress={() => {
-                
-              }}>
+              onPress={() => {}}>
               <Text
                 size={getScaleSize(19)}
                 font={FONTS.Lato.Bold}
@@ -233,7 +226,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     buttonContainer: {
       flexDirection: 'row',
       marginHorizontal: getScaleSize(22),
-      marginTop:getScaleSize(24)
+      marginTop: getScaleSize(24),
     },
     backButtonContainer: {
       flex: 1.0,

@@ -1,23 +1,10 @@
-import React, {useContext, useRef, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Image,
-  Dimensions,
-  Animated,
-  Easing,
-  Text,
-} from 'react-native';
+import React, {useContext} from 'react';
+import {View, StyleSheet, Image, Text} from 'react-native';
 import {ThemeContext, ThemeContextType} from '../context';
-import {getScaleSize, useString} from '../constant';
+import {getScaleSize} from '../constant';
 import {FONTS, IMAGES} from '../assets';
-import {constant} from 'lodash';
-import RBSheet from 'react-native-raw-bottom-sheet';
 
 const StatusItem = (props: any) => {
-  const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
 
   function getImage() {
@@ -101,9 +88,9 @@ const StatusItem = (props: any) => {
                     fontFamily: FONTS.Lato.Bold,
                     fontSize: 24,
                     color: '#2C6587',
-                    marginTop:getScaleSize(2),
-                    textAlign:'center',
-                    alignSelf:'center'
+                    marginTop: getScaleSize(2),
+                    textAlign: 'center',
+                    alignSelf: 'center',
                   },
                 ]}>
                 {'7    9    6'}
