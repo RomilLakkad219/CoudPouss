@@ -13,6 +13,7 @@ import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button } from '../../components';
+import { CommonActions } from '@react-navigation/native';
 
 
 export default function AdditionalDetails(props: any) {
@@ -90,7 +91,12 @@ export default function AdditionalDetails(props: any) {
             <View style={styles(theme).buttonContainer}>
                 <TouchableOpacity
                     onPress={() => {
-
+                        props.navigation.dispatch(
+                            CommonActions.reset({
+                                index: 0,
+                                routes: [{name: SCREENS.BottomBar.identifier}],
+                            }),
+                        );
                     }} style={styles(theme).backButton}>
                     <Text
                         size={getScaleSize(19)}

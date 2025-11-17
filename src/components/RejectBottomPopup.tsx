@@ -6,12 +6,16 @@ import {
   Image,
   Animated,
   Easing,
+  TextInput,
+  Platform,
 } from 'react-native';
 import {ThemeContext, ThemeContextType} from '../context';
 import {getScaleSize, useString} from '../constant';
 import {FONTS, IMAGES} from '../assets';
 import Text from './Text';
+import {constant} from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import Input from './Input';
 
 const RejectBottomPopup = (props: any) => {
   const STRING = useString();
@@ -22,6 +26,7 @@ const RejectBottomPopup = (props: any) => {
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   const [selectedCategory, setSelectedCategory] = useState(1);
+  const [reason, setReason] = useState('');
 
   const startOpenAnimations = () => {
     fadeAnim.setValue(0);
@@ -77,20 +82,24 @@ const RejectBottomPopup = (props: any) => {
   return (
     <View style={{backgroundColor: 'rgba(0,0,0,0.3)'}}>
       <RBSheet
-        ref={props.onRef}
-        closeOnDragDown={true}
-        closeOnPressMask={true}
-        animationType="slide"
-        onOpen={startOpenAnimations}
-        onClose={startCloseAnimations}
+        ref={props.rejectRef}
+        customModalProps={{
+          animationType: 'fade',
+          statusBarTranslucent: true,
+        }}
         customStyles={{
-          container: {
-            backgroundColor: '#FFF',
-            height: getScaleSize(500),
-            borderTopLeftRadius: getScaleSize(20),
-            borderTopRightRadius: getScaleSize(20),
+          wrapper: {
+            backgroundColor: theme._77777733,
           },
-        }}>
+          container: {
+            height: getScaleSize(700),
+            borderTopLeftRadius: getScaleSize(24),
+            borderTopRightRadius: getScaleSize(24),
+            backgroundColor: theme.white,
+          },
+        }}
+        draggable={false}
+        closeOnPressMask={true}>
         <View style={styles(theme).content}>
           <Image style={styles(theme).icon} source={IMAGES.reject_icon} />
           <Text
@@ -100,73 +109,81 @@ const RejectBottomPopup = (props: any) => {
             style={{alignSelf: 'center', marginTop: getScaleSize(16)}}>
             {STRING.RejectServicerequest}
           </Text>
-
-          <TouchableOpacity
-            style={styles(theme).radioButtonContainer}
-            activeOpacity={1}
-            onPress={() => {
-              setSelectedCategory(1);
-            }}>
-            <Text
-              style={{flex: 1.0}}
-              size={getScaleSize(18)}
-              font={FONTS.Lato.Medium}
-              color={'#424242'}>
-              {STRING.Pricehigherthancompetitors}
-            </Text>
-            <Image
-              style={styles(theme).radioButton}
-              source={
-                selectedCategory == 1 ? IMAGES.radio_fill : IMAGES.radio_unfill
-              }
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles(theme).radioButtonContainer}
-            activeOpacity={1}
-            onPress={() => {
-              setSelectedCategory(2);
-            }}>
-            <Text
-              style={{flex: 1.0}}
-              size={getScaleSize(18)}
-              font={FONTS.Lato.Medium}
-              color={'#424242'}>
-              {STRING.Lateresponse}
-            </Text>
-            <Image
-              style={styles(theme).radioButton}
-              source={
-                selectedCategory == 2 ? IMAGES.radio_fill : IMAGES.radio_unfill
-              }
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles(theme).radioButtonContainer}
-            activeOpacity={1}
-            onPress={() => {
-              setSelectedCategory(3);
-            }}>
-            <Text
-              style={{flex: 1.0}}
-              size={getScaleSize(18)}
-              font={FONTS.Lato.Medium}
-              color={'#424242'}>
-              {STRING.Rejectedforanotherreason}
-            </Text>
-            <Image
-              style={styles(theme).radioButton}
-              source={
-                selectedCategory == 3 ? IMAGES.radio_fill : IMAGES.radio_unfill
-              }
-            />
-          </TouchableOpacity>
-
+          <View style={{flex: 1.0}}>
+            <TouchableOpacity
+              style={styles(theme).radioButtonContainer}
+              activeOpacity={1}
+              onPress={() => {
+                setSelectedCategory(1);
+              }}>
+              <Text
+                style={{flex: 1.0}}
+                size={getScaleSize(18)}
+                font={FONTS.Lato.Medium}
+                color={'#424242'}>
+                {STRING.Pricehigherthancompetitors}
+              </Text>
+              <Image
+                style={styles(theme).radioButton}
+                source={
+                  selectedCategory == 1
+                    ? IMAGES.ic_radio_select
+                    : IMAGES.ic_radio_unselect
+                }
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles(theme).radioButtonContainer}
+              activeOpacity={1}
+              onPress={() => {
+                setSelectedCategory(2);
+              }}>
+              <Text
+                style={{flex: 1.0}}
+                size={getScaleSize(18)}
+                font={FONTS.Lato.Medium}
+                color={'#424242'}>
+                {STRING.Lateresponse}
+              </Text>
+              <Image
+                style={styles(theme).radioButton}
+                source={
+                  selectedCategory == 2
+                    ? IMAGES.ic_radio_select
+                    : IMAGES.ic_radio_unselect
+                }
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles(theme).otherRadioButtonContainer}
+              activeOpacity={1}
+              onPress={() => {
+                setSelectedCategory(3);
+              }}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text
+                  style={{flex: 1.0}}
+                  size={getScaleSize(18)}
+                  font={FONTS.Lato.Medium}
+                  color={'#424242'}>
+                  {STRING.Rejectedforanotherreason}
+                </Text>
+                <Image
+                  style={styles(theme).radioButton}
+                  source={
+                    selectedCategory == 3
+                      ? IMAGES.ic_radio_select
+                      : IMAGES.ic_radio_unselect
+                  }
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
           <View style={styles(theme).buttonContainer}>
             <TouchableOpacity
               style={styles(theme).backButtonContainer}
               activeOpacity={1}
-              onPress={() => {}}>
+              onPress={props.onClose}>
               <Text
                 size={getScaleSize(19)}
                 font={FONTS.Lato.Bold}
@@ -178,7 +195,7 @@ const RejectBottomPopup = (props: any) => {
             <TouchableOpacity
               style={styles(theme).nextButtonContainer}
               activeOpacity={1}
-              onPress={() => {}}>
+              onPress={props.onReject}>
               <Text
                 size={getScaleSize(19)}
                 font={FONTS.Lato.Bold}
@@ -196,12 +213,9 @@ const RejectBottomPopup = (props: any) => {
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {
-      flexDirection: 'column',
-      marginTop: getScaleSize(24),
-    },
     content: {
       paddingVertical: getScaleSize(24),
+      flex: 1.0,
     },
     icon: {
       height: getScaleSize(60),
@@ -218,9 +232,18 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(12),
       marginHorizontal: getScaleSize(22),
     },
+    otherRadioButtonContainer: {
+      marginTop: getScaleSize(20),
+      borderWidth: 1,
+      borderColor: theme._D5D5D5,
+      paddingVertical: getScaleSize(17),
+      paddingHorizontal: getScaleSize(17),
+      borderRadius: getScaleSize(12),
+      marginHorizontal: getScaleSize(22),
+    },
     radioButton: {
-      height: getScaleSize(24),
-      width: getScaleSize(24),
+      height: getScaleSize(40),
+      width: getScaleSize(40),
       alignSelf: 'center',
     },
     buttonContainer: {
@@ -247,6 +270,13 @@ const styles = (theme: ThemeContextType['theme']) =>
       paddingVertical: getScaleSize(18),
       backgroundColor: theme.primary,
       marginLeft: getScaleSize(8),
+    },
+    input: {
+      fontSize: getScaleSize(16),
+      fontFamily: FONTS.Lato.Medium,
+      color: theme._31302F,
+      flex: 1.0,
+      height: Platform.OS == 'ios' ? getScaleSize(56) : getScaleSize(56),
     },
   });
 

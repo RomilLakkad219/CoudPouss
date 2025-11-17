@@ -79,7 +79,7 @@ export default function Notification(props: any) {
                   style={styles(theme).profilePic}
                   source={IMAGES.user_placeholder}
                 />
-                <View>
+                <View style={{ flex: 1.0 }}>
                   <Text
                     style={{marginLeft: getScaleSize(16)}}
                     size={getScaleSize(18)}
@@ -99,7 +99,8 @@ export default function Notification(props: any) {
                   <View
                     style={{
                       flexDirection: 'row',
-                      marginHorizontal: getScaleSize(16),
+                      marginLeft: getScaleSize(16),
+                      marginTop: getScaleSize(4),
                     }}>
                     <Text
                       style={{flex: 1.0}}
@@ -109,7 +110,6 @@ export default function Notification(props: any) {
                       {'Friday 2:22 PM'}
                     </Text>
                     <Text
-                      style={{marginRight: getScaleSize(22)}}
                       size={getScaleSize(12)}
                       font={FONTS.Lato.Regular}
                       color={'#818285'}>
@@ -152,7 +152,7 @@ export default function Notification(props: any) {
                     style={styles(theme).nextButtonContainer}
                     activeOpacity={1}
                     onPress={() => {
-                      if (userType === 'Professional') {
+                      if (userType === 'service_provider') {
                         props.navigation.navigate(
                           SCREENS.ProfessionalTaskStatus.identifier,
                         );
@@ -204,6 +204,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     notificationContainer: {
       marginHorizontal: getScaleSize(24),
       marginTop: getScaleSize(16),
+      flex: 1.0,
     },
     profilePic: {
       height: getScaleSize(42),

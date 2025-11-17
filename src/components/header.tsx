@@ -2,7 +2,7 @@ import { Image, SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, View } fr
 import React, { useContext } from 'react'
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../context'
+import { AuthContext, ThemeContext, ThemeContextType } from '../context'
 
 //CONSTANTS & ASSETS
 import { getScaleSize } from '../constant'
@@ -19,12 +19,15 @@ interface HeaderProps {
         icon: any,
         title: string
     },
-    onPress?: () => void
+    onPress?: () => void,
+    icon?: any
 }
 
 const Header = (props: HeaderProps) => {
 
     const { theme } = useContext(ThemeContext)
+    const { userType } = useContext<any>(AuthContext)
+
     if (props.type == 'profile') {
         return (
             <View>
@@ -48,11 +51,13 @@ const Header = (props: HeaderProps) => {
                         }
                         {props.rightIcon &&
                             <TouchableOpacity style={styles(theme).flexRow} onPress={props.onPress}>
-                                <Image source={props.rightIcon.icon} style={styles(theme).rightIcon} />
+                                <Image 
+                                source={props.rightIcon.icon} 
+                                style={[styles(theme).rightIcon,{tintColor: userType === 'service_provider' ? theme._F0B52C : theme._D32F2F}]} />
                                 <Text
                                     size={getScaleSize(16)}
                                     font={FONTS.Lato.SemiBold}
-                                    color={theme._D32F2F}>
+                                    color={userType === 'service_provider' ? theme._F0B52C : theme._D32F2F}>
                                     {props.rightIcon.title}
                                 </Text>
                             </TouchableOpacity>
@@ -100,6 +105,11 @@ const Header = (props: HeaderProps) => {
                                 </Text>
                             </TouchableOpacity>
                         }
+                        {props.icon &&
+                            <TouchableOpacity style={styles(theme).flexRow} onPress={props.onPress}>
+                                <Image source={props.icon} style={styles(theme).icon} />
+                            </TouchableOpacity>
+                        }
                     </View>
                 </View>
             </View>
@@ -135,5 +145,9 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
     flexRow: {
         flexDirection: 'row',
         alignItems: 'center'
+    },
+    icon:{
+        width: getScaleSize(32),
+        height: getScaleSize(32),
     }
 })

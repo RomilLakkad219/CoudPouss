@@ -19,6 +19,9 @@ export default function AddBankDetails(props: any) {
 
     const STRING = useString();
 
+    const isEdit = props.route.params?.isEdit || false;
+    const isProfile = props.route.params?.isProfile || false;
+
     const { theme } = useContext<any>(ThemeContext);
     const [accountHolderName, setAccountHolderName] = useState('');
     const [accountNumber, setAccountNumber] = useState('');
@@ -37,7 +40,7 @@ export default function AddBankDetails(props: any) {
                 onBack={() => {
                     props.navigation.goBack();
                 }}
-                screenName={STRING.add_bank_details}
+                screenName={ isEdit ? STRING.edit_bank_details : STRING.add_bank_details}
             />
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles(theme).mainContainer}>
@@ -120,15 +123,23 @@ export default function AddBankDetails(props: any) {
                         font={FONTS.Lato.Bold}
                         color={theme._214C65}
                         align="center">
-                        {STRING.skip}
+                        { isEdit ? STRING.cancel : STRING.skip}
                     </Text>
                 </TouchableOpacity>
                 <View style={{ width: getScaleSize(16) }} />
                 <Button
-                    title={STRING.add}
+                    title={ isEdit ? STRING.save : STRING.add}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        props.navigation.navigate(SCREENS.AccountCreatedSuccessfully.identifier);
+                        if (isEdit) {
+                            props.navigation.goBack();
+                        } else {
+                            if (isProfile) {
+                                props.navigation.goBack();
+                            } else {
+                                props.navigation.navigate(SCREENS.AccountCreatedSuccessfully.identifier);
+                            }
+                        }
                     }}
                 />
             </View>

@@ -6,7 +6,15 @@ import Text from './Text';
 import {FONTS, IMAGES} from '../assets';
 
 export default function ServiceItem(props: any) {
-  const {item, itemContainer, isSelected, onPress, isReview} = props;
+  const {
+    item,
+    itemContainer,
+    isSelected,
+    onPress,
+    isReview,
+    isSelectedBox,
+    isManage,
+  } = props;
   const {theme} = useContext<any>(ThemeContext);
 
   return (
@@ -15,9 +23,9 @@ export default function ServiceItem(props: any) {
         onPress(item);
       }}
       style={[styles(theme).container, itemContainer]}>
-      <View
-        style={isReview ? styles(theme).reviewIcon : styles(theme).iconView}
-      />
+      {isSelectedBox && <View style={styles(theme).iconView} />}
+      {isReview && <View style={styles(theme).reviewIcon} />}
+      {isManage && <View style={styles(theme).iconView} />}
       <Text
         style={styles(theme).nameView}
         size={getScaleSize(18)}
@@ -25,9 +33,10 @@ export default function ServiceItem(props: any) {
         color={theme._323232}>
         {item.name}
       </Text>
-      {isReview ? (
+      {isReview && (
         <Image source={IMAGES.ic_delete} style={styles(theme).deleteIcon} />
-      ) : (
+      )}
+      {isSelectedBox && (
         <>
           {isSelected ? (
             <Image
@@ -41,6 +50,9 @@ export default function ServiceItem(props: any) {
             />
           )}
         </>
+      )}
+      {isManage && (
+        <Image source={IMAGES.ic_dott_line} style={styles(theme).icon} />
       )}
     </TouchableOpacity>
   );
@@ -71,7 +83,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     nameView: {
       flex: 1.0,
-      marginLeft: getScaleSize(22),
+      marginLeft: getScaleSize(16),
     },
     icon: {
       width: getScaleSize(24),

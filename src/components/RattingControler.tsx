@@ -6,8 +6,10 @@ import Text from './Text';
 import {FONTS} from '../assets';
 
 interface ProgressProps {
-  fillCount?: number;
-  totalCount?: number;
+  fillCount: number;
+  totalCount: number;
+  title?: string;
+  value?: string;
 }
 
 function RattingControler(props: ProgressProps) {

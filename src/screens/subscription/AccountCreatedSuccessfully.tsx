@@ -16,6 +16,7 @@ import { Header, Input, Text, Button } from '../../components';
 
 export default function AccountCreatedSuccessfully(props: any) {
 
+    const isWithdrawal = props.route.params?.isWithdrawal || false;
     const STRING = useString();
     const { theme } = useContext<any>(ThemeContext);
 
@@ -27,7 +28,7 @@ export default function AccountCreatedSuccessfully(props: any) {
                 font={FONTS.Lato.Bold}
                 color={theme._939393}
                 align="center">
-                {STRING.great_job_Your_account_is_now_created_successfully}
+                {isWithdrawal ? STRING.withdrawal_completed_successfully : STRING.great_job_Your_account_is_now_created_successfully}
             </Text>
         </View>
     )

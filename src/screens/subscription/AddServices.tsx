@@ -83,6 +83,7 @@ export default function AddServices(props: any) {
                                     <ServiceItem
                                         item={item}
                                         itemContainer={styles(theme).itemContainer}
+                                        isSelectedBox={true}
                                         isSelected={isSelected}
                                         onPress={(e: any) => {
                                             selectServices(e);

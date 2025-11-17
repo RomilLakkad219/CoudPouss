@@ -6,27 +6,29 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 //CONTEXT
-import {AuthContext, ThemeContext, ThemeContextType} from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
-import {FONTS, IMAGES} from '../../assets';
-import {getScaleSize, useString} from '../../constant';
+import { FONTS, IMAGES } from '../../assets';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //SCREENS
-import {SCREENS} from '..';
+import { SCREENS } from '..';
 
 //COMPONENTS
-import {Header, Input, Text, Button} from '../../components';
-import {CommonActions} from '@react-navigation/native';
+import { Header, Input, Text, Button } from '../../components';
+import { CommonActions } from '@react-navigation/native';
+import { API } from '../../api';
 
 export default function AddPersonalDetails(props: any) {
   const STRING = useString();
 
-  const {theme} = useContext<any>(ThemeContext);
-  const {userType} = useContext<any>(AuthContext);
+  const { theme } = useContext<any>(ThemeContext);
+  const { userType } = useContext<any>(AuthContext);
+  const isEmail = props?.route?.params?.email || '';
 
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
@@ -36,17 +38,64 @@ export default function AddPersonalDetails(props: any) {
   const [emailError, setEmailError] = useState('');
   const [address, setAddress] = useState('');
   const [addressError, setAddressError] = useState('');
+  const [isLoading, setLoading] = useState(false);
 
-  console.log('userType=====>', userType);
+  useEffect(() => {
+    setEmail(isEmail);
+  }, [isEmail]);
 
-  async function onLogin() {
-    if (userType == 'professional') {
+  async function onSignup() {
+    if (!name) {
+      setNameError(STRING.please_enter_your_name);
+    } else if (!mobileNo) {
+      setMobileNoError(STRING.please_enter_your_mobile_number);
+    } else if (!email) {
+      setEmailError(STRING.please_enter_your_email);
+    } else if (!address) {
+      setAddressError(STRING.please_enter_your_address);
+    } else {
+      setNameError('');
+      setMobileNoError('');
+      setEmailError('');
+      setAddressError('');
+     
+      const params = {
+        mobile: mobileNo,
+        name: name,
+        email: email,
+        address: address,
+        role: userType
+      };
+      try {
+        setLoading(true);
+        const result = await API.Instance.post(API.API_ROUTES.addPersonalDetails, params);
+        setLoading(false);
+        console.log('result', result.status, result)
+        if (result.status) {
+          SHOW_TOAST(result?.data?.message ?? '', 'success')
+          onNext();
+        } else {
+          SHOW_TOAST(result?.data?.message ?? '', 'error')
+          console.log('error==>', result?.data?.message)
+        }
+      } catch (error: any) {
+        setLoading(false);
+        SHOW_TOAST(error?.message ?? '', 'error');
+        console.log(error?.message)
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+
+  async function onNext() {
+    if (userType == 'service_provider') {
       props.navigation.navigate(SCREENS.ChooseYourSubscription.identifier);
     } else {
       props.navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{name: SCREENS.BottomBar.identifier}],
+          routes: [{ name: SCREENS.BottomBar.identifier }],
         }),
       );
     }
@@ -83,7 +132,7 @@ export default function AddPersonalDetails(props: any) {
             size={getScaleSize(18)}
             font={FONTS.Lato.SemiBold}
             color={theme._565656}
-            style={{marginBottom: getScaleSize(16)}}>
+            style={{ marginBottom: getScaleSize(16) }}>
             {STRING.enter_profile_details}
           </Text>
           <Input
@@ -91,7 +140,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.name}
             inputColor={true}
-            continerStyle={{marginBottom: getScaleSize(16)}}
+            continerStyle={{ marginBottom: getScaleSize(16) }}
             value={name}
             onChangeText={text => {
               setName(text);
@@ -104,7 +153,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.mobile_no}
             inputColor={true}
-            continerStyle={{marginBottom: getScaleSize(16)}}
+            continerStyle={{ marginBottom: getScaleSize(16) }}
             value={mobileNo}
             onChangeText={text => {
               setMobileNo(text);
@@ -117,7 +166,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.email}
             inputColor={true}
-            continerStyle={{marginBottom: getScaleSize(16)}}
+            continerStyle={{ marginBottom: getScaleSize(16) }}
             value={email}
             onChangeText={text => {
               setEmail(text);
@@ -130,7 +179,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.address}
             inputColor={true}
-            continerStyle={{marginBottom: getScaleSize(16)}}
+            continerStyle={{ marginBottom: getScaleSize(16) }}
             value={address}
             onChangeText={text => {
               setAddress(text);
@@ -147,7 +196,7 @@ export default function AddPersonalDetails(props: any) {
           marginHorizontal: getScaleSize(24),
         }}
         onPress={() => {
-          onLogin();
+          onSignup();
         }}
       />
     </View>

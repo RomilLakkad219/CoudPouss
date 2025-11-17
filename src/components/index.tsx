@@ -20,6 +20,10 @@ import PaymentBottomPopup from './PaymentBottomPopup'
 import StatusItem from './StatusItem'
 import ServiceRequest from './ServiceRequest'
 import TaskItem from './TaskItem'
+import RatingsReviewsItem from './RatingsReviewsItem'
+import UploadDocumentsSheet from './UploadDocumentsSheet'
+import TransactionItem from './TransactionItem'
+
 import BottomSheet from './BottomSheet'
 
 export {
@@ -45,5 +49,8 @@ export {
     StatusItem,
     ServiceRequest,
     TaskItem,
+    RatingsReviewsItem,
+    UploadDocumentsSheet,
+    TransactionItem,
     BottomSheet
 }

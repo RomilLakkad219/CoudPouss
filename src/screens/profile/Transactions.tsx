@@ -5,7 +5,7 @@ import React, { useContext } from 'react'
 import { ThemeContext, ThemeContextType } from '../../context'
 
 //COMPONENTS
-import { Header } from '../../components';
+import { Header, TransactionItem } from '../../components';
 
 //COMPONENTS
 import { Text } from '../../components';
@@ -18,6 +18,63 @@ export default function Transactions(props: any) {
 
     const { theme } = useContext<any>(ThemeContext);
     const STRING = useString();
+
+    const DATA = [
+        {
+            title: { month: "September", year: "2025", total: "€2,500.89" },
+            data: [{
+                name: 'Jane Cooper',
+                date: '20 Jan, 22:44',
+                amount: '€49.89',
+                status: 'Success',
+                paymentMethod: 'Credit Card',
+            }, {
+                name: 'Jane Cooper',
+                date: '20 Jan, 22:44',
+                amount: '€49.89',
+                status: 'Success',
+                paymentMethod: 'Credit Card',
+            }, {
+                name: 'Jane Cooper',
+                date: '20 Jan, 22:44',
+                amount: '€49.89',
+                status: 'Success',
+                paymentMethod: 'Credit Card',
+            }, {
+                name: 'Jane Cooper',
+                date: '20 Jan, 22:44',
+                amount: '€49.89',
+                status: 'Success',
+                paymentMethod: 'Credit Card',
+            }, {
+                name: 'Jane Cooper',
+                date: '20 Jan, 22:44',
+                amount: '€49.89',
+                status: 'Success',
+                paymentMethod: 'Credit Card',
+            }]
+        },
+        {
+            title: { month: "September", year: "2025", total: "€2,500.89" },
+            data: [{
+                name: 'Jane Cooper',
+                date: '20 Jan, 22:44',
+                amount: '€49.89',
+                status: 'Success',
+                paymentMethod: 'Credit Card',
+            }]
+        },
+        {
+            title: { month: "September", year: "2025", total: "€2,500.89" },
+            data: [{
+                name: 'Jane Cooper',
+                date: '20 Jan, 22:44',
+                amount: '€49.89',
+                status: 'Success',
+                paymentMethod: 'Credit Card',
+            }]
+        }
+    ]
 
     return (
         <View style={styles(theme).container}>
@@ -43,74 +100,21 @@ export default function Transactions(props: any) {
             </View>
             <View style={styles(theme).mainContainer}>
                 <SectionList
-                    sections={[
-                        {
-                            title: { month: "September", year: "2025", total: "€2,500.89" },
-                            data: [{
-                                name: 'Jane Cooper',
-                                date: '20 Jan, 22:44',
-                                amount: '€49.89',
-                                status: 'Success',
-                                paymentMethod: 'Credit Card',
-                            }, {
-                                name: 'Jane Cooper',
-                                date: '20 Jan, 22:44',
-                                amount: '€49.89',
-                                status: 'Success',
-                                paymentMethod: 'Credit Card',
-                            }, {
-                                name: 'Jane Cooper',
-                                date: '20 Jan, 22:44',
-                                amount: '€49.89',
-                                status: 'Success',
-                                paymentMethod: 'Credit Card',
-                            }, {
-                                name: 'Jane Cooper',
-                                date: '20 Jan, 22:44',
-                                amount: '€49.89',
-                                status: 'Success',
-                                paymentMethod: 'Credit Card',
-                            }, {
-                                name: 'Jane Cooper',
-                                date: '20 Jan, 22:44',
-                                amount: '€49.89',
-                                status: 'Success',
-                                paymentMethod: 'Credit Card',
-                            }]
-                        },
-                        {
-                            title: { month: "September", year: "2025", total: "€2,500.89" },
-                            data: [{
-                                name: 'Jane Cooper',
-                                date: '20 Jan, 22:44',
-                                amount: '€49.89',
-                                status: 'Success',
-                                paymentMethod: 'Credit Card',
-                            }]
-                        },
-                        {
-                            title: { month: "September", year: "2025", total: "€2,500.89" },
-                            data: [{
-                                name: 'Jane Cooper',
-                                date: '20 Jan, 22:44',
-                                amount: '€49.89',
-                                status: 'Success',
-                                paymentMethod: 'Credit Card',
-                            }]
-                        }
-                    ]}
-                    renderSectionHeader={({ section }) => {
+                    sections={DATA}
+                    keyExtractor={(item, index) => index.toString()}
+                    showsVerticalScrollIndicator={false}
+                    renderSectionHeader={({ section }: { section: any }) => {
                         return (
                             <View style={styles(theme).sectionHeaderContainer}>
                                 <View style={styles(theme).dateContainer}>
-                                    <Text size={getScaleSize(16)} font={FONTS.Lato.Medium} color={'#2C6587'}>
+                                    <Text size={getScaleSize(16)} font={FONTS.Lato.Medium} color={theme._2C6587}>
                                         {section.title.year}
                                     </Text>
-                                    <Text size={getScaleSize(24)} font={FONTS.Lato.Bold} color={'#2C6587'}>
+                                    <Text size={getScaleSize(24)} font={FONTS.Lato.Bold} color={theme._2C6587}>
                                         {section.title.month}
                                     </Text>
                                 </View>
-                                <Text size={getScaleSize(24)} font={FONTS.Lato.Bold} color={'#2C6587'}>
+                                <Text size={getScaleSize(24)} font={FONTS.Lato.Bold} color={theme._2C6587}>
                                     {section.title.total}
                                 </Text>
                             </View>
@@ -118,25 +122,9 @@ export default function Transactions(props: any) {
                     }}
                     renderItem={({ item }) => {
                         return (
-                            <View style={styles(theme).transactionItem}>
-                                <Image style={styles(theme).transactionItemImage} />
-                                <View style={styles(theme).transactionItemDetails}>
-                                    <Text size={getScaleSize(19)} font={FONTS.Lato.Medium} color={theme._2B2B2B}>
-                                        {item.name}
-                                    </Text>
-                                    <Text size={getScaleSize(16)} font={FONTS.Lato.SemiBold} color={theme._818285}>
-                                        {item.date}
-                                    </Text>
-                                </View>
-                                <View style={styles(theme).transactionStatusContainer}>
-                                    <Text size={getScaleSize(16)} font={FONTS.Lato.SemiBold} color={'#787878'}>
-                                        {item.amount}
-                                    </Text> 
-                                    <Text size={getScaleSize(16)} font={FONTS.Lato.SemiBold} color={'#4CAF50'}>
-                                        {item.status}
-                                    </Text>
-                                </View>
-                            </View>
+                            <TransactionItem 
+                            item={item} 
+                            itemContainer={styles(theme).itemContainer} />
                         )
                     }}
                 />
@@ -160,7 +148,7 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
     filterView: {
         borderRadius: getScaleSize(4),
         borderWidth: 1,
-        borderColor: '#DCDDDD',
+        borderColor: theme._DCDDDD,
         paddingHorizontal: getScaleSize(16),
         paddingVertical: getScaleSize(10),
         flexDirection: 'row',
@@ -178,31 +166,17 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
     sectionHeaderContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: "#EAF0F3",
+        backgroundColor: theme._EAF0F3,
         paddingVertical: getScaleSize(13),
         paddingHorizontal: getScaleSize(22),
-        marginTop: getScaleSize(6),
+        marginTop: getScaleSize(20),
+        marginBottom: getScaleSize(12),
     },
     dateContainer: {
         flex: 1.0
     },
-    transactionItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: getScaleSize(16),
-        paddingHorizontal: getScaleSize(22),
-    },
-    transactionItemImage: {
-        width: getScaleSize(48),
-        height: getScaleSize(48),
-        borderRadius: getScaleSize(24),
-        backgroundColor: theme._D5D5D5,
-    },
-    transactionItemDetails: {
-        flex: 1.0,
-        marginHorizontal: getScaleSize(12),
-    },
-    transactionStatusContainer: {
-        alignItems: 'flex-end',
+    itemContainer:{
+        marginHorizontal: getScaleSize(22),
+        marginVertical: getScaleSize(12),
     }
 })

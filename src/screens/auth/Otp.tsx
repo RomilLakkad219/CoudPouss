@@ -6,7 +6,7 @@ import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
@@ -16,22 +16,117 @@ import { Header, Input, Text, Button } from '../../components';
 
 //PACKAGES
 import OTPTextInput from 'react-native-otp-textinput';
+import { API } from '../../api';
 
 export default function Otp(props: any) {
 
     const STRING = useString();
     const { isFromSignup } = props.route.params || false;
+    const email = props?.route?.params?.email || '';
 
     const { theme } = useContext<any>(ThemeContext);
     const otpInput = useRef<OTPTextInput>(null);
 
     const [otp, setOtp] = useState('');
+    const [otpError, setOtpError] = useState('');
+    const [isLoading, setLoading] = useState(false);
 
     async function onOtp() {
-        if(isFromSignup){
-            props.navigation.navigate(SCREENS.CreatePassword.identifier);
-        }else{
-            props.navigation.navigate(SCREENS.NewPassword.identifier);
+        if (isFromSignup) {
+            onSignup()
+        } else {
+            onNewPassword();
+        }
+    }
+
+    async function onNewPassword() {
+        if (!otp) {
+            setOtpError(STRING.please_enter_your_otp);
+        } else {
+            setOtpError('');
+            const params = {
+                email: email,
+                otp: otp,
+            };
+            try {
+                setLoading(true);
+                const result = await API.Instance.post(API.API_ROUTES.verifyResetPassword, params);
+                setLoading(false);
+                console.log('result', result.status, result)
+                if (result.status) {
+                    SHOW_TOAST(result?.data?.message ?? '', 'success')
+                    props.navigation.navigate(SCREENS.NewPassword.identifier, {
+                        email: email,
+                    });
+                } else {
+                    SHOW_TOAST(result?.data?.message ?? '', 'error')
+                    console.log('error==>', result?.data?.message)
+                }
+            } catch (error: any) {
+                setLoading(false);
+                SHOW_TOAST(error?.message ?? '', 'error');
+                console.log(error?.message)
+            } finally {
+                setLoading(false);
+            }
+        }
+    }
+
+
+    async function onSignup() {
+        if (!otp) {
+            setOtpError(STRING.please_enter_your_otp);
+        } else {
+            setOtpError('');
+            const params = {
+                email: email,
+                otp: otp,
+            };
+            try {
+                setLoading(true);
+                const result = await API.Instance.post(API.API_ROUTES.verifyOtp, params);
+                setLoading(false);
+                console.log('result', result.status, result)
+                if (result.status) {
+                    SHOW_TOAST(result?.data?.message ?? '', 'success')
+                    props.navigation.navigate(SCREENS.CreatePassword.identifier, {
+                        email: email
+                    });
+                } else {
+                    SHOW_TOAST(result?.data?.message ?? '', 'error')
+                    console.log('error==>', result?.data?.message)
+                }
+            } catch (error: any) {
+                setLoading(false);
+                SHOW_TOAST(error?.message ?? '', 'error');
+                console.log(error?.message)
+            } finally {
+                setLoading(false);
+            }
+        }
+    }
+
+    async function onResendOtp() {
+        try {
+            setLoading(true);
+            const result = await API.Instance.post(API.API_ROUTES.resendOtp, { email: email });
+            setLoading(false);
+            console.log('result', result.status, result)
+            if (result.status) {
+                SHOW_TOAST(result?.data?.message ?? '', 'success')
+                otpInput.current?.clear();
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+                console.log('error==>', result?.data?.message)
+            }
+        }
+        catch (error: any) {
+            setLoading(false);
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        }
+        finally {
+            setLoading(false);
         }
     }
 
@@ -68,10 +163,23 @@ export default function Otp(props: any) {
                             offTintColor={theme._BFBFBF} // border color when inactive
                             textInputStyle={styles(theme).textInput}
                         />
+                        {otpError &&
+                            <Text
+                                style={{ marginTop: getScaleSize(8) }}
+                                size={getScaleSize(16)}
+                                font={FONTS.Lato.Regular}
+                                color={theme._EF5350}>
+                                {otpError}
+                            </Text>
+                        }
                     </View>
+
                 </View>
             </ScrollView>
-            <TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => {
+                    onResendOtp();
+                }}>
                 <Text
                     size={getScaleSize(20)}
                     font={FONTS.Lato.SemiBold}

@@ -1,20 +1,37 @@
-import React, {useContext} from 'react';
-import {View, StyleSheet, Image, Text} from 'react-native';
+import React, {useContext, useRef, useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Image,
+  Dimensions,
+  Animated,
+  Easing,
+  Text,
+} from 'react-native';
 import {ThemeContext, ThemeContextType} from '../context';
-import {getScaleSize} from '../constant';
+import {getScaleSize, useString} from '../constant';
 import {FONTS, IMAGES} from '../assets';
+import {constant} from 'lodash';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 const StatusItem = (props: any) => {
+  const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
 
   function getImage() {
     if (props?.item?.serviceRunning) {
       return IMAGES.service_running;
     } else {
-      if (props?.item?.completed) {
-        return IMAGES.status_green;
+      if (props?.item?.isRejected) {
+        return IMAGES.ic_rejected;
       } else {
-        return IMAGES.empty_view;
+        if (props?.item?.completed) {
+          return IMAGES.status_green;
+        } else {
+          return IMAGES.empty_view;
+        }
       }
     }
   }
@@ -23,13 +40,6 @@ const StatusItem = (props: any) => {
     <View style={[styles(theme).statusItem, {}]}>
       {/* Timeline line */}
       <View style={styles(theme).timelineContainer}>
-        {/* <View
-          style={[
-            styles(theme).timelineDot,
-            props?.item?.completed ? styles(theme).completedDot : styles(theme).pendingDot,
-          ]}>
-          {props?.item?.completed && <View style={styles(theme).innerDot} />}
-        </View> */}
         <Image
           style={{
             height: getScaleSize(24),
@@ -43,7 +53,11 @@ const StatusItem = (props: any) => {
             style={[
               styles(theme).timelineLine,
               {
-                backgroundColor: props?.item?.completed ? '#2E7D32' : '#424242',
+                backgroundColor: props?.item?.isRejected
+                  ? 'red'
+                  : props?.item?.completed
+                  ? '#2E7D32'
+                  : '#424242',
               },
             ]}
           />

@@ -49,6 +49,15 @@ import MyProfile from './profile/MyProfile';
 import RatingsReviews from './profile/RatingsReviews';
 import Transactions from './profile/Transactions';
 import Notifications from './profile/Notifications';
+import MyProfileProfessional from './profile/MyProfileProfessional';
+import EditProfile from './profile/EditProfile';
+import ApplicationStatus from './profile/ApplicationStatus';
+import ManageServices from './profile/ManageServices';
+import MyEarnings from './profile/MyEarnings';
+import BankDetails from './profile/BankDetails';
+import WithdrawHistory from './profile/WithdrawHistory';
+import MoneyWithdrawal from './profile/MoneyWithdrawal';
+import ManageSubscription from './subscription/ManageSubscription';
 
 export const SCREENS = {
   Splash: {
@@ -208,6 +217,42 @@ export const SCREENS = {
     identifier: 'ProfessionalTaskDetails',
     component: ProfessionalTaskDetails,
   },
+  MyProfileProfessional: {
+    identifier: 'MyProfileProfessional',
+    component: MyProfileProfessional,
+  },
+  EditProfile: {
+    identifier: 'EditProfile',
+    component: EditProfile,
+  },
+  ApplicationStatus:{
+    identifier: 'ApplicationStatus',
+    component: ApplicationStatus,
+  },
+  ManageServices: {
+    identifier: 'ManageServices',
+    component: ManageServices,
+  },
+  MyEarnings: {
+    identifier: 'MyEarnings',
+    component: MyEarnings,
+  },
+  BankDetails: {
+    identifier: 'BankDetails',
+    component: BankDetails,
+  },
+  WithdrawHistory: {
+    identifier: 'WithdrawHistory',
+    component: WithdrawHistory,
+  },
+  MoneyWithdrawal: {
+    identifier: 'MoneyWithdrawal',
+    component: MoneyWithdrawal,
+  },
+  ManageSubscription:{
+    identifier: 'ManageSubscription',
+    component: ManageSubscription,
+  },
   ProfessionalTaskStatus: {
     identifier: 'ProfessionalTaskStatus',
     component: ProfessionalTaskStatus,
@@ -243,4 +288,5 @@ export const TABS = {
     identifier: 'Task',
     component: Task,
   },
+ 
 };
