@@ -12,6 +12,9 @@ const API_ROUTES = {
     resetPassword: 'userService/auth/reset/start',
     verifyResetPassword: 'userService/auth/reset/verify',
     createNewPassword: 'userService/auth/reset/confirm',
+    getUserDetails: 'userService/auth/get_user',
+    uploadProfileImage: 'userService/auth/upload-profile-photo',
+    getHomeData: "home_module/home",
 }
 
 export { API_ROUTES, API_BASE_URL, DISABLE_API_LOGS }

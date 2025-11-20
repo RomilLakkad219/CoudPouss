@@ -2,33 +2,50 @@ import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { getScaleSize, REGEX, SHOW_TOAST, Storage, useString } from '../../constant';
 
 //COMPONENTS
-import { Header, Input, Text, Button } from '../../components';
+import { Header, Input, Text, Button, SelectCountrySheet } from '../../components';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //PACKAGES
 import { CommonActions } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { API } from '../../api';
 
 export default function Login(props: any) {
 
   const STRING = useString();
-
+  const { setUser, setUserType } = useContext<any>(AuthContext);
   const { theme } = useContext<any>(ThemeContext);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(true);
   const [passwordError, setPasswordError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isLoading, setLoading] = useState(false);
+  const [visibleCountry, setVisibleCountry] = useState(false);
+  const [countryCode, setCountryCode] = useState('+91');
+  const [isPhoneNumber, setIsPhoneNumber] = useState(false);
+
+  useEffect(() => {
+    if (email.length >= 3) {
+      const isNumber = REGEX.phoneRegex.test(email);
+      setIsPhoneNumber(isNumber)
+    }
+    else {
+      setIsPhoneNumber(false)
+    }
+  }, [email])
+
+
 
   async function onVerification() {
     if (!email) {
@@ -44,18 +61,29 @@ export default function Login(props: any) {
 
 
   async function onLogin() {
-    const params = {
-      email: email,
-      password: password,
-    };
-
+    let params = {}
+    if (isPhoneNumber) {
+      params = {
+        mobile: email,
+        phone_country_code: countryCode,
+        password: password,
+      }
+    } else {
+      params = {
+        email: email,
+        password: password,
+      }
+    }
     try {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
       setLoading(false);
       console.log('result', result.status, result)
       if (result.status) {
-        console.log('result?.data?.data?', result?.data?.data?.token)
+        console.log('result?.data?.data?', result?.data?.data)
+        Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
+        setUser(result?.data?.data);
+        setUserType(result?.data?.data?.user_data?.role);
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -96,20 +124,42 @@ export default function Login(props: any) {
             {STRING.enter_your_email_and_password_to_login}
           </Text>
           <View style={styles(theme).inputContainer}>
-            <Input
-              placeholder={STRING.enter_email_or_mobile_number}
-              placeholderTextColor={theme._939393}
-              inputTitle={STRING.email_or_mobile_number}
-              inputColor={false}
-              value={email}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              onChangeText={text => {
-                setEmail(text);
-                setEmailError('');
-              }}
-              isError={emailError}
-            />
+            {isPhoneNumber ? (
+              <Input
+                placeholder={STRING.enter_email_or_mobile_number}
+                placeholderTextColor={theme._939393}
+                inputTitle={STRING.email_or_mobile_number}
+                inputColor={false}
+                value={email}
+                maxLength={10}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                countryCode={countryCode ? countryCode : '+91'}
+                onPressCountryCode={() => {
+                  setVisibleCountry(true);
+                }}
+                onChangeText={text => {
+                  setEmail(text);
+                  setEmailError('');
+                }}
+                isError={emailError}
+              />
+            ) : (
+              <Input
+                placeholder={STRING.enter_email_or_mobile_number}
+                placeholderTextColor={theme._939393}
+                inputTitle={STRING.email_or_mobile_number}
+                inputColor={false}
+                value={email}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={text => {
+                  setEmail(text);
+                  setEmailError('');
+                }}
+                isError={emailError}
+              />
+            )}
           </View>
           <View style={styles(theme).inputContainer}>
             <Input
@@ -167,6 +217,18 @@ export default function Login(props: any) {
           </Text>
         </View>
       </ScrollView>
+      <SelectCountrySheet
+        height={getScaleSize(500)}
+        isVisible={visibleCountry}
+        onPress={(e: any) => {
+          console.log('e000', e)
+          setCountryCode(e.dial_code);
+          setVisibleCountry(false);
+        }}
+        onClose={() => {
+          setVisibleCountry(false);
+        }}
+      />
     </View>
   );
 }

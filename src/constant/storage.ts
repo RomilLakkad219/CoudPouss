@@ -23,7 +23,7 @@ const Storage = {
         }
     },
     async clear() {
-        const result = await AsyncStorage.clear()
+        const result = await AsyncStorage.removeItem(Storage.USER_DETAILS)
         return result
     },
 }

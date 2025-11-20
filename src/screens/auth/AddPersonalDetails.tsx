@@ -4,6 +4,7 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
@@ -13,22 +14,26 @@ import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, Storage, useString } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //COMPONENTS
-import { Header, Input, Text, Button } from '../../components';
+import { Header, Input, Text, Button, SelectCountrySheet } from '../../components';
 import { CommonActions } from '@react-navigation/native';
 import { API } from '../../api';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 export default function AddPersonalDetails(props: any) {
   const STRING = useString();
 
   const { theme } = useContext<any>(ThemeContext);
-  const { userType } = useContext<any>(AuthContext);
+  const { userType, setUser, setUserType } = useContext<any>(AuthContext);
+
   const isEmail = props?.route?.params?.email || '';
+  const isPhoneNumber = props?.route?.params?.isPhoneNumber || false;
+  const isCountryCode = props?.route?.params?.countryCode || '+91';
 
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
@@ -39,10 +44,64 @@ export default function AddPersonalDetails(props: any) {
   const [address, setAddress] = useState('');
   const [addressError, setAddressError] = useState('');
   const [isLoading, setLoading] = useState(false);
+  const [visibleCountry, setVisibleCountry] = useState(false);
+  const [countryCode, setCountryCode] = useState('+91');
+  const [profileImage, setProfileImage] = useState<any>(null);
 
   useEffect(() => {
-    setEmail(isEmail);
+    if (isPhoneNumber) {
+      setMobileNo(isEmail);
+      setCountryCode(isCountryCode);
+    } else {
+      setEmail(isEmail);
+    }
   }, [isEmail]);
+
+  const pickImage = async () => {
+    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+      if (!response.didCancel && !response.errorCode && response.assets) {
+        const asset: any = response.assets[0];
+        console.log('asset', asset)
+        setProfileImage(asset);
+        uploadProfileImage(asset);
+      } else {
+        console.log('response', response)
+      }
+    });
+  }
+
+  async function uploadProfileImage(asset: any) {
+    try {
+      const formData = new FormData();
+      formData.append(isPhoneNumber ? 'mobile' : 'email', isEmail);
+      formData.append('file', {
+        uri: asset?.uri,
+        name: asset?.fileName || 'profile_image.jpg',
+        type: asset?.type || 'image/jpeg',
+      });
+      setLoading(true);
+      const result = await API.Instance.post(API.API_ROUTES.uploadProfileImage, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setLoading(false);
+      console.log('result', result.status, result)
+      if (result.status) {
+        SHOW_TOAST(result?.data?.message ?? '', 'success')
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+      console.log('error==>', result?.data?.message)
+    }
+    catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function onSignup() {
     if (!name) {
@@ -58,9 +117,10 @@ export default function AddPersonalDetails(props: any) {
       setMobileNoError('');
       setEmailError('');
       setAddressError('');
-     
+
       const params = {
         mobile: mobileNo,
+        phone_country_code: countryCode,
         name: name,
         email: email,
         address: address,
@@ -73,6 +133,9 @@ export default function AddPersonalDetails(props: any) {
         console.log('result', result.status, result)
         if (result.status) {
           SHOW_TOAST(result?.data?.message ?? '', 'success')
+          Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
+          setUser(result?.data?.data);
+          setUserType(result?.data?.data?.user_data?.role);
           onNext();
         } else {
           SHOW_TOAST(result?.data?.message ?? '', 'error')
@@ -89,16 +152,16 @@ export default function AddPersonalDetails(props: any) {
   }
 
   async function onNext() {
-    if (userType == 'service_provider') {
-      props.navigation.navigate(SCREENS.ChooseYourSubscription.identifier);
-    } else {
+    // if (userType == 'service_provider') {
+    //   props.navigation.navigate(SCREENS.ChooseYourSubscription.identifier);
+    // } else {
       props.navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: SCREENS.BottomBar.identifier }],
         }),
       );
-    }
+    // }
   }
 
   return (
@@ -112,21 +175,35 @@ export default function AddPersonalDetails(props: any) {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles(theme).mainContainer}>
           <View style={styles(theme).imageContainer}>
-            <View style={styles(theme).image}>
+            {profileImage ? (
+              <Image source={{ uri: profileImage?.uri }} style={styles(theme).image} />
+            ) : (
+              <View style={styles(theme).image}>
+                <Text
+                  size={getScaleSize(24)}
+                  font={FONTS.Lato.Regular}
+                  color={theme._262B43E5}>
+                  {STRING.bc}
+                </Text>
+              </View>
+            )}
+            {/* <View style={styles(theme).image}>
               <Text
                 size={getScaleSize(24)}
                 font={FONTS.Lato.Regular}
                 color={theme._262B43E5}>
                 {STRING.bc}
               </Text>
-            </View>
-            <Text
-              size={getScaleSize(16)}
-              font={FONTS.Lato.SemiBold}
-              color={theme._2C6587}
-              align="center">
-              {STRING.upload_profile_picture}
-            </Text>
+            </View> */}
+            <TouchableOpacity onPress={() => { pickImage() }}>
+              <Text
+                size={getScaleSize(16)}
+                font={FONTS.Lato.SemiBold}
+                color={theme._2C6587}
+                align="center">
+                {STRING.upload_profile_picture}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Text
             size={getScaleSize(18)}
@@ -155,11 +232,16 @@ export default function AddPersonalDetails(props: any) {
             inputColor={true}
             continerStyle={{ marginBottom: getScaleSize(16) }}
             value={mobileNo}
+            editable={!isPhoneNumber}
             onChangeText={text => {
               setMobileNo(text);
               setMobileNoError('');
             }}
             isError={mobileNoError}
+            countryCode={countryCode}
+            onPressCountryCode={() => {
+              setVisibleCountry(true);
+            }}
           />
           <Input
             placeholder={STRING.enter_email}
@@ -168,6 +250,7 @@ export default function AddPersonalDetails(props: any) {
             inputColor={true}
             continerStyle={{ marginBottom: getScaleSize(16) }}
             value={email}
+            editable={isPhoneNumber}
             onChangeText={text => {
               setEmail(text);
               setEmailError('');
@@ -197,6 +280,17 @@ export default function AddPersonalDetails(props: any) {
         }}
         onPress={() => {
           onSignup();
+        }}
+      />
+      <SelectCountrySheet
+        height={getScaleSize(500)}
+        isVisible={visibleCountry}
+        onPress={(e: any) => {
+          setCountryCode(e.dial_code);
+          setVisibleCountry(false);
+        }}
+        onClose={() => {
+          setVisibleCountry(false);
         }}
       />
     </View>
