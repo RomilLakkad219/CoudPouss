@@ -23,7 +23,7 @@ import TaskItem from './TaskItem'
 import RatingsReviewsItem from './RatingsReviewsItem'
 import UploadDocumentsSheet from './UploadDocumentsSheet'
 import TransactionItem from './TransactionItem'
-
+import SelectCountrySheet from './SelectCountrySheet'
 import BottomSheet from './BottomSheet'
 
 export {
@@ -52,5 +52,6 @@ export {
     RatingsReviewsItem,
     UploadDocumentsSheet,
     TransactionItem,
-    BottomSheet
+    BottomSheet,
+    SelectCountrySheet
 }

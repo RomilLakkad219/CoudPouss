@@ -2,25 +2,52 @@ import { Dimensions, Image, SafeAreaView, StatusBar, StyleSheet, Text, View } fr
 import React, { useContext, useEffect } from 'react'
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../context'
+import { AuthContext, ThemeContext, ThemeContextType } from '../context'
 
 //CONSTANT & ASSETS
 import { IMAGES } from '../assets'
-import { getScaleSize } from '../constant'
+import { getScaleSize, Storage } from '../constant'
 
 //SCREENS
 import { SCREENS } from '.'
+import { CommonActions } from '@react-navigation/native'
 
 
 export default function Splash(props: any) {
 
     const { theme } = useContext(ThemeContext)
+    const { setUser, setUserType } = useContext<any>(AuthContext);
 
     useEffect(() => {
-        setTimeout(() => {
-            props?.navigation?.navigate(SCREENS.Login.identifier)
-        }, 2000)
+        checkUserDetails()
     }, [])
+
+    async function checkUserDetails() {
+        const userDetails = await Storage.get(Storage.USER_DETAILS);
+        const userData = JSON.parse(userDetails ?? '{}');
+        console.log('userData', userData)
+        if (userData && userData?.user_data?.role) {
+            setUser(userData);
+            setUserType(userData?.user_data?.role);
+            setTimeout(() => {
+                props?.navigation?.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: SCREENS.BottomBar.identifier }],
+                    }),
+                );
+            }, 1000)
+        } else {
+            setTimeout(() => {
+                props?.navigation?.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: SCREENS.Login.identifier }],
+                    }),
+                );
+            }, 2000)
+        }
+    };
 
     return (
         <View style={styles(theme).container}>

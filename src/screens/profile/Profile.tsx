@@ -12,18 +12,21 @@ import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, Storage, useString } from '../../constant';
 
 //COMPONENTS
 import { Text, HomeHeader, SearchComponent, Header, Button } from '../../components';
 import { SCREENS } from '..';
+import { CommonActions } from '@react-navigation/native';
 
 
 export default function Profile(props: any) {
 
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
-  const { userType } = useContext<any>(AuthContext);
+  const { userType, setUser, setUserType, user } = useContext<any>(AuthContext);
+
+  console.log('user==', user)
 
   const profileItemsElder = [
     { id: 1, title: STRING.my_profile, icon: IMAGES.ic_my_profile, onPress: SCREENS.MyProfile.identifier },
@@ -50,23 +53,43 @@ export default function Profile(props: any) {
   }
 
 
+  async function logout() {
+    props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: SCREENS.Login.identifier }],
+      }),
+    );
+    await Storage.clear()
+    setUser(null);
+    setUserType(null);
+  }
+
+
   return (
     <View style={styles(theme).container}>
       <Header
         type="profile"
         rightIcon={{ icon: IMAGES.ic_logout, title: STRING.logout }}
-        onPress={() => { }}
+        onPress={() => {
+          logout();
+        }}
         screenName={STRING.my_account}
       />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles(theme).mainContainer}>
-          <View style={styles(theme).profileContainer} />
+          {user?.user_data?.profile_image ? (
+            <Image source={{ uri: user?.user_data?.profile_image }} style={styles(theme).profileContainer} />
+          ) : (
+            <View style={styles(theme).profileContainer} />
+          )}
+
           <Text
             size={getScaleSize(22)}
             font={FONTS.Lato.SemiBold}
             align="center"
             color={theme._2B2B2B}>
-            {'Bessie Cooper'}
+            {user?.user_data?.name ?? ''}
           </Text>
           {userType === 'service_provider' && (
             <View style={styles(theme).checkStatusContainer}>
@@ -79,10 +102,10 @@ export default function Profile(props: any) {
                 {STRING.account_under_verification}
               </Text>
               <TouchableOpacity
-               onPress={() => { 
-                props.navigation.navigate(SCREENS.ApplicationStatus.identifier);
-               }}
-               style={styles(theme).checkStatusButton}>
+                onPress={() => {
+                  props.navigation.navigate(SCREENS.ApplicationStatus.identifier);
+                }}
+                style={styles(theme).checkStatusButton}>
                 <Text
                   size={getScaleSize(16)}
                   font={FONTS.Lato.SemiBold}
