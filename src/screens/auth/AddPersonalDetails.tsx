@@ -22,12 +22,14 @@ import { SCREENS } from '..';
 import { Header, Input, Text, Button } from '../../components';
 import { CommonActions } from '@react-navigation/native';
 import { API } from '../../api';
+import { upsertUserProfile } from '../../services/chat';
+import { Storage } from '../../constant';
 
 export default function AddPersonalDetails(props: any) {
   const STRING = useString();
 
   const { theme } = useContext<any>(ThemeContext);
-  const { userType } = useContext<any>(AuthContext);
+  const { userType, setUser, setUserType } = useContext<any>(AuthContext);
   const isEmail = props?.route?.params?.email || '';
 
   const [name, setName] = useState('');
@@ -73,6 +75,56 @@ export default function AddPersonalDetails(props: any) {
         console.log('result', result.status, result)
         if (result.status) {
           SHOW_TOAST(result?.data?.message ?? '', 'success')
+          
+          // If API returns user data, store it and sync to Firestore
+          const responseData = result?.data?.data;
+          if (responseData?.user_data || responseData?.user_id) {
+            const userData = responseData?.user_data || {
+              user_id: responseData?.user_id,
+              name: name,
+              email: email,
+              mobile: mobileNo,
+              role: userType,
+              address: address,
+            };
+
+            // Store user session
+            const authPayload = {
+              token: responseData?.access_token,
+              refreshToken: responseData?.refresh_token,
+              tokenType: responseData?.token_type || 'bearer',
+              accessTokenExpire: responseData?.access_token_expire,
+              refreshTokenExpire: responseData?.refresh_token_expire,
+              user: userData,
+            };
+
+            await Storage.save(Storage.USER_DETAILS, JSON.stringify(authPayload));
+
+            const fullUserData = {
+              ...userData,
+              token: responseData?.access_token,
+              refreshToken: responseData?.refresh_token,
+              tokenType: responseData?.token_type || 'bearer',
+            };
+
+            setUser(fullUserData);
+            setUserType(userType);
+
+            // Sync user to Firestore
+            try {
+              await upsertUserProfile({
+                user_id: userData?.user_id,
+                name: userData?.name || name,
+                email: userData?.email || email,
+                mobile: userData?.mobile || mobileNo,
+                role: userData?.role || userType,
+                address: userData?.address || address,
+              });
+            } catch (firestoreError) {
+              console.log('Failed to sync user with Firestore after signup', firestoreError);
+            }
+          }
+          
           onNext();
         } else {
           SHOW_TOAST(result?.data?.message ?? '', 'error')

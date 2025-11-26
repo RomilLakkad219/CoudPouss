@@ -1,28 +1,29 @@
-import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import {Dimensions, Image, ScrollView, StyleSheet, View} from 'react-native';
+import React, {useContext, useState} from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import {ThemeContext, ThemeContextType, AuthContext} from '../../context';
 
 //CONSTANT & ASSETS
-import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import {FONTS, IMAGES} from '../../assets';
+import {getScaleSize, SHOW_TOAST, Storage, useString} from '../../constant';
 
 //COMPONENTS
-import { Header, Input, Text, Button } from '../../components';
+import {Header, Input, Text, Button} from '../../components';
 
 //SCREENS
-import { SCREENS } from '..';
+import {SCREENS} from '..';
 
 //PACKAGES
-import { CommonActions } from '@react-navigation/native';
-import { API } from '../../api';
+import {CommonActions} from '@react-navigation/native';
+import {API} from '../../api';
+import {upsertUserProfile} from '../../services/chat';
 
 export default function Login(props: any) {
-
   const STRING = useString();
 
-  const { theme } = useContext<any>(ThemeContext);
+  const {theme} = useContext<any>(ThemeContext);
+  const {setUser, setUserType} = useContext<any>(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(true);
@@ -38,10 +39,48 @@ export default function Login(props: any) {
     } else {
       setEmailError('');
       setPasswordError('');
-      onLogin()
+      onLogin();
     }
   }
 
+  async function persistUserSession(loginResponse: any) {
+    const authPayload = {
+      token: loginResponse?.access_token,
+      refreshToken: loginResponse?.refresh_token,
+      tokenType: loginResponse?.token_type,
+      accessTokenExpire: loginResponse?.access_token_expire,
+      refreshTokenExpire: loginResponse?.refresh_token_expire,
+      user: loginResponse?.user_data,
+    };
+
+    await Storage.save(Storage.USER_DETAILS, JSON.stringify(authPayload));
+
+    const userData = {
+      ...(loginResponse?.user_data ?? {}),
+      token: loginResponse?.access_token,
+      refreshToken: loginResponse?.refresh_token,
+      tokenType: loginResponse?.token_type,
+    };
+
+    setUser(userData);
+    const role = loginResponse?.user_data?.role;
+    if (role) {
+      setUserType(role);
+    }
+
+    try {
+      await upsertUserProfile({
+        user_id: loginResponse?.user_data?.user_id,
+        name: loginResponse?.user_data?.name,
+        email: loginResponse?.user_data?.email,
+        mobile: loginResponse?.user_data?.mobile,
+        role: loginResponse?.user_data?.role,
+        address: loginResponse?.user_data?.address,
+      });
+    } catch (firestoreError) {
+      console.log('Failed to sync user with Firestore', firestoreError);
+    }
+  }
 
   async function onLogin() {
     const params = {
@@ -52,24 +91,24 @@ export default function Login(props: any) {
     try {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
-      setLoading(false);
-      console.log('result', result.status, result)
-      if (result.status) {
-        console.log('result?.data?.data?', result?.data?.data?.token)
+      console.log('result', result.status, result);
+      if (result.status && result?.data?.data) {
+        await persistUserSession(result?.data?.data);
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: SCREENS.BottomBar.identifier }],
+            routes: [{name: SCREENS.BottomBar.identifier}],
           }),
         );
       } else {
-        SHOW_TOAST(result?.data?.msg, 'error')
-        console.log(result?.data?.msg)
+        SHOW_TOAST(result?.data?.msg, 'error');
+        console.log(result?.data?.msg);
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log(error?.message)
+      console.log(error?.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -84,7 +123,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.ExtraBold}
             color={theme._2C6587}
             align="center"
-            style={{ marginBottom: getScaleSize(12) }}>
+            style={{marginBottom: getScaleSize(12)}}>
             {STRING.welcome_back}
           </Text>
           <Text
@@ -92,7 +131,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.SemiBold}
             color={theme._565656}
             align="center"
-            style={{ marginBottom: getScaleSize(36) }}>
+            style={{marginBottom: getScaleSize(36)}}>
             {STRING.enter_your_email_and_password_to_login}
           </Text>
           <View style={styles(theme).inputContainer}>
@@ -131,8 +170,9 @@ export default function Login(props: any) {
             />
           </View>
           <Button
-            title="Log In"
-            style={{ marginTop: getScaleSize(8), marginBottom: getScaleSize(24) }}
+            title={isLoading ? 'Logging in...' : 'Log In'}
+            style={{marginTop: getScaleSize(8), marginBottom: getScaleSize(24)}}
+            disabled={isLoading}
             onPress={() => {
               onVerification();
             }}
@@ -142,7 +182,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.Regular}
             color={theme._999999}
             align="center"
-            style={{ marginTop: getScaleSize(12) }}>
+            style={{marginTop: getScaleSize(12)}}>
             {STRING.dont_have_an_account}{' '}
             <Text
               size={getScaleSize(20)}
@@ -162,7 +202,7 @@ export default function Login(props: any) {
             }}
             color={theme._999999}
             align="center"
-            style={{ marginTop: getScaleSize(24) }}>
+            style={{marginTop: getScaleSize(24)}}>
             {STRING.forgot_password}
           </Text>
         </View>
@@ -176,13 +216,13 @@ const styles = (theme: ThemeContextType['theme']) =>
     container: {
       flex: 1.0,
       backgroundColor: theme.white,
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     mainContainer: {
       flex: 1.0,
       marginHorizontal: getScaleSize(24),
       marginVertical: getScaleSize(24),
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     logo: {
       width: Dimensions.get('window').width - getScaleSize(240),
