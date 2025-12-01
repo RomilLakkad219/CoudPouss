@@ -4,7 +4,7 @@ import Input from './Input'
 import Button from './Button'
 import HomeHeader from './HomeHeader'
 import RequestItem from './RequestItem'
-import Favourites from './Favourites'
+import FavouritesItem from './FavouritesItem'
 import SearchComponent from './SearchComponent'
 import Tabbar from './Tabbar'
 import ProgressSlider from './ProgressSlider'
@@ -33,7 +33,7 @@ export {
     Button,
     HomeHeader,
     RequestItem,
-    Favourites,
+    FavouritesItem,
     SearchComponent,
     Tabbar,
     ProgressSlider,

@@ -10,41 +10,46 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../context';
 
 //CONSTANTS & ASSETS
-import {getScaleSize, useString} from '../constant';
-import {FONTS, IMAGES} from '../assets';
+import { getScaleSize, useString } from '../constant';
+import { FONTS, IMAGES } from '../assets';
 
 //COMPONENTS
 import Text from './Text';
-import {flatMap, head} from 'lodash';
+import { flatMap, head } from 'lodash';
 
 const HEADER_HEIGHT = 260;
 
 const HomeHeader = (props: any) => {
   const STRING = useString();
-  const {theme} = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
+  const { user } = useContext<any>(AuthContext);
 
   return (
     <View style={styles(theme).container}>
       <View style={styles(theme).headerView}>
-        <Text
-          style={{flex: 1.0}}
-          size={getScaleSize(16)}
-          font={FONTS.Lato.Medium}
-          color={theme.white}>
-          {'Hello! James\n'}
+        <View style={{ flex: 1.0, marginRight: getScaleSize(16) }}>
+          <Text
+            style={{ flex: 1.0 }}
+            numberOfLines={1}
+            size={getScaleSize(16)}
+            font={FONTS.Lato.Medium}
+            color={theme.white}>
+            {`Hello! ${user?.user_data?.name}\n`}
+
+          </Text>
           <Text
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.white}>
             {STRING.welcome_to_coudpouss}
           </Text>
-        </Text>
+        </View>
         <TouchableOpacity
           style={styles(theme).notificationContainer}
           activeOpacity={1}
@@ -59,10 +64,10 @@ const HomeHeader = (props: any) => {
         <TouchableOpacity
           style={[
             styles(theme).placeholderImage,
-            {marginLeft: getScaleSize(12)},
+            { marginLeft: getScaleSize(12) },
           ]}
           activeOpacity={1}
-          onPress={() => {}}>
+          onPress={() => { }}>
           <Image
             style={styles(theme).placeholderImage}
             source={IMAGES.user_placeholder}
@@ -90,7 +95,7 @@ const HomeHeader = (props: any) => {
           <Image style={styles(theme).workerImage} source={IMAGES.worker} />
         </View>
         <View style={styles(theme).textView}>
-          <View style={{flexDirection: 'row'}}>
+          <View style={{ flexDirection: 'row' }}>
             <Text
               size={getScaleSize(48)}
               font={FONTS.Lato.Bold}
@@ -105,7 +110,7 @@ const HomeHeader = (props: any) => {
             </Text>
           </View>
           <Text
-            style={{marginTop: getScaleSize(8)}}
+            style={{ marginTop: getScaleSize(8) }}
             size={getScaleSize(12)}
             font={FONTS.Lato.Regular}
             color={theme.white}>
@@ -114,7 +119,7 @@ const HomeHeader = (props: any) => {
             }
           </Text>
         </View>
-      </View>      
+      </View>
     </View>
   );
 };
@@ -122,6 +127,7 @@ const HomeHeader = (props: any) => {
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
     container: {
+      flex: 1.0,
       backgroundColor: theme.primary,
       paddingTop: getScaleSize(15),
       // paddingHorizontal: getScaleSize(20),
@@ -131,6 +137,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       height: getScaleSize(395),
     },
     headerView: {
+      flex: 1.0,
       flexDirection: 'row',
       marginHorizontal: getScaleSize(21),
     },
@@ -200,13 +207,13 @@ const styles = (theme: ThemeContextType['theme']) =>
     notificationContainer: {
       height: getScaleSize(24),
       width: getScaleSize(24),
-      alignSelf:'center'
+      alignSelf: 'center'
     },
     placeholderImage: {
       height: getScaleSize(34),
       width: getScaleSize(34),
       borderRadius: getScaleSize(17),
-      alignSelf:'center'
+      alignSelf: 'center'
     },
     bottomText: {
       flexDirection: 'row',

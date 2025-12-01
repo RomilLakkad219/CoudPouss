@@ -19,15 +19,13 @@ export default function SubscriptionSuccessful(props: any) {
 
     const STRING = useString();
 
+    const planDetails: any = props?.route?.params?.planDetails ?? {};
     const { theme } = useContext<any>(ThemeContext);
-    const { myPlan } = useContext<any>(AuthContext);
 
     return (
         <View style={styles(theme).container}>
             <Header
-                onBack={() => {
-                    props.navigation.goBack();
-                }}
+               
                 screenName={STRING.payment_method}
             />
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -57,7 +55,7 @@ export default function SubscriptionSuccessful(props: any) {
                             <Text size={getScaleSize(16)}
                                 font={FONTS.Lato.Bold}
                                 color={theme._424242}>
-                                {myPlan == 'professional_certified' ? STRING.professional_certified : STRING.non_certified_provider}
+                                {planDetails?.name ?? ''}
                             </Text>
                         </View>
                         <View style={[styles(theme).flexView, { marginBottom: getScaleSize(16) }]}>
@@ -141,7 +139,11 @@ export default function SubscriptionSuccessful(props: any) {
                 title={STRING.complete_profile_now}
                 style={{ marginBottom: getScaleSize(24), marginHorizontal: getScaleSize(24) }}
                 onPress={() => {
-                    props.navigation.navigate(SCREENS.AdditionalDetails.identifier);
+                    if (planDetails?.type === 'professional') {
+                        props.navigation.navigate(SCREENS.AdditionalDetails.identifier);
+                    } else {
+                        props.navigation.navigate(SCREENS.YearsOfExperience.identifier);
+                    }
                 }}
             />
         </View>

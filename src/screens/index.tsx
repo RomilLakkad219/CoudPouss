@@ -58,6 +58,7 @@ import BankDetails from './profile/BankDetails';
 import WithdrawHistory from './profile/WithdrawHistory';
 import MoneyWithdrawal from './profile/MoneyWithdrawal';
 import ManageSubscription from './subscription/ManageSubscription';
+import Favourites from './home/Favourites';
 
 export const SCREENS = {
   Splash: {
@@ -256,6 +257,10 @@ export const SCREENS = {
   ProfessionalTaskStatus: {
     identifier: 'ProfessionalTaskStatus',
     component: ProfessionalTaskStatus,
+  },
+  Favourites: {
+    identifier: 'Favourites',
+    component: Favourites,
   },
 };
 

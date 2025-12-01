@@ -141,7 +141,7 @@ export default function ReviewServices(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        if (myPlan === 'professional_certified') {
+                        if (myPlan === 'professional') {
                             props.navigation.navigate(SCREENS.AddBankDetails.identifier);
                         } else {
                             props.navigation.navigate(SCREENS.AccountCreatedSuccessfully.identifier);

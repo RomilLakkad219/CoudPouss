@@ -91,10 +91,12 @@ export default function AddPersonalDetails(props: any) {
         SHOW_TOAST(result?.data?.message ?? '', 'success')
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
+        setProfileImage(null);
       }
       console.log('error==>', result?.data?.message)
     }
     catch (error: any) {
+      setProfileImage(null);
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
       console.log(error?.message)
@@ -152,16 +154,16 @@ export default function AddPersonalDetails(props: any) {
   }
 
   async function onNext() {
-    // if (userType == 'service_provider') {
-    //   props.navigation.navigate(SCREENS.ChooseYourSubscription.identifier);
-    // } else {
+    if (userType == 'service_provider') {
+      props.navigation.navigate(SCREENS.ChooseYourSubscription.identifier);
+    } else {
       props.navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: SCREENS.BottomBar.identifier }],
         }),
       );
-    // }
+    }
   }
 
   return (

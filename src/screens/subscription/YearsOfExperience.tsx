@@ -13,6 +13,7 @@ import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button } from '../../components';
+import { API } from '../../api';
 
 
 export default function YearsOfExperience(props: any) {
@@ -21,6 +22,36 @@ export default function YearsOfExperience(props: any) {
 
     const { theme } = useContext<any>(ThemeContext);
     const [yearsOfExperience, setYearsOfExperience] = useState('');
+    const [isLoading, setLoading] = useState(false);
+
+    async function addYearsOfExperience() {
+        if (!yearsOfExperience) {
+            SHOW_TOAST('Please enter your years of experience', 'error')
+            return;
+        }
+        try {
+            const params = {
+                years_of_experience: yearsOfExperience,
+            }
+            setLoading(true);
+            const result = await API.Instance.patch(API.API_ROUTES.getPlanDetails, params);
+            setLoading(false);
+            console.log('result', result.status, result)
+            if (result.status) {
+                console.log('yearsOfExperience==', result?.data?.data)
+                props.navigation.navigate(SCREENS.AddServices.identifier);
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+                console.log('error==>', result?.data?.message)
+            }
+        } catch (error: any) {
+            setLoading(false);
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -74,6 +105,7 @@ export default function YearsOfExperience(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
+                        addYearsOfExperience()
                         props.navigation.navigate(SCREENS.AddServices.identifier);
                     }}
                 />

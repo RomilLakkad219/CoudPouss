@@ -179,10 +179,22 @@ export default function Login(props: any) {
               }}
               isError={passwordError}
             />
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.Medium}
+              onPress={() => {
+                props.navigation.navigate(SCREENS.ResetPassword.identifier);
+              }}
+              color={theme._2C6587}
+              align='right'
+              style={{ marginTop: getScaleSize(12) }}>
+              {STRING.forgot_password}
+            </Text>
           </View>
+
           <Button
             title="Log In"
-            style={{ marginTop: getScaleSize(8), marginBottom: getScaleSize(24) }}
+            style={{ marginBottom: getScaleSize(24) }}
             onPress={() => {
               onVerification();
             }}
@@ -203,17 +215,6 @@ export default function Login(props: any) {
               }}>
               {STRING.sign_up}
             </Text>
-          </Text>
-          <Text
-            size={getScaleSize(20)}
-            font={FONTS.Lato.Regular}
-            onPress={() => {
-              props.navigation.navigate(SCREENS.ResetPassword.identifier);
-            }}
-            color={theme._999999}
-            align="center"
-            style={{ marginTop: getScaleSize(24) }}>
-            {STRING.forgot_password}
           </Text>
         </View>
       </ScrollView>

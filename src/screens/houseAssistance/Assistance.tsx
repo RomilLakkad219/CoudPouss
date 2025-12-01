@@ -1,195 +1,235 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
-  StatusBar,
   StyleSheet,
   Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Alert,
-  ScrollView,
   FlatList,
   TouchableOpacity,
   Image,
-  Platform,
-  SafeAreaView,
-  TextInput,
+  
 } from 'react-native';
 
 //ASSETS
-import {FONTS, IMAGES} from '../../assets';
+import { FONTS } from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import {CATEGORY_DATA, getScaleSize, useString} from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
-  AssistanceItems,
-  CalendarComponent,
-  CategoryDropdown,
   Header,
-  Input,
-  ProgressSlider,
   SearchComponent,
-  ServiceItem,
   Text,
-  TimePicker,
 } from '../../components';
 
-//PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS} from '..';
-import {ASSITANCEDATA} from '../../constant/utils';
+//API
+import { API } from '../../api';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const cellSize = (width - 30) / 7;
 
 export default function Assistance(props: any) {
+
+  const service = props.route.params?.service;
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [categoryList, setCategoryList] = useState([]);
+  const [subCategoryList, setSubCategoryList] = useState([]);
+  const [bannerData, setBannerData] = useState<any>(null);
 
-  const servicesData = [
-    {
-      id: '1',
-      title: 'Furniture Assembly',
-      image: 'https://picsum.photos/id/1/200/300',
-    },
-    {
-      id: '2',
-      title: 'Interior Painting',
-      image: 'https://picsum.photos/id/1/200/300',
-    },
-  ];
+  useEffect(() => {
+    getCategoryData();
+  }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(theme.white);
-        StatusBar.setBarStyle('dark-content');
+  useEffect(() => {
+    if (selectedCategory) {
+      getSubCategoryData(selectedCategory?.id);
+    }
+  }, [selectedCategory]);
+
+  async function getCategoryData() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getHomeData + `?service_name=${service?.name}`);
+      setLoading(false);
+      console.log('result', result.status, result)
+      if (result.status) {
+        console.log('categoryList==', result?.data?.data)
+        setCategoryList(result?.data?.data?.categories ?? []);
+        if (result?.data?.data?.categories?.[0]?.id) {
+          setSelectedCategory(result?.data?.data?.categories?.[0]);
+          getSubCategoryData(result?.data?.data?.categories?.[0]?.id);
+        }
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+        console.log('error==>', result?.data?.message)
       }
-    }, []),
-  );
+    } catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function getSubCategoryData(id: string) {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getHomeData + `/${id}`);
+      setLoading(false);
+      console.log('result', result.status, result)
+      if (result.status) {
+        console.log('subcategoryList==', result?.data?.data)
+        setBannerData(result?.data?.data?.Banner ?? null);
+        setSubCategoryList(result?.data?.data?.subcategories ?? []);
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+        console.log('error==>', result?.data?.message)
+      }
+    } catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const patterns = ['small', 'large', 'large', 'small'];
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
-      {/* <SafeAreaView /> */}
       <Header
         onBack={() => {
           props.navigation.goBack();
         }}
-        screenName={ASSITANCEDATA[selectedIndex]?.label}
+        screenName={selectedCategory ? selectedCategory?.name : service?.name}
       />
-      <FlatList
-        data={servicesData}
-        ListHeaderComponent={() => {
-          return (
-            <>
-              <View
-                style={{
-                  marginTop: getScaleSize(16),
-                  marginHorizontal: getScaleSize(22),
-                }}>
-                <SearchComponent />
-              </View>
-              <View style={styles(theme).deviderView}></View>
-              <Image
-                style={styles(theme).bannerContainer}
-                source={{uri: 'https://picsum.photos/id/1/200/300'}}
-              />
-              <View>
-                <FlatList
-                  data={ASSITANCEDATA}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  ListHeaderComponent={() => {
-                    return <View style={{width: getScaleSize(22)}} />;
-                  }}
-                  ListFooterComponent={() => {
-                    return <View style={{width: getScaleSize(16)}} />;
-                  }}
-                  renderItem={({item, index}) => {
-                    return (
-                      <TouchableOpacity
-                        style={[
-                          styles(theme).itemContainer,
-                          {
-                            marginLeft: index === 0 ? 0 : 8,
-                            backgroundColor:
-                              selectedIndex === index
-                                ? theme.primary
-                                : theme.white,
-                          },
-                        ]}
-                        activeOpacity={1}
-                        onPress={() => {
-                          setSelectedIndex(index);
-                        }}>
-                        <Image
-                          style={styles(theme).categoryImage}
-                          source={item?.icon}
-                        />
-                        <Text
-                          style={{
-                            marginLeft: getScaleSize(14),
-                            alignSelf: 'center',
-                          }}
-                          size={getScaleSize(16)}
-                          font={FONTS.Lato.Regular}
-                          color={
-                            selectedIndex === index
-                              ? theme.white
-                              : theme._999999
-                          }>
-                          {item?.label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  }}
-                />
-              </View>
-            </>
-          );
-        }}
-        renderItem={({item, index}) => (
-          <View style={{marginHorizontal: getScaleSize(22)}}>
-            <AssistanceItems item={item} index={index} />
-          </View>
-        )}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={() => {
-          return <View style={{height: 16}} />;
-        }}
-      />
-      {/* <ScrollView
-        showsVerticalScrollIndicator={false}
+      <View
         style={{
-          marginTop: getScaleSize(40),
-          marginHorizontal: getScaleSize(22),
+          marginTop: getScaleSize(16),
+          marginHorizontal: getScaleSize(24),
         }}>
-        {['',''].map((item)=>{
+        <SearchComponent />
+      </View>
+      <View style={styles(theme).deviderView}></View>
+      {bannerData ? (
+        <Image
+          style={styles(theme).bannerContainer}
+          source={{ uri: bannerData?.image }}
+        />
+      ):(
+        <View style={styles(theme).bannerContainer} />
+      )}
+      {categoryList.length > 1 && (
+        <View style={{ marginBottom: getScaleSize(40), marginTop: getScaleSize(20) }}>
+          <FlatList
+            data={categoryList}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item: any, index: number) => index.toString()}
+            ListHeaderComponent={() => {
+              return <View style={{ width: getScaleSize(22) }} />;
+            }}
+            ListFooterComponent={() => {
+              return <View style={{ width: getScaleSize(16) }} />;
+            }}
+            renderItem={({ item, index }) => {
               return (
-                <AssistanceItems />
-              )
-            })}
-      </ScrollView> */}
+                <TouchableOpacity
+                  style={[
+                    styles(theme).itemContainer,
+                    {
+                      marginLeft: index === 0 ? 0 : 8,
+                      backgroundColor:
+                        selectedCategory?.id === item?.id
+                          ? theme.primary
+                          : theme.white,
+                    },
+                  ]}
+                  activeOpacity={1}
+                  onPress={() => {
+                    setSelectedCategory(item);
+                  }}>
+                  <Image
+                    style={styles(theme).categoryImage}
+                    source={{ uri: item?.image }}
+                  />
+                  <Text
+                    style={{
+                      marginLeft: getScaleSize(14),
+                      alignSelf: 'center',
+                    }}
+                    size={getScaleSize(16)}
+                    font={FONTS.Lato.Regular}
+                    color={
+                      selectedCategory?.id === item?.id
+                        ? theme.white
+                        : theme._999999
+                    }>
+                    {item?.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
+      )}
+      <FlatList
+        data={subCategoryList}
+        numColumns={2}
+        contentContainerStyle={{ marginTop: getScaleSize(-20) }}
+        keyExtractor={(item: any, index: number) => index.toString()}
+        showsVerticalScrollIndicator={false}
+        columnWrapperStyle={{ paddingLeft: getScaleSize(8) }}
+        ListFooterComponent={() => {
+          return <View style={{ height: getScaleSize(50) }} />;
+        }}
+        renderItem={({ item, index }) => {
+          const type = patterns[index % 4];
+          return (
+            <View
+              style={[
+                styles(theme).cardContainer,
+                {
+                  height: type === 'small' ? getScaleSize(188) : getScaleSize(233),
+                  marginTop: type === 'large' && index % 2 == 0 ? getScaleSize(-25) : getScaleSize(20),
+                }
+              ]}>
+              <Image
+                style={styles(theme).imageView}
+                resizeMode='cover'
+                source={{ uri: 'https://picsum.photos/id/1/200/300' }}
+              />
+
+              <Text
+                style={{
+                  marginVertical: getScaleSize(14),
+                  marginHorizontal: getScaleSize(14),
+                }}
+                size={getScaleSize(16)}
+                font={FONTS.Lato.Bold}
+                color={theme.primary}>
+                {item?.title}
+              </Text>
+            </View>
+          )
+        }}
+      />
     </View>
   );
 }
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     deviderView: {
       marginTop: getScaleSize(30),
       height: getScaleSize(6),
@@ -198,11 +238,11 @@ const styles = (theme: ThemeContextType['theme']) =>
     bannerContainer: {
       height: getScaleSize(182),
       borderRadius: getScaleSize(20),
-      marginTop: getScaleSize(20),
+      marginVertical: getScaleSize(20),
       marginHorizontal: getScaleSize(24),
+      backgroundColor: theme._EAF0F3,
     },
     itemContainer: {
-      marginTop: getScaleSize(42),
       height: getScaleSize(44),
       paddingHorizontal: getScaleSize(20),
       borderRadius: getScaleSize(32),
@@ -215,4 +255,14 @@ const styles = (theme: ThemeContextType['theme']) =>
       width: getScaleSize(24),
       alignSelf: 'center',
     },
+    cardContainer: {
+      borderRadius: getScaleSize(20),
+      backgroundColor: theme._EAF0F3,
+      width: (Dimensions.get('window').width - getScaleSize(64)) / 2,
+      marginLeft: getScaleSize(16),
+    },
+    imageView: {
+      flex: 1.0,
+      borderRadius: getScaleSize(20),
+    }
   });

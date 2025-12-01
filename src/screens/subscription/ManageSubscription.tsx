@@ -37,7 +37,7 @@ export default function ManageSubscription(props: any) {
                             font={FONTS.Lato.Bold}
                             color={theme._214C65}
                             style={{ marginBottom: getScaleSize(12) }}>
-                            {myPlan == 'professional_certified' ? STRING.professional_certified : STRING.non_certified_provider}
+                            {myPlan == 'professional' ? STRING.professional_certified : STRING.non_certified_provider}
                         </Text>
                         <Text size={getScaleSize(27)}
                             font={FONTS.Lato.ExtraBold}

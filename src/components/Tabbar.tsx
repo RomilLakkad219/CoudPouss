@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Alert,
   Image,
@@ -12,17 +12,42 @@ import {
 } from 'react-native';
 
 // CONSTANT & ASSETS
-import {getScaleSize, useString} from '../constant';
-import {IMAGES} from '../assets/images';
-import {FONTS} from '../assets';
-import {AuthContext, ThemeContext, ThemeContextType} from '../context';
+import { getScaleSize, useString, Storage } from '../constant';
+import { IMAGES } from '../assets/images';
+import { FONTS } from '../assets';
+import { AuthContext, ThemeContext, ThemeContextType } from '../context';
 import Text from './Text';
-import {head} from 'lodash';
+import { head } from 'lodash';
+import { EventRegister } from 'react-native-event-listeners';
+import { CommonActions } from '@react-navigation/native';
+import { SCREENS } from '../screens';
 
 function Tabbar(props: any) {
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
-  const {userType} = useContext<any>(AuthContext);
+  const { userType, setUser, setUserType } = useContext<any>(AuthContext);
+
+  useEffect(() => {
+    EventRegister.addEventListener('onInvalidToken', () => {
+      onLogout()
+    });
+    return () => {
+      EventRegister.removeEventListener('onInvalidToken')
+    }
+  }, [])
+
+  function onLogout() {
+    Storage.clear();
+    setUser(null);
+    setUserType(null);
+    props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: SCREENS.Login.identifier }],
+      }),
+    );
+  }
+
 
   let images: any = [];
   let names: any = [];
@@ -35,7 +60,7 @@ function Tabbar(props: any) {
       IMAGES.profile_unselected,
     ];
 
-    names = ['Home', 'Task',  'Chat', 'Profile'];
+    names = ['Home', 'Task', 'Chat', 'Profile'];
   } else {
     images = [
       IMAGES.home_unselected,
@@ -53,6 +78,8 @@ function Tabbar(props: any) {
   function onPress(name: string) {
     props.navigation.navigate(name);
   }
+
+
 
   return (
     <View style={styles(theme).mainView}>
@@ -76,9 +103,9 @@ function Tabbar(props: any) {
 }
 
 const Item = (props: any) => {
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
-  const {userType} = useContext<any>(AuthContext);
+  const { userType } = useContext<any>(AuthContext);
 
   let images: any = [];
   let names: any = [];
@@ -113,7 +140,7 @@ const Item = (props: any) => {
         <View>
           {/*  */}
           {props?.selected ? (
-            <View style={{alignSelf: 'center'}}>
+            <View style={{ alignSelf: 'center' }}>
               <Image
                 style={
                   props.selected
@@ -125,7 +152,7 @@ const Item = (props: any) => {
                 source={images[props.index]}
               />
               <Text
-                style={{marginTop: getScaleSize(8)}}
+                style={{ marginTop: getScaleSize(8) }}
                 size={getScaleSize(14)}
                 font={FONTS.Lato.Bold}
                 color={theme.primary}
@@ -134,7 +161,7 @@ const Item = (props: any) => {
               </Text>
             </View>
           ) : (
-            <View style={{alignSelf: 'center'}}>
+            <View style={{ alignSelf: 'center' }}>
               <Image
                 style={
                   props.selected
@@ -145,7 +172,7 @@ const Item = (props: any) => {
                 source={images[props.index]}
               />
               <Text
-                style={{marginTop: getScaleSize(8)}}
+                style={{ marginTop: getScaleSize(8) }}
                 size={getScaleSize(12)}
                 font={FONTS.Lato.Medium}
                 color={'#E6E6E6'}
@@ -161,10 +188,10 @@ const Item = (props: any) => {
     if (props?.index == 2) {
       return (
         <TouchableOpacity
-         onPress={() => {props.onPress}}
-         style={{alignSelf: 'center'}}>
+          onPress={() => { props.onPress }}
+          style={{ alignSelf: 'center' }}>
           <Image
-            style={{height:getScaleSize(98), width: getScaleSize(98), marginTop: getScaleSize(-90)}}
+            style={{ height: getScaleSize(98), width: getScaleSize(98), marginTop: getScaleSize(-90) }}
             resizeMode="contain"
             source={IMAGES.plus}
           />
@@ -178,7 +205,7 @@ const Item = (props: any) => {
           <View>
             {/*  */}
             {props?.selected ? (
-              <View style={{alignSelf: 'center'}}>
+              <View style={{ alignSelf: 'center' }}>
                 <Image
                   style={
                     props.selected
@@ -190,7 +217,7 @@ const Item = (props: any) => {
                   source={images[props.index]}
                 />
                 <Text
-                  style={{marginTop: getScaleSize(8)}}
+                  style={{ marginTop: getScaleSize(8) }}
                   size={getScaleSize(14)}
                   font={FONTS.Lato.Bold}
                   color={theme.primary}
@@ -199,7 +226,7 @@ const Item = (props: any) => {
                 </Text>
               </View>
             ) : (
-              <View style={{alignSelf: 'center'}}>
+              <View style={{ alignSelf: 'center' }}>
                 <Image
                   style={
                     props.selected
@@ -210,7 +237,7 @@ const Item = (props: any) => {
                   source={images[props.index]}
                 />
                 <Text
-                  style={{marginTop: getScaleSize(8)}}
+                  style={{ marginTop: getScaleSize(8) }}
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={'#E6E6E6'}

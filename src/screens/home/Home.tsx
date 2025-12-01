@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -22,22 +22,26 @@ import Animated, {
 } from 'react-native-reanimated';
 import { ThemeContext, ThemeContextType } from '../../context';
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 import {
   Text,
   HomeHeader,
   SearchComponent,
   RequestItem,
-  Favourites,
+  FavouritesItem,
 } from '../../components';
-import { useFocusEffect } from '@react-navigation/native';
+import { CommonActions, useFocusEffect } from '@react-navigation/native';
 import { SCREENS, TABS } from '..';
+import { API } from '../../api';
 
 const HEADER_HEIGHT = 500;
 
 export default function Home(props: any) {
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
+
+  const [isLoading, setLoading] = useState(false);
+  const [allServices, setAllServices] = useState([]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -46,6 +50,33 @@ export default function Home(props: any) {
     }, []),
   );
 
+  useEffect(() => {
+    getHomeData();
+  }, []);
+
+  async function getHomeData() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getHomeData);
+      setLoading(false);
+      console.log('result', result.status, result)
+      if (result.status) {
+        console.log('homeDTAtatata==', result?.data?.data)
+        setAllServices(result?.data?.data?.services);
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+        console.log('error==>', result?.data?.message)
+      }
+    } catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
   return (
     <View style={styles(theme).container}>
       <StatusBar
@@ -53,9 +84,7 @@ export default function Home(props: any) {
         backgroundColor={theme.primary}
         translucent={false}
       />
-
       {/* HEADER */}
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         scrollEnabled={true}
@@ -67,7 +96,6 @@ export default function Home(props: any) {
             }}
           />
         </View>
-
         <Text
           size={getScaleSize(20)}
           font={FONTS.Lato.SemiBold}
@@ -81,7 +109,12 @@ export default function Home(props: any) {
         <TouchableOpacity style={styles(theme).bannerContainer}
           activeOpacity={1}
           onPress={() => {
-            props.navigation.navigate(SCREENS.Assistance.identifier)
+            const service = allServices.find((item: any) => item.name === "Home Assistance");
+            if (service) {
+              props.navigation.navigate(SCREENS.Assistance.identifier, {
+                service: service
+              })
+            }
           }}>
           <Text
             style={{ flex: 1.0, alignSelf: 'center' }}
@@ -103,7 +136,13 @@ export default function Home(props: any) {
             ]}
             activeOpacity={1}
             onPress={() => {
-              props.navigation.navigate(SCREENS.Transport.identifier)
+              const service = allServices.find((item: any) => item.name === "Transport");
+              if (service) {
+                props.navigation.navigate(SCREENS.Assistance.identifier, {
+                  service: service
+                })
+              }
+              // props.navigation.navigate(SCREENS.Transport.identifier)
             }}>
             <Image
               resizeMode="contain"
@@ -124,7 +163,12 @@ export default function Home(props: any) {
             ]}
             activeOpacity={1}
             onPress={() => {
-              props.navigation.navigate(SCREENS.Transport.identifier)
+              const service = allServices.find((item: any) => item.name === "Personal Care");
+              if (service) {
+                props.navigation.navigate(SCREENS.Assistance.identifier, {
+                  service: service
+                })
+              }
             }}>
             <Image
               style={styles(theme).iconImage}
@@ -146,7 +190,12 @@ export default function Home(props: any) {
             ]}
             activeOpacity={1}
             onPress={() => {
-              props.navigation.navigate(SCREENS.Transport.identifier)
+              const service = allServices.find((item: any) => item.name === "Tech Support");
+              if (service) {
+                props.navigation.navigate(SCREENS.Assistance.identifier, {
+                  service: service
+                })
+              }
             }}>
             <Image
               resizeMode="contain"
@@ -210,27 +259,28 @@ export default function Home(props: any) {
             {STRING.FavoriteProfessionals}
           </Text>
           <Text
+            onPress={() => {
+              props.navigation.navigate(SCREENS.Favourites.identifier);
+            }}
             size={getScaleSize(16)}
             font={FONTS.Lato.Regular}
-            onPress={() => { }}
             style={{ alignSelf: 'center' }}
             color={theme._999999}>
             {STRING.ViewAll}
           </Text>
         </View>
-        <FlatList
-          data={['', '']}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({item, index}) => {
+        <View style={{ marginHorizontal: getScaleSize(24), flexDirection: 'row', justifyContent: 'space-between' }}>
+          {['', ''].map((item: any) => {
             return (
               <View style={{ marginTop: getScaleSize(26) }}>
-                <Favourites />
+                <FavouritesItem
+                  itemContainer={{}}
+                />
               </View>
             );
-          }}
-        />
-        <View style={{ height: 32 }}></View>
+          })}
+        </View>
+        <View style={{ height: getScaleSize(32) }} />
       </ScrollView>
     </View>
   );
