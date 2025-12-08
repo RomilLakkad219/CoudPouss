@@ -114,6 +114,8 @@ export default function Home(props: any) {
               props.navigation.navigate(SCREENS.Assistance.identifier, {
                 service: service
               })
+            } else {
+              SHOW_TOAST('Service not found', 'error');
             }
           }}>
           <Text
@@ -141,8 +143,9 @@ export default function Home(props: any) {
                 props.navigation.navigate(SCREENS.Assistance.identifier, {
                   service: service
                 })
+              } else {
+                SHOW_TOAST('Service not found', 'error');
               }
-              // props.navigation.navigate(SCREENS.Transport.identifier)
             }}>
             <Image
               resizeMode="contain"
@@ -168,6 +171,8 @@ export default function Home(props: any) {
                 props.navigation.navigate(SCREENS.Assistance.identifier, {
                   service: service
                 })
+              } else {
+                SHOW_TOAST('Service not found', 'error');
               }
             }}>
             <Image
@@ -195,6 +200,8 @@ export default function Home(props: any) {
                 props.navigation.navigate(SCREENS.Assistance.identifier, {
                   service: service
                 })
+              } else {
+                SHOW_TOAST('Service not found', 'error');
               }
             }}>
             <Image

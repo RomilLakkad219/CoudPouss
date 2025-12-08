@@ -31,7 +31,7 @@ export default function ServiceItem(props: any) {
                 font={FONTS.Lato.SemiBold}
                 color={theme._323232}
             >
-                {item.name}
+                {item.title ?? ''}
             </Text>
             {isReview &&
                 (

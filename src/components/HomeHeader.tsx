@@ -68,6 +68,7 @@ const HomeHeader = (props: any) => {
           ]}
           activeOpacity={1}
           onPress={() => { }}>
+            
           <Image
             style={styles(theme).placeholderImage}
             source={IMAGES.user_placeholder}

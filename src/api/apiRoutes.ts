@@ -19,7 +19,10 @@ const API_ROUTES = {
     getPlanDetails: "userService/auth/plans",
     uploadDocuments:'userService/auth/provider/upload-documents',
     addYearsOfExperience:'userService/auth/experience',
-    onSelectPlan: "userService/auth/select-plan"
+    onSelectPlan: "userService/auth/select-plan",
+    allCategories: "home_module/all_categories",
+    allRequests: "service_request/service-requests",
+    uploadServiceRequestImage: "service_request/upload"
 }
 
 export { API_ROUTES, API_BASE_URL, DISABLE_API_LOGS }

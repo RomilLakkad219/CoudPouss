@@ -226,7 +226,7 @@ export const SCREENS = {
     identifier: 'EditProfile',
     component: EditProfile,
   },
-  ApplicationStatus:{
+  ApplicationStatus: {
     identifier: 'ApplicationStatus',
     component: ApplicationStatus,
   },
@@ -250,7 +250,7 @@ export const SCREENS = {
     identifier: 'MoneyWithdrawal',
     component: MoneyWithdrawal,
   },
-  ManageSubscription:{
+  ManageSubscription: {
     identifier: 'ManageSubscription',
     component: ManageSubscription,
   },
@@ -261,6 +261,10 @@ export const SCREENS = {
   Favourites: {
     identifier: 'Favourites',
     component: Favourites,
+  },
+  CreateRequest: {
+    identifier: 'CreateRequest',
+    component: CreateRequest,
   },
 };
 
@@ -273,10 +277,7 @@ export const TABS = {
     identifier: 'Request',
     component: Request,
   },
-  CreateRequest: {
-    identifier: 'CreateRequest',
-    component: CreateRequest,
-  },
+ 
   Chat: {
     identifier: 'Chat',
     component: Chat,
@@ -293,5 +294,5 @@ export const TABS = {
     identifier: 'Task',
     component: Task,
   },
- 
+
 };

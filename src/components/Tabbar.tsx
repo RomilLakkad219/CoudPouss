@@ -76,7 +76,11 @@ function Tabbar(props: any) {
   const STRING = useString();
 
   function onPress(name: string) {
-    props.navigation.navigate(name);
+    if (name === 'plus') {
+      props.navigation.navigate(SCREENS.CreateRequest.identifier);
+    } else {
+      props.navigation.navigate(name);
+    }
   }
 
 
@@ -188,7 +192,7 @@ const Item = (props: any) => {
     if (props?.index == 2) {
       return (
         <TouchableOpacity
-          onPress={() => { props.onPress }}
+          onPress={() => { props.onPress(SCREENS.CreateRequest.identifier) }}
           style={{ alignSelf: 'center' }}>
           <Image
             style={{ height: getScaleSize(98), width: getScaleSize(98), marginTop: getScaleSize(-90) }}

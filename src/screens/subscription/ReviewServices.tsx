@@ -21,52 +21,20 @@ export default function ReviewServices(props: any) {
 
     const { theme } = useContext<any>(ThemeContext);
     const { myPlan } = useContext<any>(AuthContext);
-    
-    const SECTIONS_DATA = [
-        {
-            title: 'DIY',
-            icon: IMAGES.ic_hammer_wrench,
-            data: [
-                {
-                    id: 1,
-                    name: 'Furniture Assembly'
-                }, {
-                    id: 2,
-                    name: 'Interior Painting'
-                }
-            ]
-        },
-        {
-            title: 'Gardening',
-            icon: IMAGES.ic_hammer_wrench,
-            data: [
-                {
-                    id: 1,
-                    name: 'Green Waste Removal'
-                }
-            ]
-        },
-        {
-            title: 'Moving',
-            icon: IMAGES.ic_hammer_wrench,
-            data: [
-                {
-                    id: 1,
-                    name: 'Moving'
-                }
-            ]
-        },
-        {
-            title: 'Housekeeping',
-            icon: IMAGES.ic_hammer_wrench,
-            data: [
-                {
-                    id: 1,
-                    name: 'Housekeeping'
-                }
-            ]
-        }
-    ]
+
+    const selectedServices = props.route.params?.selectedServices ?? [];
+    const [serviceList, setServiceList] = useState(selectedServices);
+
+    const onDeleteService = (service: any) => {
+        const updated = serviceList
+            .map((section: any) => ({
+                ...section,
+                service: section?.service?.filter((s: any) => s?.id !== service?.id)
+            }))
+            .filter((section: any) => section?.service?.length > 0);
+
+        setServiceList(updated);
+    };
 
     return (
         <View style={styles(theme).container}>
@@ -91,28 +59,26 @@ export default function ReviewServices(props: any) {
                 </Text>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={{ flex: 1.0 }}>
-                        {SECTIONS_DATA.map((section) => {
+                        {serviceList.map((section: any, index: number) => {
                             return (
-                                <View style={styles(theme).itemContainer}>
+                                <View key={index} style={styles(theme).itemContainer}>
                                     <View style={styles(theme).sectionHeaderContainer}>
                                         <Image source={section.icon} style={styles(theme).sectionHeaderIcon} />
                                         <Text size={getScaleSize(16)}
                                             font={FONTS.Lato.SemiBold}
                                             color={theme._2C6587}>
-                                            {section.title}
+                                            {section?.category?.name ?? ''}
                                         </Text>
                                     </View>
-                                    {section.data.map((item) => {
+                                    {(section?.service ?? []).map((item: any, index: number) => {
                                         return (
                                             <ServiceItem
+                                                key={index}
                                                 item={item}
                                                 itemContainer={{ marginBottom: getScaleSize(20) }}
                                                 isReview={true}
                                                 onPress={() => {
-
-                                                }}
-                                                onDelete={() => {
-
+                                                    onDeleteService(item);
                                                 }}
                                             />
                                         )
