@@ -12,7 +12,7 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
     const [userType, setUserType] = useState<any>('service_provider')
     //elderly_user , service_provider
     const [myPlan, setMyPlan] = useState<any>(null)
-    //professional_certified, non_certified_provider   
+    //professional, non_professional   
 
 
     return (

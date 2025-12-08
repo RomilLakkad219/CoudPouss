@@ -1,21 +1,34 @@
-import React, {useContext, useState} from 'react';
-import {View, StyleSheet, TouchableOpacity, Alert, Image} from 'react-native';
-import {ThemeContext, ThemeContextType} from '../context';
-import {getScaleSize} from '../constant';
-import {FONTS, IMAGES} from '../assets';
+import React, { useContext, useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { ThemeContext, ThemeContextType } from '../context';
+import { getScaleSize } from '../constant';
+import { FONTS, IMAGES } from '../assets';
 import Text from './Text';
+import moment from 'moment';
 
-const TimePicker = () => {
-  const {theme} = useContext<any>(ThemeContext);
+const TimePicker = (props: any) => {
+  const { onTimeChange } = props;
+  const { theme } = useContext<any>(ThemeContext);
 
-  const [selectedHour, setSelectedHour] = useState(10);
-  const [selectedMinute, setSelectedMinute] = useState(0);
-  const [isAM, setIsAM] = useState(true);
+  const currentHour24 = moment().hour();
+  const currentHour12 = currentHour24 % 12 === 0 ? 12 : currentHour24 % 12;
+  const isCurrentAM = currentHour24 < 12;
+
+  const [selectedHour, setSelectedHour] = useState(currentHour12);
+  const [selectedMinute, setSelectedMinute] = useState(moment().minute());
+  const [isAM, setIsAM] = useState(isCurrentAM);
+
+  console.log('selectedHour', selectedHour, selectedMinute, isAM)
+
+  const updateParent = (hour: number, minute: number, am: boolean) => {
+    onTimeChange && onTimeChange(hour, minute, am);
+  };
 
   // Handle hour increment
   const incrementHour = () => {
     setSelectedHour(prev => {
       const newHour = prev === 12 ? 1 : prev + 1;
+      updateParent(newHour, selectedMinute, isAM);
       return newHour;
     });
   };
@@ -24,6 +37,7 @@ const TimePicker = () => {
   const decrementHour = () => {
     setSelectedHour(prev => {
       const newHour = prev === 1 ? 12 : prev - 1;
+      updateParent(newHour, selectedMinute, isAM);
       return newHour;
     });
   };
@@ -32,6 +46,7 @@ const TimePicker = () => {
   const incrementMinute = () => {
     setSelectedMinute(prev => {
       const newMinute = prev === 59 ? 0 : prev + 1;
+      updateParent(selectedHour, newMinute, isAM);
       return newMinute;
     });
   };
@@ -40,13 +55,18 @@ const TimePicker = () => {
   const decrementMinute = () => {
     setSelectedMinute(prev => {
       const newMinute = prev === 0 ? 59 : prev - 1;
+      updateParent(selectedHour, newMinute, isAM);
       return newMinute;
     });
   };
 
   // Toggle AM/PM
   const toggleAmPm = () => {
-    setIsAM(prev => !prev);
+    setIsAM(prev => {
+      const newAm = !prev;
+      updateParent(selectedHour, selectedMinute, newAm);
+      return newAm;
+    });
   };
 
   // Handle time confirmation
@@ -56,7 +76,7 @@ const TimePicker = () => {
       `You selected: ${selectedHour}:${selectedMinute
         .toString()
         .padStart(2, '0')} ${isAM ? 'AM' : 'PM'}`,
-      [{text: 'OK'}],
+      [{ text: 'OK' }],
     );
   };
 
@@ -73,7 +93,7 @@ const TimePicker = () => {
             />
           </TouchableOpacity>
           <Text
-            style={{marginVertical: getScaleSize(20)}}
+            style={{ marginVertical: getScaleSize(20) }}
             size={getScaleSize(24)}
             align="center"
             font={FONTS.Lato.Bold}
@@ -82,15 +102,15 @@ const TimePicker = () => {
           </Text>
           <TouchableOpacity
             style={styles(theme).backwardIcon}
-            onPress={incrementHour}>
+            onPress={decrementHour}>
             <Image
               style={styles(theme).backwardIcon}
               source={IMAGES.backward_time}
             />
           </TouchableOpacity>
         </View>
-        <Image style={styles(theme).dotIcon} source={IMAGES.dot_icon}/>
-         <View style={styles(theme).verticalView}>
+        <Image style={styles(theme).dotIcon} source={IMAGES.dot_icon} />
+        <View style={styles(theme).verticalView}>
           <TouchableOpacity
             style={styles(theme).backwardIcon}
             onPress={incrementMinute}>
@@ -100,12 +120,12 @@ const TimePicker = () => {
             />
           </TouchableOpacity>
           <Text
-            style={{marginVertical: getScaleSize(20)}}
+            style={{ marginVertical: getScaleSize(20) }}
             size={getScaleSize(24)}
             align="center"
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-             {selectedMinute.toString().padStart(2, '0')}
+            {selectedMinute.toString().padStart(2, '0')}
           </Text>
           <TouchableOpacity
             style={styles(theme).backwardIcon}
@@ -117,19 +137,25 @@ const TimePicker = () => {
           </TouchableOpacity>
         </View>
         <Text
-            style={{alignSelf:'center', marginHorizontal:getScaleSize(52)}}
-            size={getScaleSize(24)}
-            font={FONTS.Lato.Bold}
-            color={theme.primary}>
-             {'AM'}
-          </Text>
-           <Text
-            style={{alignSelf:'center'}}
-            size={getScaleSize(24)}
-            font={FONTS.Lato.Bold}
-            color={theme._D5D5D5}>
-             {'PM'}
-          </Text>
+          onPress={() => {
+            toggleAmPm()
+          }}
+          style={{ alignSelf: 'center', marginHorizontal: getScaleSize(52) }}
+          size={getScaleSize(24)}
+          font={FONTS.Lato.Bold}
+          color={isAM ? theme.primary : theme._D5D5D5}>
+          {'AM'}
+        </Text>
+        <Text
+          onPress={() => {
+            toggleAmPm()
+          }}
+          style={{ alignSelf: 'center' }}
+          size={getScaleSize(24)}
+          font={FONTS.Lato.Bold}
+          color={isAM ? theme._D5D5D5 : theme.primary}>
+          {'PM'}
+        </Text>
       </View>
       {/* <View style={styles.timeSelector}>        
         <View style={styles.timeSection}>
@@ -237,7 +263,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       paddingHorizontal: getScaleSize(43),
       borderRadius: getScaleSize(18),
       backgroundColor: '#FBFBFB',
-      alignItems:'center'
+      alignItems: 'center'
     },
     timeSelection: {
       flexDirection: 'row',
@@ -250,12 +276,12 @@ const styles = (theme: ThemeContextType['theme']) =>
       width: 20,
       alignSelf: 'center',
     },
-    dotIcon:{
-      width:7,
-      height:27,
-      alignSelf:'center',
-      resizeMode:'contain',
-      marginHorizontal:getScaleSize(42)
+    dotIcon: {
+      width: 7,
+      height: 27,
+      alignSelf: 'center',
+      resizeMode: 'contain',
+      marginHorizontal: getScaleSize(42)
     }
   });
 

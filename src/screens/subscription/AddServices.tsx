@@ -13,6 +13,7 @@ import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button, CategoryDropdown, ServiceItem } from '../../components';
+import { API } from '../../api';
 
 
 export default function AddServices(props: any) {
@@ -22,18 +23,123 @@ export default function AddServices(props: any) {
     const { theme } = useContext<any>(ThemeContext);
     const [selectedCategory, setSelectedCategory] = useState<any>(null);
     const [selectedServices, setSelectedServices] = useState<any>([]);
+    const [isLoading, setLoading] = useState(false);
+    const [allCategories, setAllCategories] = useState([]);
+    const [subCategoryList, setSubCategoryList] = useState([]);
+
+    console.log('selectedCategory==>', selectedCategory, selectedServices)
+    useEffect(() => {
+        getAllCategories();
+    }, []);
 
 
-    const selectServices = (item: any) => {
-        const exists = selectedServices.some((e: any) => e.id === item.id);
-        if (exists) {
-            setSelectedServices(
-                selectedServices.filter((e: any) => e.id !== item.id),
-            );
-        } else {
-            setSelectedServices([...selectedServices, item]);
+    async function getAllCategories() {
+        try {
+            setLoading(true);
+            const result = await API.Instance.get(API.API_ROUTES.allCategories);
+            setLoading(false);
+            console.log('result', result.status, result)
+            if (result.status) {
+                console.log('allCategories==', result?.data?.data)
+                setAllCategories(result?.data?.data);
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+                console.log('error==>', result?.data?.message)
+            }
+        } catch (error: any) {
+            setLoading(false);
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function getSubCategoryData(id: string) {
+        try {
+            setLoading(true);
+            const result = await API.Instance.get(API.API_ROUTES.getHomeData + `/${id}`);
+            setLoading(false);
+            console.log('result', result.status, result)
+            if (result.status) {
+                console.log('subcategoryList==', result?.data?.data)
+                setSubCategoryList(result?.data?.data?.subcategories ?? []);
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+                console.log('error==>', result?.data?.message)
+            }
+        } catch (error: any) {
+            setLoading(false);
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+
+    useEffect(() => {
+        console.log('selectedServices==>', selectedServices)
+    }, [selectedServices])
+
+
+    const isServiceSelected = (item: any) => {
+        if (selectedServices && selectedServices.length > 0) {
+            const categoryItem = selectedServices.find((e: any) => e?.category?.id === selectedCategory?.id);
+            if (categoryItem) {
+                return categoryItem?.service?.some((f: any) => f?.id === item?.id);
+            }
+        }
+        return false;
+    }
+
+    const onSelectServices = (item: any) => {
+        if (selectedServices && selectedServices.length > 0) {
+            const categoryItem = selectedServices.find((e: any) => e?.category?.id === selectedCategory?.id);
+            if (categoryItem) {
+                const newCategoryItem = {...categoryItem};
+
+                let services: any[] = newCategoryItem?.service ?? [];
+                const serviceItem = services?.find((e: any) => e?.id === item?.id);
+                if (serviceItem) {
+                    services = services.filter((e: any) => e.id !== item.id);
+                }
+                else {
+                    services = [...services, item];
+                }
+
+                newCategoryItem.service = services;
+                
+                const categoryItemIndex = selectedServices.findIndex((e: any) => e?.category?.id === selectedCategory?.id);
+                if (newCategoryItem.service && newCategoryItem.service.length > 0) {
+                    selectedServices.splice(categoryItemIndex, 1, newCategoryItem);
+                    setSelectedServices([...selectedServices]);
+                }
+                else {
+                    selectedServices.splice(categoryItemIndex, 1);
+                    setSelectedServices([...selectedServices]);
+                }
+            }
+            else {
+                const newCategoryItem = {
+                    category: selectedCategory,
+                    service: [item],
+                }
+
+                setSelectedServices([...selectedServices, newCategoryItem]);
+            }
+        }
+        else {
+            const categoryItem = {
+                category: selectedCategory,
+                service: [item],
+            }
+
+            setSelectedServices([...selectedServices, categoryItem]);
         }
     };
+
+
 
     return (
         <View style={styles(theme).container}>
@@ -54,19 +160,20 @@ export default function AddServices(props: any) {
                     font={FONTS.Lato.SemiBold}
                     color={theme._939393}
                     style={{ marginBottom: getScaleSize(24) }}>
-                    {selectedCategory ? 
-                    STRING.thank_you_for_choosing_a_category_Now_select_the_services_you_want_to_provide_within_this_category
-                    :
-                    STRING.choose_a_category_that_best_matches_your_services_This_helps_us_connect_you_with_the_right_clients
+                    {selectedCategory ?
+                        STRING.thank_you_for_choosing_a_category_Now_select_the_services_you_want_to_provide_within_this_category
+                        :
+                        STRING.choose_a_category_that_best_matches_your_services_This_helps_us_connect_you_with_the_right_clients
                     }
                 </Text>
                 <CategoryDropdown
                     onChange={(item) => {
                         setSelectedCategory(item);
+                        getSubCategoryData(item?.id);
                     }}
                     selectedItem={selectedCategory}
                     container={{}}
-                    data={CATEGORY_DATA}
+                    data={allCategories}
                 />
                 {selectedCategory && (
                     <View style={styles(theme).divider} />
@@ -74,11 +181,11 @@ export default function AddServices(props: any) {
                 <View style={{ flex: 1.0 }}>
                     {selectedCategory && (
                         <FlatList
-                            data={SERVICES_DATA}
+                            data={subCategoryList}
                             showsVerticalScrollIndicator={false}
                             keyExtractor={(item: any, index: number) => index.toString()}
                             renderItem={({ item, index }) => {
-                                const isSelected = selectedServices.some((e: any) => e.id === item.id);
+                                const isSelected = isServiceSelected(item);
                                 return (
                                     <ServiceItem
                                         item={item}
@@ -86,7 +193,7 @@ export default function AddServices(props: any) {
                                         isSelectedBox={true}
                                         isSelected={isSelected}
                                         onPress={(e: any) => {
-                                            selectServices(e);
+                                            onSelectServices(e);
                                         }}
                                     />
 
@@ -114,7 +221,9 @@ export default function AddServices(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        props.navigation.navigate(SCREENS.ReviewServices.identifier);
+                        props.navigation.navigate(SCREENS.ReviewServices.identifier,{
+                            selectedServices: selectedServices,
+                        });
                     }}
                 />
             </View>

@@ -26,8 +26,6 @@ export default function Profile(props: any) {
   const { theme } = useContext<any>(ThemeContext);
   const { userType, setUser, setUserType, user } = useContext<any>(AuthContext);
 
-  console.log('user==', user)
-
   const profileItemsElder = [
     { id: 1, title: STRING.my_profile, icon: IMAGES.ic_my_profile, onPress: SCREENS.MyProfile.identifier },
     { id: 2, title: STRING.transactions, icon: IMAGES.ic_transactions, onPress: SCREENS.Transactions.identifier },
@@ -61,8 +59,8 @@ export default function Profile(props: any) {
       }),
     );
     await Storage.clear()
-    setUser(null);
-    setUserType(null);
+    setUser('');
+    setUserType('');
   }
 
 

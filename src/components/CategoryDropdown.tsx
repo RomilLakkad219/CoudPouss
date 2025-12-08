@@ -37,7 +37,7 @@ const CategoryDropdown = (props: DropdownProps) => {
                         size={getScaleSize(16)}
                         font={FONTS.Lato.SemiBold}
                         color={isSelected ? theme._2C6587 : theme._818285}>
-                        {item.label}
+                        {item.name}
                     </Text>
                 </View>
                 {isSelected ?
@@ -59,10 +59,10 @@ const CategoryDropdown = (props: DropdownProps) => {
                 data={data}
                 showsVerticalScrollIndicator={false}
                 maxHeight={getScaleSize(400)}
-                labelField="label"
-                valueField="value"
+                labelField="name"
+                valueField="name"
                 placeholder={STRING.select_category}
-                value={selectedItem?.value}
+                value={selectedItem?.name}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={(item) => {

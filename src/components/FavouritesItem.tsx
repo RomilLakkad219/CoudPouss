@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   Image,
   SafeAreaView,
   StatusBar,
@@ -7,24 +8,25 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../context';
+import { ThemeContext, ThemeContextType } from '../context';
 
 //CONSTANTS & ASSETS
-import {getScaleSize, useString} from '../constant';
-import {FONTS, IMAGES} from '../assets';
+import { getScaleSize, useString } from '../constant';
+import { FONTS, IMAGES } from '../assets';
 
 //COMPONENTS
 import Text from './Text';
 
-function Favourites(props: any) {
+function FavouritesItem(props: any) {
   const STRING = useString();
-  const {theme} = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
+  const { itemContainer } = props;
 
   return (
-    <View style={styles(theme).container}>
+    <View style={[styles(theme).container, itemContainer]}>
       <Image style={styles(theme).userImage} source={IMAGES.user_placeholder} />
       <Image style={styles(theme).likeImage} source={IMAGES.like} />
       <Text
@@ -33,18 +35,18 @@ function Favourites(props: any) {
         color={theme._323232}>
         {'Wade Warren'}
       </Text>
-      <View style={{flexDirection:'row'}}>
+      <View style={{ flexDirection: 'row' }}>
         <Text
           size={getScaleSize(17)}
           font={FONTS.Lato.Medium}
           color={theme._6D6D6D}>
           {'4.2'}
         </Text>
-        <Image style={styles(theme).starImage} source={IMAGES.star}/>
-        <View style={{flex:1.0}}/>
-         <Text
+        <Image style={styles(theme).starImage} source={IMAGES.star} />
+        <View style={{ flex: 1.0 }} />
+        <Text
           size={getScaleSize(11)}
-          style={{alignSelf:'center'}}
+          style={{ alignSelf: 'center' }}
           font={FONTS.Lato.Regular}
           color={theme._999999}>
           {'(499 Reviews)'}
@@ -62,8 +64,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(18),
       borderWidth: 1,
       borderColor: theme._DFE8ED,
-      marginLeft: getScaleSize(16),
-      width: getScaleSize(183),
+      width: (Dimensions.get('window').width - getScaleSize(64)) / 2,
     },
     userImage: {
       height: getScaleSize(92),
@@ -78,13 +79,13 @@ const styles = (theme: ThemeContextType['theme']) =>
       right: getScaleSize(14),
       top: getScaleSize(16),
     },
-    starImage:{
-      height:getScaleSize(16),
-      width:getScaleSize(16),
-      alignSelf:'center',
-      tintColor:'#F0B52C',
-      marginLeft:getScaleSize(4)
+    starImage: {
+      height: getScaleSize(16),
+      width: getScaleSize(16),
+      alignSelf: 'center',
+      tintColor: '#F0B52C',
+      marginLeft: getScaleSize(4)
     }
   });
 
-export default Favourites;
+export default FavouritesItem;

@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -14,79 +14,84 @@ import {
 } from 'react-native';
 
 //ASSETS
-import {FONTS, IMAGES} from '../../assets';
+import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
-import {Header, RequestItem, SearchComponent, Text} from '../../components';
+import { Header, RequestItem, SearchComponent, Text } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS} from '..';
+import { useFocusEffect } from '@react-navigation/native';
+import { SCREENS } from '..';
+import { API } from '../../api';
 
 export default function Request(props: any) {
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isLoading, setLoading] = useState(false);
+  const [allRequests, setAllRequests] = useState([]);
 
   const data = [
-    {id: '1', title: 'All'},
-    {id: '2', title: 'Open Proposal'},
-    {id: '3', title: 'Responses'},
-    {id: '4', title: 'Validation'},
+    { id: '1', title: 'All' },
+    { id: '2', title: 'Open Proposal' },
+    { id: '3', title: 'Responses' },
+    { id: '4', title: 'Validation' },
   ];
 
-  useFocusEffect(
-    React.useCallback(() => {
-      StatusBar.setBackgroundColor(theme.white);
-      StatusBar.setBarStyle('dark-content');
-    }, []),
-  );
+  useEffect(() => {
+    getAllRequests();
+  }, []);
+
+  async function getAllRequests() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.allRequests + `?page=1&limit=5`);
+      setLoading(false);
+      console.log('result', result.status, result)
+      if (result.status) {
+        console.log('allRequests==', result?.data?.data)
+        setAllRequests(result?.data?.data);
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+        console.log('error==>', result?.data?.message)
+      }
+    } catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
-      <Text
-        size={getScaleSize(24)}
-        font={FONTS.Lato.Bold}
-        color={theme.primary}
-        style={{
-          marginTop: getScaleSize(8),
-          marginHorizontal: getScaleSize(22),
-        }}>
-        {STRING.Request}
-      </Text>
-      <ScrollView
-        style={styles(theme).scrolledContainer}
-        showsVerticalScrollIndicator={false}>
-        <View style={{marginHorizontal:getScaleSize(22)}}>
-          <SearchComponent />
-        </View>
+      <Header
+        type='profile'
+        screenName={STRING.Request} />
+      <View style={{ marginTop: getScaleSize(16), marginHorizontal: getScaleSize(22) }}>
+        <SearchComponent />
+      </View>
+      <View style={{ marginTop: getScaleSize(18) }}>
         <FlatList
           data={data}
           keyExtractor={item => item.id}
           ListHeaderComponent={() => {
-            return <View style={{width: getScaleSize(22)}} />;
+            return <View style={{ width: getScaleSize(22) }} />;
+          }}
+          ListFooterComponent={() => {
+            return <View style={{ width: getScaleSize(22) }} />;
           }}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            marginTop: getScaleSize(18),
-          }}
-          // ListHeaderComponent={() => {
-          //   return <View style={{width: getScaleSize(22)}} />;
-          // }}
-          renderItem={({item, index}) => (
+          renderItem={({ item, index }) => (
             <TouchableOpacity
               style={[
                 styles(theme).unselectedContainer,
@@ -109,12 +114,21 @@ export default function Request(props: any) {
             </TouchableOpacity>
           )}
         />
-        {['', '', '', '', ''].map((item: any) => {
-          return <RequestItem onPress={()=>{
-              props.navigation.navigate(SCREENS.RequestDetails.identifier)
-          }} />;
-        })}
-        {/* <View style={styles(theme).emptyView}>
+      </View>
+      {allRequests?.length > 0 ?
+        <ScrollView
+          style={styles(theme).scrolledContainer}
+          showsVerticalScrollIndicator={false}>
+          {allRequests?.length > 0 && allRequests?.map((item: any) => {
+            return (
+              <RequestItem key={item?.id} onPress={() => {
+                props.navigation.navigate(SCREENS.RequestDetails.identifier)
+              }} title={item?.name} description={item?.description} />
+            )
+          })}
+        </ScrollView>
+        :
+        <View style={styles(theme).emptyView}>
           <Image style={styles(theme).emptyImage} source={IMAGES.empty} />
           <Text
             size={getScaleSize(16)}
@@ -141,15 +155,16 @@ export default function Request(props: any) {
               {STRING.Requestaservice}
             </Text>
           </TouchableOpacity>
-        </View> */}
-      </ScrollView>
+        </View>
+      }
+
     </View>
   );
 }
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     scrolledContainer: {
       // marginHorizontal: getScaleSize(22),
       marginTop: getScaleSize(24),

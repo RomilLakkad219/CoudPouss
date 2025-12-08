@@ -19,6 +19,7 @@ export default function PaymentMethod(props: any) {
 
     const STRING = useString();
 
+    const planDetails: any = props?.route?.params?.planDetails ?? {};
     const { theme } = useContext<any>(ThemeContext);
 
     const { myPlan } = useContext<any>(AuthContext);
@@ -52,7 +53,7 @@ export default function PaymentMethod(props: any) {
                                 size={getScaleSize(19)}
                                 font={FONTS.Lato.Bold}
                                 color={theme._214C65}>
-                                {myPlan === 'professional_certified' ? STRING.professional_certified : STRING.non_certified_provider}
+                                {planDetails?.name ?? ''}
                             </Text>
                             <Image source={IMAGES.ic_check} style={styles(theme).selectedView} />
                         </View>
@@ -60,14 +61,14 @@ export default function PaymentMethod(props: any) {
                             size={getScaleSize(18)}
                             font={FONTS.Lato.Medium}
                             color={theme._214C65}>
-                            {STRING.monthly}
+                            {planDetails?.duration ?? ''}
                         </Text>
                         <Text
                             size={getScaleSize(19)}
                             font={FONTS.Lato.Bold}
                             color={theme._214C65}
                             style={{ marginVertical: getScaleSize(8) }}>
-                            {'€15.99'}
+                            {`€${planDetails?.price ?? '0.00'}`}
                         </Text>
                         <Text
                             size={getScaleSize(12)}
@@ -85,12 +86,12 @@ export default function PaymentMethod(props: any) {
                     <View style={styles(theme).paymentMethodContainer}>
                         {paymentMethods.map((e, index) => {
                             return (
-                                <TouchableOpacity 
-                                key={index} 
-                                onPress={() => {
-                                    
-                                }}
-                                style={styles(theme).itemContainer}>
+                                <TouchableOpacity
+                                    key={index}
+                                    onPress={() => {
+
+                                    }}
+                                    style={styles(theme).itemContainer}>
                                     <Image source={e.icon} style={styles(theme).itemIcon} />
                                     <Text
                                         style={{ flex: 1.0 }}
@@ -99,7 +100,7 @@ export default function PaymentMethod(props: any) {
                                         color={theme._424242}>
                                         {e.title}
                                     </Text>
-                                    <Image source={IMAGES.ic_right} style={[styles(theme).selectedView, {marginRight: getScaleSize(12)}]} />
+                                    <Image source={IMAGES.ic_right} style={[styles(theme).selectedView, { marginRight: getScaleSize(12) }]} />
                                 </TouchableOpacity>
                             )
                         })}
@@ -125,7 +126,9 @@ export default function PaymentMethod(props: any) {
                     title={STRING.proceed_to_pay}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                            props.navigation.navigate(SCREENS.SubscriptionSuccessful.identifier)
+                        props.navigation.navigate(SCREENS.SubscriptionSuccessful.identifier,{
+                            planDetails: planDetails,
+                        });
                     }}
                 />
             </View>
@@ -179,10 +182,10 @@ const styles = (theme: ThemeContextType['theme']) =>
             alignItems: 'center',
             justifyContent: 'center',
         },
-        paymentMethodContainer:{
+        paymentMethodContainer: {
             marginTop: getScaleSize(20)
         },
-        itemContainer:{
+        itemContainer: {
             flexDirection: 'row',
             alignItems: 'center',
             marginBottom: getScaleSize(16),
@@ -192,7 +195,7 @@ const styles = (theme: ThemeContextType['theme']) =>
             paddingVertical: getScaleSize(8),
             paddingHorizontal: getScaleSize(12),
         },
-        itemIcon:{
+        itemIcon: {
             width: getScaleSize(60),
             height: getScaleSize(60),
             marginRight: getScaleSize(15)
