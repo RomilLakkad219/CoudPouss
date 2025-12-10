@@ -1,28 +1,27 @@
-import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import {Dimensions, Image, ScrollView, StyleSheet, View} from 'react-native';
+import React, {useContext, useState} from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import {ThemeContext, ThemeContextType} from '../../context';
 
 //CONSTANT & ASSETS
-import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import {FONTS, IMAGES} from '../../assets';
+import {getScaleSize, SHOW_TOAST, useString} from '../../constant';
 
 //COMPONENTS
-import { Header, Input, Text, Button } from '../../components';
+import {Header, Input, Text, Button} from '../../components';
 
 //SCREENS
-import { SCREENS } from '..';
+import {SCREENS} from '..';
 
 //PACKAGES
-import { CommonActions } from '@react-navigation/native';
-import { API } from '../../api';
+import {CommonActions} from '@react-navigation/native';
+import {API} from '../../api';
 
 export default function Login(props: any) {
-
   const STRING = useString();
 
-  const { theme } = useContext<any>(ThemeContext);
+  const {theme} = useContext<any>(ThemeContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(true);
@@ -38,10 +37,9 @@ export default function Login(props: any) {
     } else {
       setEmailError('');
       setPasswordError('');
-      onLogin()
+      onLogin();
     }
   }
-
 
   async function onLogin() {
     const params = {
@@ -53,23 +51,23 @@ export default function Login(props: any) {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
       setLoading(false);
-      console.log('result', result.status, result)
+      console.log('result', result.status, result);
       if (result.status) {
-        console.log('result?.data?.data?', result?.data?.data?.token)
+        console.log('result?.data?.data?', result?.data?.data?.token);
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: SCREENS.BottomBar.identifier }],
+            routes: [{name: SCREENS.BottomBar.identifier}],
           }),
         );
       } else {
-        SHOW_TOAST(result?.data?.msg, 'error')
-        console.log(result?.data?.msg)
+        SHOW_TOAST(result?.data?.msg, 'error');
+        console.log(result?.data?.msg);
       }
     } catch (error: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log(error?.message)
+      console.log(error?.message);
     }
   }
 
@@ -84,7 +82,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.ExtraBold}
             color={theme._2C6587}
             align="center"
-            style={{ marginBottom: getScaleSize(12) }}>
+            style={{marginBottom: getScaleSize(12)}}>
             {STRING.welcome_back}
           </Text>
           <Text
@@ -92,7 +90,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.SemiBold}
             color={theme._565656}
             align="center"
-            style={{ marginBottom: getScaleSize(36) }}>
+            style={{marginBottom: getScaleSize(36)}}>
             {STRING.enter_your_email_and_password_to_login}
           </Text>
           <View style={styles(theme).inputContainer}>
@@ -132,7 +130,7 @@ export default function Login(props: any) {
           </View>
           <Button
             title="Log In"
-            style={{ marginTop: getScaleSize(8), marginBottom: getScaleSize(24) }}
+            style={{marginTop: getScaleSize(8), marginBottom: getScaleSize(24)}}
             onPress={() => {
               onVerification();
             }}
@@ -142,7 +140,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.Regular}
             color={theme._999999}
             align="center"
-            style={{ marginTop: getScaleSize(12) }}>
+            style={{marginTop: getScaleSize(12)}}>
             {STRING.dont_have_an_account}{' '}
             <Text
               size={getScaleSize(20)}
@@ -162,7 +160,7 @@ export default function Login(props: any) {
             }}
             color={theme._999999}
             align="center"
-            style={{ marginTop: getScaleSize(24) }}>
+            style={{marginTop: getScaleSize(24)}}>
             {STRING.forgot_password}
           </Text>
         </View>
@@ -176,13 +174,13 @@ const styles = (theme: ThemeContextType['theme']) =>
     container: {
       flex: 1.0,
       backgroundColor: theme.white,
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     mainContainer: {
       flex: 1.0,
       marginHorizontal: getScaleSize(24),
       marginVertical: getScaleSize(24),
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     logo: {
       width: Dimensions.get('window').width - getScaleSize(240),

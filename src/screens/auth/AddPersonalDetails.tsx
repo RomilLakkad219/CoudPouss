@@ -1,33 +1,26 @@
-import {
-  Alert,
-  Dimensions,
-  Image,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
 
 //CONTEXT
-import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
+import {AuthContext, ThemeContext, ThemeContextType} from '../../context';
 
 //CONSTANT & ASSETS
-import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import {FONTS} from '../../assets';
+import {getScaleSize, SHOW_TOAST, useString} from '../../constant';
 
 //SCREENS
-import { SCREENS } from '..';
+import {SCREENS} from '..';
 
 //COMPONENTS
-import { Header, Input, Text, Button } from '../../components';
-import { CommonActions } from '@react-navigation/native';
-import { API } from '../../api';
+import {Header, Input, Text, Button} from '../../components';
+import {CommonActions} from '@react-navigation/native';
+import {API} from '../../api';
 
 export default function AddPersonalDetails(props: any) {
   const STRING = useString();
 
-  const { theme } = useContext<any>(ThemeContext);
-  const { userType } = useContext<any>(AuthContext);
+  const {theme} = useContext<any>(ThemeContext);
+  const {userType} = useContext<any>(AuthContext);
   const isEmail = props?.route?.params?.email || '';
 
   const [name, setName] = useState('');
@@ -58,30 +51,33 @@ export default function AddPersonalDetails(props: any) {
       setMobileNoError('');
       setEmailError('');
       setAddressError('');
-     
+
       const params = {
         mobile: mobileNo,
         name: name,
         email: email,
         address: address,
-        role: userType
+        role: userType,
       };
       try {
         setLoading(true);
-        const result = await API.Instance.post(API.API_ROUTES.addPersonalDetails, params);
+        const result = await API.Instance.post(
+          API.API_ROUTES.addPersonalDetails,
+          params,
+        );
         setLoading(false);
-        console.log('result', result.status, result)
+        console.log('result', result.status, result);
         if (result.status) {
-          SHOW_TOAST(result?.data?.message ?? '', 'success')
+          SHOW_TOAST(result?.data?.message ?? '', 'success');
           onNext();
         } else {
-          SHOW_TOAST(result?.data?.message ?? '', 'error')
-          console.log('error==>', result?.data?.message)
+          SHOW_TOAST(result?.data?.message ?? '', 'error');
+          console.log('error==>', result?.data?.message);
         }
       } catch (error: any) {
         setLoading(false);
         SHOW_TOAST(error?.message ?? '', 'error');
-        console.log(error?.message)
+        console.log(error?.message);
       } finally {
         setLoading(false);
       }
@@ -95,7 +91,7 @@ export default function AddPersonalDetails(props: any) {
       props.navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: SCREENS.BottomBar.identifier }],
+          routes: [{name: SCREENS.BottomBar.identifier}],
         }),
       );
     }
@@ -132,7 +128,7 @@ export default function AddPersonalDetails(props: any) {
             size={getScaleSize(18)}
             font={FONTS.Lato.SemiBold}
             color={theme._565656}
-            style={{ marginBottom: getScaleSize(16) }}>
+            style={{marginBottom: getScaleSize(16)}}>
             {STRING.enter_profile_details}
           </Text>
           <Input
@@ -140,7 +136,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.name}
             inputColor={true}
-            continerStyle={{ marginBottom: getScaleSize(16) }}
+            continerStyle={{marginBottom: getScaleSize(16)}}
             value={name}
             onChangeText={text => {
               setName(text);
@@ -153,7 +149,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.mobile_no}
             inputColor={true}
-            continerStyle={{ marginBottom: getScaleSize(16) }}
+            continerStyle={{marginBottom: getScaleSize(16)}}
             value={mobileNo}
             onChangeText={text => {
               setMobileNo(text);
@@ -166,7 +162,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.email}
             inputColor={true}
-            continerStyle={{ marginBottom: getScaleSize(16) }}
+            continerStyle={{marginBottom: getScaleSize(16)}}
             value={email}
             onChangeText={text => {
               setEmail(text);
@@ -179,7 +175,7 @@ export default function AddPersonalDetails(props: any) {
             placeholderTextColor={theme._939393}
             inputTitle={STRING.address}
             inputColor={true}
-            continerStyle={{ marginBottom: getScaleSize(16) }}
+            continerStyle={{marginBottom: getScaleSize(16)}}
             value={address}
             onChangeText={text => {
               setAddress(text);
