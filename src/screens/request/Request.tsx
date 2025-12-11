@@ -11,6 +11,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 
 //ASSETS
@@ -30,13 +31,16 @@ import { useFocusEffect } from '@react-navigation/native';
 import { SCREENS } from '..';
 import { API } from '../../api';
 
+const PAGE_SIZE = 2;
 export default function Request(props: any) {
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLoading, setLoading] = useState(false);
-  const [allRequests, setAllRequests] = useState([]);
+  const [allRequests, setAllRequests] = useState<any>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const data = [
     { id: '1', title: 'All' },
@@ -46,18 +50,22 @@ export default function Request(props: any) {
   ];
 
   useEffect(() => {
-    getAllRequests();
-  }, []);
+    getAllRequests(page);
+  }, [page]);
 
-  async function getAllRequests() {
+  async function getAllRequests(page: number) {
+    if (isLoading || !hasMore) return;
     try {
       setLoading(true);
-      const result = await API.Instance.get(API.API_ROUTES.allRequests + `?page=1&limit=5`);
+      const result = await API.Instance.get(API.API_ROUTES.allRequests + `?page=${page}&limit=${PAGE_SIZE}`);
       setLoading(false);
       console.log('result', result.status, result)
       if (result.status) {
-        console.log('allRequests==', result?.data?.data)
-        setAllRequests(result?.data?.data?.services ?? []);
+        const newData: any = result?.data?.data?.recent_requests?.items ?? []
+        setAllRequests((prev: any) => [...prev, ...newData]);
+        if (newData.length < PAGE_SIZE) {
+          setHasMore(false);
+        }
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
         console.log('error==>', result?.data?.message)
@@ -70,6 +78,12 @@ export default function Request(props: any) {
       setLoading(false);
     }
   }
+
+  const loadMore = () => {
+    if (!isLoading && hasMore) {
+      setPage((prev) => prev + 1);
+    }
+  };
 
   return (
     <View style={styles(theme).container}>
@@ -116,21 +130,25 @@ export default function Request(props: any) {
         />
       </View>
       {allRequests?.length > 0 ?
-        <ScrollView
-          style={styles(theme).scrolledContainer}
-          showsVerticalScrollIndicator={false}>
-          {allRequests?.length > 0 && allRequests?.map((item: any) => {
-            return (
-              <RequestItem key={item?.id} 
-              onPress={() => {
-                props.navigation.navigate(SCREENS.RequestDetails.identifier, {
-                  item: item
-                })
-              }} 
+        <FlatList
+          data={allRequests}
+          contentContainerStyle={{ paddingBottom: getScaleSize(50) }}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item: any, index: number) => index.toString()}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={
+            isLoading ? <ActivityIndicator size="large" color={theme.primary} style={{ margin: 20 }} /> : null
+          }
+          renderItem={({ item }) => (
+            <RequestItem onPress={() => {
+              props.navigation.navigate(SCREENS.RequestDetails.identifier, {
+                item: item
+              })
+            }}
               item={item} />
-            )
-          })}
-        </ScrollView>
+          )}
+        />
         :
         <View style={styles(theme).emptyView}>
           <Image style={styles(theme).emptyImage} source={IMAGES.empty} />

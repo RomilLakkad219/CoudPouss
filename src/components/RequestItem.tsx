@@ -18,6 +18,7 @@ import {FONTS, IMAGES} from '../assets';
 
 //COMPONENTS
 import Text from './Text';
+import moment from 'moment';
 
 function RequestItem(props: any) {
   const STRING = useString();
@@ -40,7 +41,7 @@ function RequestItem(props: any) {
           size={getScaleSize(24)}
           font={FONTS.Lato.Bold}
           color={theme.primary}>
-          {`${item?.category} Service`}
+          {`${item?.category_name} Service`}
         </Text>
       </View>
       <Text
@@ -48,7 +49,7 @@ function RequestItem(props: any) {
         size={getScaleSize(20)}
         font={FONTS.Lato.SemiBold}
         color={theme.primary}>
-        {item?.sub_category}
+        {item?.sub_category_name}
       </Text>
       <View style={styles(theme).detailsView}>
         <View style={styles(theme).horizontalContainer}>
@@ -63,7 +64,7 @@ function RequestItem(props: any) {
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>
-            {'€449.20'}
+            {`€${item?.amount}`}
           </Text>
         </View>
         <View style={[styles(theme).horizontalContainer, {marginTop: getScaleSize(3)}]}>
@@ -78,7 +79,7 @@ function RequestItem(props: any) {
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>
-            {'16 Aug'}
+            {moment(item?.chossen_time).format('DD MMM')}
           </Text>
         </View>
         <View style={[styles(theme).horizontalContainer, {marginTop: getScaleSize(3)}]}>
@@ -93,7 +94,7 @@ function RequestItem(props: any) {
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>
-            {'10:00 Am'}
+            {moment(item?.chossen_time).format('hh:mm A')}
           </Text>
         </View>
       </View>

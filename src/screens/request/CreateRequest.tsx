@@ -386,8 +386,7 @@ export default function CreateRequest(props: any) {
         }
       }
       setLoading(true);
-      const result = await API.Instance.post(API.API_ROUTES.allRequests, params);
-      setLoading(false);
+      const result = await API.Instance.post(API.API_ROUTES.onServiceRequest, params);
       console.log('result', result.status, result)
       if (result.status) {
         SHOW_TOAST(result?.data?.message ?? '', 'success')

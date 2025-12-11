@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -15,13 +15,13 @@ import {
 } from 'react-native';
 
 //ASSETS
-import {FONTS, IMAGES} from '../../assets';
+import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import {getScaleSize, SHOW_TOAST, useString} from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -35,13 +35,14 @@ import {
 } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS} from '..';
+import { useFocusEffect } from '@react-navigation/native';
+import { SCREENS } from '..';
 import { API } from '../../api';
+import moment from 'moment';
 
 export default function RequestDetails(props: any) {
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
   const item = props.route.params?.item ?? {};
 
   const rejectRef = useRef<any>(null);
@@ -90,10 +91,14 @@ export default function RequestDetails(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          <Image
-            style={styles(theme).imageView}
-            source={{uri: 'https://picsum.photos/id/1/200/300'}}
-          />
+          {serviceDetails?.subcategory_photo_url ?
+            <Image
+              style={styles(theme).imageView}
+              source={{ uri: serviceDetails?.subcategory_photo_url }}
+            />
+            :
+            <View style={[styles(theme).imageView, { backgroundColor: theme._D5D5D5 }]} />
+          }
           <Text
             style={{
               marginVertical: getScaleSize(12),
@@ -102,7 +107,7 @@ export default function RequestDetails(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {'Furniture Assembly'}
+            {serviceDetails?.sub_category}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -119,7 +124,7 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'16 Aug, 2025'}
+                  {serviceDetails?.chosen_date_time ? moment(serviceDetails?.chosen_date_time).format('DD MMM, YYYY') : '-'}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -135,14 +140,14 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'10:00 am'}
+                  {serviceDetails?.chosen_date_time ? moment(serviceDetails?.chosen_date_time).format('hh:mm A') : '-'}
                 </Text>
               </View>
             </View>
             <View
               style={[
                 styles(theme).horizontalView,
-                {marginTop: getScaleSize(12)},
+                { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
                 <Image
@@ -157,7 +162,7 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'DIY Services'}
+                  {serviceDetails?.category}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -173,14 +178,14 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'Paris, 75001'}
+                  {'-'}
                 </Text>
               </View>
             </View>
           </View>
         </View>
         <Text
-          style={{marginTop: getScaleSize(24)}}
+          style={{ marginTop: getScaleSize(24) }}
           size={getScaleSize(18)}
           font={FONTS.Lato.SemiBold}
           color={theme._323232}>
@@ -188,11 +193,11 @@ export default function RequestDetails(props: any) {
         </Text>
         <View style={styles(theme).amountContainer}>
           <Text
-            style={{flex: 1.0, alignSelf: 'center'}}
+            style={{ flex: 1.0, alignSelf: 'center' }}
             size={getScaleSize(27)}
             font={FONTS.Lato.Bold}
             color={theme._323232}>
-            {'€499'}
+            {`€${serviceDetails?.total_renegotiated}`}
           </Text>
           <TouchableOpacity
             style={styles(theme).negociateButton}
@@ -211,7 +216,7 @@ export default function RequestDetails(props: any) {
         <View style={styles(theme).profileContainer}>
           <View style={styles(theme).horizontalView}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(18)}
               font={FONTS.Lato.SemiBold}
               color={theme._323232}>
@@ -222,14 +227,14 @@ export default function RequestDetails(props: any) {
           <View
             style={[
               styles(theme).horizontalView,
-              {marginTop: getScaleSize(16)},
+              { marginTop: getScaleSize(16) },
             ]}>
             <Image
               style={styles(theme).profilePicView}
               source={IMAGES.user_placeholder}
             />
             <Text
-              style={{alignSelf: 'center', marginLeft: getScaleSize(16)}}
+              style={{ alignSelf: 'center', marginLeft: getScaleSize(16) }}
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={'#0F232F'}>
@@ -248,11 +253,11 @@ export default function RequestDetails(props: any) {
           <View
             style={[
               styles(theme).horizontalView,
-              {marginTop: getScaleSize(16)},
+              { marginTop: getScaleSize(16) },
             ]}>
             <TouchableOpacity
               activeOpacity={1}
-              style={[styles(theme).newButton, {marginRight: getScaleSize(6)}]}
+              style={[styles(theme).newButton, { marginRight: getScaleSize(6) }]}
               onPress={() => {
                 props.navigation.navigate(SCREENS.ChatDetails.identifier);
               }}>
@@ -265,7 +270,7 @@ export default function RequestDetails(props: any) {
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={1}
-              style={[styles(theme).newButton, {marginLeft: getScaleSize(6)}]}
+              style={[styles(theme).newButton, { marginLeft: getScaleSize(6) }]}
               onPress={() => {
                 props.navigation.navigate(SCREENS.OtherUserProfile.identifier);
               }}>
@@ -279,7 +284,7 @@ export default function RequestDetails(props: any) {
           </View>
         </View>
         <Text
-          style={{marginTop: getScaleSize(24)}}
+          style={{ marginTop: getScaleSize(24) }}
           size={getScaleSize(18)}
           font={FONTS.Lato.SemiBold}
           color={theme._323232}>
@@ -290,13 +295,11 @@ export default function RequestDetails(props: any) {
             size={getScaleSize(18)}
             font={FONTS.Lato.Regular}
             color={theme._555555}>
-            {
-              'Our skilled team will expertly assemble your furniture, ensuring every piece is put together with precision. We take pride in our attention to detail, so you can trust that your items will be ready for use in no time. Whether its a complex wardrobe or a simple table, we handle it all with care and professionalism. Enjoy a hassle-free experience as we transform your space with our assembly services.'
-            }
+            {serviceDetails?.personilized_short_message ?? '-'}
           </Text>
         </View>
         <Text
-          style={{marginTop: getScaleSize(24)}}
+          style={{ marginTop: getScaleSize(24) }}
           size={getScaleSize(18)}
           font={FONTS.Lato.SemiBold}
           color={theme._323232}>
@@ -304,15 +307,15 @@ export default function RequestDetails(props: any) {
         </Text>
         <View style={styles(theme).imageUploadContent}>
           <TouchableOpacity
-            style={[styles(theme).uploadButton, {marginRight: getScaleSize(9)}]}
+            style={[styles(theme).uploadButton, { marginRight: getScaleSize(9) }]}
             activeOpacity={1}
-            onPress={() => {}}>
+            onPress={() => { }}>
             <Image
               style={styles(theme).attachmentIcon}
               source={IMAGES.pdf_icon}
             />
             <Text
-              style={{marginTop: getScaleSize(8)}}
+              style={{ marginTop: getScaleSize(8) }}
               size={getScaleSize(15)}
               font={FONTS.Lato.Regular}
               color={theme._818285}>
@@ -320,15 +323,15 @@ export default function RequestDetails(props: any) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles(theme).uploadButton, {marginLeft: getScaleSize(9)}]}
+            style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9) }]}
             activeOpacity={1}
-            onPress={() => {}}>
+            onPress={() => { }}>
             <Image
               style={styles(theme).attachmentIcon}
               source={IMAGES.pdf_icon}
             />
             <Text
-              style={{marginTop: getScaleSize(8)}}
+              style={{ marginTop: getScaleSize(8) }}
               size={getScaleSize(15)}
               font={FONTS.Lato.Regular}
               color={theme._818285}>
@@ -337,7 +340,7 @@ export default function RequestDetails(props: any) {
           </TouchableOpacity>
         </View>
         <Text
-          style={{marginTop: getScaleSize(24)}}
+          style={{ marginTop: getScaleSize(24) }}
           size={getScaleSize(18)}
           font={FONTS.Lato.SemiBold}
           color={theme._323232}>
@@ -347,11 +350,11 @@ export default function RequestDetails(props: any) {
           data={['']}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={({item, index}) => {
+          renderItem={({ item, index }) => {
             return (
               <Image
                 style={[styles(theme).photosView]}
-                source={{uri: 'https://picsum.photos/id/1/200/300'}}
+                source={{ uri: 'https://picsum.photos/id/1/200/300' }}
               />
             );
           }}
@@ -368,7 +371,7 @@ export default function RequestDetails(props: any) {
             size={getScaleSize(19)}
             font={FONTS.Lato.Bold}
             color={theme.primary}
-            style={{alignSelf: 'center'}}>
+            style={{ alignSelf: 'center' }}>
             {STRING.Reject}
           </Text>
         </TouchableOpacity>
@@ -382,19 +385,19 @@ export default function RequestDetails(props: any) {
             size={getScaleSize(19)}
             font={FONTS.Lato.Bold}
             color={theme.white}
-            style={{alignSelf: 'center'}}>
+            style={{ alignSelf: 'center' }}>
             {STRING.Accept}
           </Text>
         </TouchableOpacity>
       </View>
-      <RejectBottomPopup 
-      rejectRef={rejectRef} 
-      onClose={() => {
-        rejectRef.current.close();
-      }}
-      onReject={() => {
-        rejectRef.current.close();
-      }}
+      <RejectBottomPopup
+        rejectRef={rejectRef}
+        onClose={() => {
+          rejectRef.current.close();
+        }}
+        onReject={() => {
+          rejectRef.current.close();
+        }}
       />
       <AcceptBottomPopup
         onRef={acceptRef}
@@ -426,7 +429,7 @@ export default function RequestDetails(props: any) {
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     scrolledContainer: {
       marginTop: getScaleSize(19),
       marginHorizontal: getScaleSize(24),
@@ -440,6 +443,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     imageView: {
       height: getScaleSize(172),
       borderRadius: getScaleSize(20),
+      overflow: 'hidden',
       flex: 1.0,
     },
     informationView: {
