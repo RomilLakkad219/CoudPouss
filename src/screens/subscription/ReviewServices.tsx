@@ -51,8 +51,8 @@ export default function ReviewServices(props: any) {
                 console.log('result?.data?.data?', result?.data?.data)
                 onSelectedServices()
             } else {
-                SHOW_TOAST(result?.data?.msg, 'error')
-                console.log(result?.data?.msg)
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
             }
         } catch (error: any) {
             SHOW_TOAST(error?.message ?? '', 'error');
@@ -86,8 +86,8 @@ export default function ReviewServices(props: any) {
                     props.navigation.navigate(SCREENS.AccountCreatedSuccessfully.identifier);
                 }
             } else {
-                SHOW_TOAST(result?.data?.msg, 'error')
-                console.log(result?.data?.msg)
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
             }
         } catch (error: any) {
             SHOW_TOAST(error?.message ?? '', 'error');

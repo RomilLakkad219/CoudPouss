@@ -137,7 +137,10 @@ export default function MyProfile(props: any) {
                 props.navigation.goBack();
                 await fetchProfile()
             }
-
+            else {
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
+            }
         } catch (error: any) {
             SHOW_TOAST(error?.message ?? '', 'error');
         }
@@ -165,7 +168,8 @@ export default function MyProfile(props: any) {
                 }, 500);
             }
             else {
-                SHOW_TOAST(result?.error?.message, 'error')
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
             }
         } catch (error: any) {
             SHOW_TOAST(error?.message ?? '', 'error');

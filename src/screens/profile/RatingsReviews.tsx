@@ -42,7 +42,8 @@ export default function RatingsReviews(props: any) {
 
             }
             else {
-
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
             }
 
         } catch (error: any) {
