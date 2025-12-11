@@ -20,7 +20,7 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 import { FONTS, IMAGES } from '../../assets';
 import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 import {
@@ -93,6 +93,9 @@ export default function Home(props: any) {
           <HomeHeader
             onPressNotification={() => {
               props.navigation.navigate(SCREENS.Notification.identifier);
+            }}
+            onPressUserProfile={()=>{
+               props.navigation.navigate(SCREENS.MyProfile.identifier);
             }}
           />
         </View>

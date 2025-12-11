@@ -6,17 +6,19 @@ import { AuthContext, ThemeContext, ThemeContextType } from '../context'
 
 //CONSTANT & ASSETS
 import { IMAGES } from '../assets'
-import { getScaleSize, Storage } from '../constant'
+import { getScaleSize, SHOW_TOAST, Storage } from '../constant'
 
 //SCREENS
 import { SCREENS } from '.'
 import { CommonActions } from '@react-navigation/native'
 
+//API
+import { API } from '../api'
 
 export default function Splash(props: any) {
 
     const { theme } = useContext(ThemeContext)
-    const { setUser, setUserType } = useContext<any>(AuthContext);
+    const { setUser, setUserType, setProfile } = useContext<any>(AuthContext);
 
     useEffect(() => {
         checkUserDetails()
@@ -29,6 +31,11 @@ export default function Splash(props: any) {
         if (userData && userData?.user_data?.role) {
             setUser(userData);
             setUserType(userData?.user_data?.role);
+            const profileData = await getProfileData();
+
+            if (profileData) {
+                console.log("Profile data", profileData);
+            }
             setTimeout(() => {
                 props?.navigation?.dispatch(
                     CommonActions.reset({
@@ -48,6 +55,23 @@ export default function Splash(props: any) {
             }, 2000)
         }
     };
+
+    async function getProfileData() {
+        try {
+            const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
+            const userDetail = result?.data?.data?.user;
+
+            if (userDetail) {
+                setProfile(userDetail);
+                return userDetail;
+            }
+
+            return null;
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+            return null;
+        }
+    }
 
     return (
         <View style={styles(theme).container}>

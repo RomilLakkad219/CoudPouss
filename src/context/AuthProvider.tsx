@@ -1,4 +1,5 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
+import { API } from '../api';
 
 interface AuthProviderProps {
     children: any
@@ -8,13 +9,34 @@ export const AuthContext = createContext<any>(null);
 
 export function AuthProvider(props: Readonly<AuthProviderProps>): any {
 
+    useEffect(() => {
+        fetchProfile()
+    }, [])
+
     const [user, setUser] = useState<any>(null)
     const [userType, setUserType] = useState<any>('service_provider')
     //elderly_user , service_provider
     const [myPlan, setMyPlan] = useState<any>(null)
     //professional, non_professional   
-    const [selectedServices, setSelectedServices] = useState<any>([])
+    const [profile, setProfile] = useState<any>(null)
+     const [selectedServices, setSelectedServices] = useState<any>([])
 
+    async function fetchProfile() {
+        try {
+            const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
+
+            console.log('PROFILE', JSON.stringify(result))
+            if (result.status) {
+                const userDetail = result?.data?.data?.user;
+                setProfile(userDetail)
+                return userDetail
+            }
+            return null
+        }
+        catch (error: any) {
+            return null
+        }
+    }
 
     return (
         <AuthContext.Provider value={{
@@ -24,6 +46,9 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
             setUserType,
             myPlan,
             setMyPlan,
+            profile,
+            setProfile,
+            fetchProfile,
             selectedServices,
             setSelectedServices
         }}>

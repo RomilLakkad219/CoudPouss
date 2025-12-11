@@ -1,5 +1,5 @@
-import {stubString} from 'lodash';
-import {useTranslation} from 'react-i18next';
+import { stubString } from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 export const useString = () => {
   return {
@@ -275,7 +275,7 @@ export const useString = () => {
     Addpersonalizedshortmessage: 'Add personalized short message',
     Attachsupportingdocuments: 'Attach supporting documents',
     Uploadashortvideo: ' Upload a short video (max 2 minutes)',
-    SubmitQuote :'Submit Quote',
+    SubmitQuote: 'Submit Quote',
     manage_services: "Manage Services",
     manage_subscription: "Manage Subscription",
     account_under_verification: "Account under verification",
@@ -312,9 +312,9 @@ export const useString = () => {
     withdrawal_completed_successfully: "Withdrawal completed\nsuccessfully!",
     active_Plan: "Active Plan",
     manage_plan: "Manage Plan",
-    next_payment: "Next Payment",   
+    next_payment: "Next Payment",
     non_certified_provider_details: "Non-Certified Provider Details",
-    service_or_item_exchanges_only : "Service or item exchanges only",
+    service_or_item_exchanges_only: "Service or item exchanges only",
     No_money_transactions_Barter_only: "No money transactions (Barter only)",
     my_account: "My Account",
     logout: "Log Out",
@@ -335,8 +335,8 @@ export const useString = () => {
     recent_works_reviews: "Recent works reviews",
     read_more: "Read More",
     show_less: "Show Less",
-    my_earnings: "My Earnings",  
-    thank_you_for_your_review: "Thank you for your review!",  
+    my_earnings: "My Earnings",
+    thank_you_for_your_review: "Thank you for your review!",
     back_to_home: "Back to Home",
     we_appreciated_you_taking_the_time_to_reflect_on_your_experience: "We appreciated you taking the time to reflect on your experience",
     write_your_reason_here: "Write your reason here…",
@@ -345,6 +345,7 @@ export const useString = () => {
     passwords_do_not_match: "Passwords do not match",
     please_enter_your_address: "Please enter your address",
     password_validation_message: "Password must be at least 8 characters and include an uppercase letter, a number, and a special character",
+    profile_updated_successfully: "Profile updated successfully",
     add_details_of_the_product_or_thing_you_want_to_offer_in_exchange_for_the_service: "Add details of the product or thing you want to offer in exchange for the service.",
     add_product_name: "Add Product Name",
     upload_photos_of_a_product: "Upload Photos of a Product",
@@ -355,6 +356,6 @@ export const useString = () => {
 };
 
 export function getTranslation(str: string) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   return t(str);
 }
