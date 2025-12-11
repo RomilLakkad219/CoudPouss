@@ -6,7 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  
+
 } from 'react-native';
 
 //ASSETS
@@ -42,6 +42,8 @@ export default function Assistance(props: any) {
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
   const [bannerData, setBannerData] = useState<any>(null);
+  const [searchText, setSearchText] = useState('');
+  const [filteredSubCategories, setFilteredSubCategories] = useState([]);
 
   useEffect(() => {
     getCategoryData();
@@ -53,14 +55,33 @@ export default function Assistance(props: any) {
     }
   }, [selectedCategory]);
 
+  useEffect(() => {
+    if (!searchText.trim()) {
+      setFilteredSubCategories(subCategoryList);
+      return;
+    }
+
+    const search = searchText.toLowerCase();
+
+    const filtered = subCategoryList.filter((item: any) => {
+      const title = (item?.subcategory_name || "").toLowerCase();
+      return title.includes(search);
+    });
+
+    setFilteredSubCategories(filtered);
+
+    console.log('Filtered', filtered)
+  }, [searchText, subCategoryList]);
+
   async function getCategoryData() {
     try {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getHomeData + `?service_name=${service?.name}`);
       setLoading(false);
-      console.log('result', result.status, result)
+
+      console.log('MAIN CAT',JSON.stringify(result))
+
       if (result.status) {
-        console.log('categoryList==', result?.data?.data)
         setCategoryList(result?.data?.data?.categories ?? []);
         if (result?.data?.data?.categories?.[0]?.id) {
           setSelectedCategory(result?.data?.data?.categories?.[0]);
@@ -68,12 +89,10 @@ export default function Assistance(props: any) {
         }
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
-        console.log('error==>', result?.data?.message)
       }
     } catch (error: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log(error?.message)
     } finally {
       setLoading(false);
     }
@@ -84,25 +103,25 @@ export default function Assistance(props: any) {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getHomeData + `/${id}`);
       setLoading(false);
-      console.log('result', result.status, result)
+
       if (result.status) {
-        console.log('subcategoryList==', result?.data?.data)
+        console.log('subcategoryList==', JSON.stringify(result?.data?.data))
         setBannerData(result?.data?.data?.Banner ?? null);
         setSubCategoryList(result?.data?.data?.subcategories ?? []);
+        setFilteredSubCategories(result?.data?.data?.subcategories ?? []);
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
-        console.log('error==>', result?.data?.message)
       }
     } catch (error: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log(error?.message)
     } finally {
       setLoading(false);
     }
   }
 
-  const patterns = ['small', 'large', 'large', 'small'];
+  // const patterns = searchText ? ['small'] : ['small', 'large', 'large', 'small'];
+    const patterns = ['small', 'large', 'large', 'small'];
 
   return (
     <View style={styles(theme).container}>
@@ -117,7 +136,12 @@ export default function Assistance(props: any) {
           marginTop: getScaleSize(16),
           marginHorizontal: getScaleSize(24),
         }}>
-        <SearchComponent />
+        <SearchComponent
+          value={searchText}
+          onChangeText={(text:any) => {
+            console.log("SEARCH TEXT:", text);
+            setSearchText(text);
+          }} />
       </View>
       <View style={styles(theme).deviderView}></View>
       {bannerData ? (
@@ -125,7 +149,7 @@ export default function Assistance(props: any) {
           style={styles(theme).bannerContainer}
           source={{ uri: bannerData?.image }}
         />
-      ):(
+      ) : (
         <View style={styles(theme).bannerContainer} />
       )}
       {categoryList.length > 1 && (
@@ -156,11 +180,12 @@ export default function Assistance(props: any) {
                   ]}
                   activeOpacity={1}
                   onPress={() => {
+                    setSearchText('');
                     setSelectedCategory(item);
                   }}>
                   <Image
                     style={styles(theme).categoryImage}
-                    source={{ uri: item?.image }}
+                    source={{ uri: item?.category_logo }}
                   />
                   <Text
                     style={{
@@ -174,7 +199,7 @@ export default function Assistance(props: any) {
                         ? theme.white
                         : theme._999999
                     }>
-                    {item?.name}
+                    {item?.category_name}
                   </Text>
                 </TouchableOpacity>
               );
@@ -183,7 +208,7 @@ export default function Assistance(props: any) {
         </View>
       )}
       <FlatList
-        data={subCategoryList}
+        data={filteredSubCategories}
         numColumns={2}
         contentContainerStyle={{ marginTop: getScaleSize(-20) }}
         keyExtractor={(item: any, index: number) => index.toString()}
@@ -203,12 +228,16 @@ export default function Assistance(props: any) {
                   marginTop: type === 'large' && index % 2 == 0 ? getScaleSize(-25) : getScaleSize(20),
                 }
               ]}>
-              <Image
-                style={styles(theme).imageView}
-                resizeMode='cover'
-                source={{ uri: 'https://picsum.photos/id/1/200/300' }}
-              />
-
+              {item?.image === null ?
+                <View style={[styles(theme).imageView, {
+                  backgroundColor: 'gray'
+                }]}></View> :
+                <Image
+                  style={styles(theme).imageView}
+                  resizeMode='cover'
+                  source={{ uri: item?.image }}
+                />
+              }
               <Text
                 style={{
                   marginVertical: getScaleSize(14),
@@ -217,7 +246,7 @@ export default function Assistance(props: any) {
                 size={getScaleSize(16)}
                 font={FONTS.Lato.Bold}
                 color={theme.primary}>
-                {item?.title}
+                {item?.subcategory_name}
               </Text>
             </View>
           )
