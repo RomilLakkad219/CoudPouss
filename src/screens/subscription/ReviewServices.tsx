@@ -13,6 +13,7 @@ import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button, CategoryDropdown, ServiceItem } from '../../components';
+import { API } from '../../api';
 
 
 export default function ReviewServices(props: any) {
@@ -20,21 +21,81 @@ export default function ReviewServices(props: any) {
     const STRING = useString();
 
     const { theme } = useContext<any>(ThemeContext);
-    const { myPlan } = useContext<any>(AuthContext);
+    const { selectedServices, setSelectedServices, myPlan } = useContext<any>(AuthContext);
 
-    const selectedServices = props.route.params?.selectedServices ?? [];
-    const [serviceList, setServiceList] = useState(selectedServices);
+    const [isLoading, setLoading] = useState(false);
 
     const onDeleteService = (service: any) => {
-        const updated = serviceList
+        const updated = selectedServices
             .map((section: any) => ({
                 ...section,
                 service: section?.service?.filter((s: any) => s?.id !== service?.id)
             }))
             .filter((section: any) => section?.service?.length > 0);
 
-        setServiceList(updated);
+        setSelectedServices(updated);
     };
+
+    console.log('selectedServices==>', selectedServices)
+
+    async function onSelectedCategories() {
+        const categoryIds = selectedServices.map((item: any) => item.category?.id);
+        const params = {
+            category_ids: categoryIds
+        }
+        try {
+            setLoading(true);
+            const result = await API.Instance.post(API.API_ROUTES.onSelectedCategories, params);
+            console.log('result', result.status, result)
+            if (result.status) {
+                console.log('result?.data?.data?', result?.data?.data)
+                onSelectedServices()
+            } else {
+                SHOW_TOAST(result?.data?.msg, 'error')
+                console.log(result?.data?.msg)
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function onSelectedServices() {
+        const serviceIds: any = [];
+        selectedServices.forEach((item: any) => {
+            item.service?.forEach((e: any) => {
+                serviceIds.push(e.id);
+            });
+        });
+
+        const params = {
+            sub_category_ids: serviceIds
+        }
+        try {
+            setLoading(true);
+            const result = await API.Instance.post(API.API_ROUTES.onSelectedServices, params);
+            console.log('result', result.status, result)
+            if (result.status) {
+                console.log('result?.data?.data?', result?.data?.data)
+                setSelectedServices([]);
+                if (myPlan === 'professional') {
+                    props.navigation.navigate(SCREENS.AddBankDetails.identifier);
+                } else {
+                    props.navigation.navigate(SCREENS.AccountCreatedSuccessfully.identifier);
+                }
+            } else {
+                SHOW_TOAST(result?.data?.msg, 'error')
+                console.log(result?.data?.msg)
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -59,7 +120,7 @@ export default function ReviewServices(props: any) {
                 </Text>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={{ flex: 1.0 }}>
-                        {serviceList.map((section: any, index: number) => {
+                        {selectedServices.map((section: any, index: number) => {
                             return (
                                 <View key={index} style={styles(theme).itemContainer}>
                                     <View style={styles(theme).sectionHeaderContainer}>
@@ -107,11 +168,7 @@ export default function ReviewServices(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        if (myPlan === 'professional') {
-                            props.navigation.navigate(SCREENS.AddBankDetails.identifier);
-                        } else {
-                            props.navigation.navigate(SCREENS.AccountCreatedSuccessfully.identifier);
-                        }
+                        onSelectedCategories();
                     }}
                 />
             </View>

@@ -57,7 +57,7 @@ export default function Request(props: any) {
       console.log('result', result.status, result)
       if (result.status) {
         console.log('allRequests==', result?.data?.data)
-        setAllRequests(result?.data?.data);
+        setAllRequests(result?.data?.data?.services ?? []);
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
         console.log('error==>', result?.data?.message)
@@ -121,9 +121,13 @@ export default function Request(props: any) {
           showsVerticalScrollIndicator={false}>
           {allRequests?.length > 0 && allRequests?.map((item: any) => {
             return (
-              <RequestItem key={item?.id} onPress={() => {
-                props.navigation.navigate(SCREENS.RequestDetails.identifier)
-              }} title={item?.name} description={item?.description} />
+              <RequestItem key={item?.id} 
+              onPress={() => {
+                props.navigation.navigate(SCREENS.RequestDetails.identifier, {
+                  item: item
+                })
+              }} 
+              item={item} />
             )
           })}
         </ScrollView>

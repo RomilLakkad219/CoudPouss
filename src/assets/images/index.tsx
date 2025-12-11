@@ -100,4 +100,6 @@ export const IMAGES = {
   location_map : require('./location_map.png'),
   ic_review: require('./ic_review.png'),
   ic_phone: require('./ic_phone.png'),
+  quantity_remove: require('./quantity_remove.png'),
+  quantity_add: require('./quantity_add.png'),
 };

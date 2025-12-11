@@ -59,6 +59,26 @@ export default function BottomSheet(props: BottomSheetProps) {
                         </Text>
                     </View>
                 )}
+                {type === 'payment' && (
+                    <View style={styles(theme).statusContainer}>
+                        <Image source={IMAGES.add_service} style={[styles(theme).alartIcon, { marginBottom: getScaleSize(16) }]} />
+                        <Text
+                            size={getScaleSize(22)}
+                            font={FONTS.Lato.SemiBold}
+                            align="center"
+                            color={theme._323232}>
+                            {title}
+                        </Text>
+                        <Text
+                            size={getScaleSize(18)}
+                            style={{ marginTop: getScaleSize(16) }}
+                            font={FONTS.Lato.Medium}
+                            align="center"
+                            color={theme._424242}>
+                            {description}
+                        </Text>
+                    </View>
+                )}
                 {type === 'review' && (
                     <View style={styles(theme).statusContainer}>
                         <Image source={IMAGES.ic_review} style={[styles(theme).alartIcon, { marginBottom: getScaleSize(16) }]} />
