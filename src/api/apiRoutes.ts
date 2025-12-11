@@ -21,11 +21,14 @@ const API_ROUTES = {
     addYearsOfExperience: 'userService/auth/experience',
     onSelectPlan: "userService/auth/select-plan",
     allCategories: "home_module/all_categories",
-    allRequests: "service_request/service-requests",
     uploadServiceRequestImage: "service_request/upload",
     editProfile: "elderly_profile/profile",
     ratingAndReviews: "elderly_profile/profile?section=ratings_reviews",
-    deleteProfile: "elderly_profile/profile?section=my_profile"
+    deleteProfile: "elderly_profile/profile?section=my_profile",
+    allRequests: "service_confirmation/service_accept/get_services",
+    onSelectedCategories: "userService/auth/select-categories",
+    onSelectedServices: "userService/auth/select-sub-categories",
+    getServiceDetails: "service_confirmation/service_accept/get_service"
 }
 
 export { API_ROUTES, API_BASE_URL, DISABLE_API_LOGS }

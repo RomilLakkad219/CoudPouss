@@ -57,7 +57,7 @@ Instance.interceptors.request.use(
             const result = JSON.parse(userData)
             console.log('result==>', result)
             const accessToken = result?.access_token
-            // const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiM2I1Y2FkZTAtNjFjYi00NzcyLTk0OTItMWM3MmYzOGU4Njk3IiwidXNlcl9yb2xlIjoic2VydmljZV9wcm92aWRlciIsImV4cCI6MTc2NDkzNzcyMH0.Z2-vTvNqt8CAmtIcuVFJRUuBHN39DcE6SUBWX1r3u-8'
+            // const accessToken = ''
 
             if (accessToken) {
                 // const latestToken = accessToken.reduce((a: any, b: any) => b.updatedAt > a.updatedAt ? b : a);

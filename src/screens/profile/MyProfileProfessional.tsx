@@ -249,6 +249,7 @@ export default function MyProfileProfessional(props: any) {
               <View style={styles(theme).rowView}>
                 {[...Array(5)].map((_, i) => (
                   <Image
+                    key={i}
                     source={IMAGES.star}
                     style={styles(theme).ratingimage}
                   />
@@ -314,6 +315,7 @@ export default function MyProfileProfessional(props: any) {
           {['', ''].map((item: any, index: number) => {
             return (
                 <RatingsReviewsItem
+                key={index}
                 itemContainer={{ marginTop: index === 0 ? getScaleSize(20) : getScaleSize(16) }}
                 onPressShowMore={() => {
                     setShowMore(!showMore);

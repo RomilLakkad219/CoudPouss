@@ -23,6 +23,8 @@ function RequestItem(props: any) {
   const STRING = useString();
   const {theme} = useContext(ThemeContext);
 
+  const { item } = props;
+
   return (
     <TouchableOpacity style={styles(theme).container} onPress={()=>{
       props.onPress()
@@ -38,7 +40,7 @@ function RequestItem(props: any) {
           size={getScaleSize(24)}
           font={FONTS.Lato.Bold}
           color={theme.primary}>
-          {'DIY Service'}
+          {`${item?.category} Service`}
         </Text>
       </View>
       <Text
@@ -46,7 +48,7 @@ function RequestItem(props: any) {
         size={getScaleSize(20)}
         font={FONTS.Lato.SemiBold}
         color={theme.primary}>
-        {'Furniture Assembly'}
+        {item?.sub_category}
       </Text>
       <View style={styles(theme).detailsView}>
         <View style={styles(theme).horizontalContainer}>

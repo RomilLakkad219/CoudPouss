@@ -35,15 +35,15 @@ export default function Login(props: any) {
   const [countryCode, setCountryCode] = useState('+91');
   const [isPhoneNumber, setIsPhoneNumber] = useState(false);
 
-  useEffect(() => {
-    if (email.length >= 3) {
-      const isNumber = REGEX.phoneRegex.test(email);
-      setIsPhoneNumber(isNumber)
-    }
-    else {
-      setIsPhoneNumber(false)
-    }
-  }, [email])
+  // useEffect(() => {
+  //   if (email.length >= 3) {
+  //     const isNumber = REGEX.phoneRegex.test(email);
+  //     setIsPhoneNumber(isNumber)
+  //   }
+  //   else {
+  //     setIsPhoneNumber(false)
+  //   }
+  // }, [email])
 
 
 

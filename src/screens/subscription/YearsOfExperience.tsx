@@ -2,7 +2,7 @@ import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } fro
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -19,7 +19,7 @@ import { API } from '../../api';
 export default function YearsOfExperience(props: any) {
 
     const STRING = useString();
-
+    const { setSelectedServices } = useContext<any>(AuthContext);
     const { theme } = useContext<any>(ThemeContext);
     const [yearsOfExperience, setYearsOfExperience] = useState('');
     const [isLoading, setLoading] = useState(false);
@@ -39,6 +39,7 @@ export default function YearsOfExperience(props: any) {
             console.log('result', result.status, result)
             if (result.status) {
                 console.log('yearsOfExperience==', result?.data?.data)
+                setSelectedServices([]);
                 props.navigation.navigate(SCREENS.AddServices.identifier);
             } else {
                 SHOW_TOAST(result?.data?.message ?? '', 'error')
@@ -106,7 +107,6 @@ export default function YearsOfExperience(props: any) {
                     style={{ flex: 1.0 }}
                     onPress={() => {
                         addYearsOfExperience()
-                        props.navigation.navigate(SCREENS.AddServices.identifier);
                     }}
                 />
             </View>

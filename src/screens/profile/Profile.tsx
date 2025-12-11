@@ -51,14 +51,14 @@ export default function Profile(props: any) {
   }
 
 
-  async function logout() {
+  function logout() {
     props.navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: SCREENS.Login.identifier }],
+        routes: [{ name: SCREENS.Splash.identifier }],
       }),
     );
-    await Storage.clear()
+    Storage.clear()
     setUser('');
     setUserType('');
   }

@@ -137,9 +137,10 @@ export default function Task(props: any) {
       {/* <View style={styles(theme).bottomStrip}></View> */}
       <View style={styles(theme).deviderView}></View>
       <View style={{marginHorizontal: getScaleSize(22)}}>
-        {['', ''].map(item => {
+        {['', ''].map((item: any, index: number) => {
           return (
             <TaskItem
+              key={index}
               onPressItem={() => {
                 props.navigation.navigate(
                   SCREENS.ProfessionalTaskDetails.identifier,
