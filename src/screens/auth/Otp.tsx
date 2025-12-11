@@ -32,6 +32,25 @@ export default function Otp(props: any) {
     const [otp, setOtp] = useState('');
     const [otpError, setOtpError] = useState('');
     const [isLoading, setLoading] = useState(false);
+    const [timer, setTimer] = useState(60); // seconds
+    const [isResendDisabled, setIsResendDisabled] = useState(true);
+
+    useEffect(() => {
+        let interval: any;
+        if (isResendDisabled) {
+            interval = setInterval(() => {
+                setTimer(prev => {
+                    if (prev <= 1) {
+                        clearInterval(interval);
+                        setIsResendDisabled(false);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [isResendDisabled]);
 
     async function onOtp() {
         if (isFromSignup) {
@@ -149,6 +168,8 @@ export default function Otp(props: any) {
             if (result.status) {
                 SHOW_TOAST(result?.data?.message ?? '', 'success')
                 otpInput.current?.clear();
+                setTimer(60);
+                setIsResendDisabled(true);
             } else {
                 SHOW_TOAST(result?.data?.message ?? '', 'error')
                 console.log('error==>', result?.data?.message)
@@ -207,22 +228,33 @@ export default function Otp(props: any) {
                             </Text>
                         }
                     </View>
-
                 </View>
             </ScrollView>
-            <TouchableOpacity
-                onPress={() => {
-                    onResendOtp();
-                }}>
-                <Text
-                    size={getScaleSize(20)}
-                    font={FONTS.Lato.SemiBold}
-                    color={theme._2C6587}
-                    align="center"
-                    style={{ marginBottom: getScaleSize(16) }}>
-                    {STRING.resend_code}
-                </Text>
-            </TouchableOpacity>
+            <View style={styles(theme).resendOtpView}>
+                {isResendDisabled ? (
+                    <Text
+                        font={FONTS.Lato.SemiBold}
+                        color={theme._2C6587}
+                        size={getScaleSize(18)}
+                        align="center">
+                        {`Resend code in ${timer} seconds`}
+                    </Text>
+                ) : (
+                    <TouchableOpacity
+                        onPress={() => {
+                            onResendOtp();
+                        }}>
+                        <Text
+                            size={getScaleSize(20)}
+                            font={FONTS.Lato.SemiBold}
+                            color={theme._2C6587}
+                            align="center"
+                            style={{ marginBottom: getScaleSize(16) }}>
+                            {STRING.resend_code}
+                        </Text>
+                    </TouchableOpacity>
+                )}
+            </View>
             <Button
                 title={isFromSignup ? STRING.verify_OTP : STRING.continue}
                 disabled={!otp}
@@ -262,5 +294,10 @@ const styles = (theme: ThemeContextType['theme']) =>
             fontFamily: FONTS.Lato.Bold,
             color: theme._31302F,
             backgroundColor: theme.white,
+        },
+        resendOtpView: {
+            alignItems: 'center',
+            marginTop: getScaleSize(12),
+            marginBottom: getScaleSize(10)
         },
     });

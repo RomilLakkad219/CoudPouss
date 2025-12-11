@@ -45,8 +45,6 @@ export default function Login(props: any) {
   //   }
   // }, [email])
 
-
-
   async function onVerification() {
     if (!email) {
       setEmailError(STRING.please_enter_your_email);
@@ -58,7 +56,6 @@ export default function Login(props: any) {
       onLogin()
     }
   }
-
 
   async function onLogin() {
     let params = {}
@@ -78,7 +75,7 @@ export default function Login(props: any) {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
       setLoading(false);
-      console.log('result', result.status, result)
+      console.log('result', JSON.stringify(result.status), JSON.stringify(result))
       if (result.status) {
         console.log('result?.data?.data?', result?.data?.data)
         Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
@@ -101,13 +98,13 @@ export default function Login(props: any) {
           }),
         );
       } else {
-        SHOW_TOAST(result?.data?.msg, 'error')
-        console.log(result?.data?.msg)
+        SHOW_TOAST(result?.data?.message, 'error')
+        console.log('ERR',result?.data?.message)
       }
     } catch (error: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log(error?.message)
+      console.log('CATCH ERR',error?.message)
     }
   }
 

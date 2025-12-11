@@ -130,12 +130,11 @@ const styles = (theme: ThemeContextType['theme']) =>
     container: {
       flex: 1.0,
       backgroundColor: theme.primary,
-      paddingTop: getScaleSize(15),
+      paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + getScaleSize(10) : getScaleSize(20),
       // paddingHorizontal: getScaleSize(20),
       borderBottomLeftRadius: getScaleSize(60),
       borderBottomRightRadius: getScaleSize(60),
       overflow: 'hidden',
-      height: getScaleSize(395),
     },
     headerView: {
       flex: 1.0,
