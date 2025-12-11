@@ -2,7 +2,7 @@ import { Dimensions, FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, 
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
@@ -12,7 +12,7 @@ import { getScaleSize, useString, SHOW_TOAST, CATEGORY_DATA, SERVICES_DATA } fro
 import { SCREENS } from '..';
 
 //COMPONENTS
-import { Header, Input, Text, Button, CategoryDropdown, ServiceItem } from '../../components';
+import { Header, Input, Text, Button, CategoryDropdown, ServiceItem, BottomSheet } from '../../components';
 import { API } from '../../api';
 
 
@@ -20,12 +20,15 @@ export default function AddServices(props: any) {
 
     const STRING = useString();
 
+    const { setSelectedServices, selectedServices, myPlan } = useContext<any>(AuthContext);
     const { theme } = useContext<any>(ThemeContext);
+
+    const bottomSheetRef = useRef<any>(null);
     const [selectedCategory, setSelectedCategory] = useState<any>(null);
-    const [selectedServices, setSelectedServices] = useState<any>([]);
     const [isLoading, setLoading] = useState(false);
     const [allCategories, setAllCategories] = useState([]);
     const [subCategoryList, setSubCategoryList] = useState([]);
+    const [paymentPopup, setPaymentPopup] = useState(false);
 
     console.log('selectedCategory==>', selectedCategory, selectedServices)
     useEffect(() => {
@@ -93,11 +96,18 @@ export default function AddServices(props: any) {
         return false;
     }
 
-    const onSelectServices = (item: any) => {
+    async function onSelectServices(item: any) {
+        const mySelectedPlan = myPlan === 'non_professional'
         if (selectedServices && selectedServices.length > 0) {
             const categoryItem = selectedServices.find((e: any) => e?.category?.id === selectedCategory?.id);
+
+            //---=============== Payment popup logic ================
+
+
+
+            //---=============== Payment popup logic End================
             if (categoryItem) {
-                const newCategoryItem = {...categoryItem};
+                const newCategoryItem = { ...categoryItem };
 
                 let services: any[] = newCategoryItem?.service ?? [];
                 const serviceItem = services?.find((e: any) => e?.id === item?.id);
@@ -109,7 +119,7 @@ export default function AddServices(props: any) {
                 }
 
                 newCategoryItem.service = services;
-                
+
                 const categoryItemIndex = selectedServices.findIndex((e: any) => e?.category?.id === selectedCategory?.id);
                 if (newCategoryItem.service && newCategoryItem.service.length > 0) {
                     selectedServices.splice(categoryItemIndex, 1, newCategoryItem);
@@ -140,6 +150,14 @@ export default function AddServices(props: any) {
     };
 
 
+    async function showPaymentPopup() {
+        if (paymentPopup) {
+            return true;
+        } else {
+            bottomSheetRef.current.open();
+            return false;
+        }
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -168,8 +186,19 @@ export default function AddServices(props: any) {
                 </Text>
                 <CategoryDropdown
                     onChange={(item) => {
-                        setSelectedCategory(item);
-                        getSubCategoryData(item?.id);
+                        if (selectedServices.length > 0) {
+                            const categoryItem = selectedServices.find((e: any) => e?.category?.id === selectedCategory?.id);
+                            if (categoryItem) {
+                                bottomSheetRef.current.open();
+                            } else {
+                                setSelectedCategory(item);
+                                getSubCategoryData(item?.id);
+                            }
+                        } else {
+                            setSelectedCategory(item);
+                            getSubCategoryData(item?.id);
+                        }
+
                     }}
                     selectedItem={selectedCategory}
                     container={{}}
@@ -221,12 +250,26 @@ export default function AddServices(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        props.navigation.navigate(SCREENS.ReviewServices.identifier,{
-                            selectedServices: selectedServices,
-                        });
+                        props.navigation.navigate(SCREENS.ReviewServices.identifier);
                     }}
                 />
             </View>
+            <BottomSheet
+                bottomSheetRef={bottomSheetRef}
+                height={getScaleSize(350)}
+                type="payment"
+                title={STRING.want_to_add_more_service_categories}
+                description={STRING.additional_category_you_add_will_incur_a_monthly_fee_of}
+                buttonTitle={STRING.proceed_to_pay}
+                secondButtonTitle={STRING.No}
+                onPressButton={() => {
+                    setPaymentPopup(true);
+                    bottomSheetRef.current.close();
+                }}
+                onPressSecondButton={() => {
+                    bottomSheetRef.current.close();
+                }}
+            />
         </View>
     );
 }

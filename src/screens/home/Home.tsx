@@ -243,9 +243,10 @@ export default function Home(props: any) {
             {STRING.ViewAll}
           </Text>
         </View>
-        {['', ''].map((item: any) => {
+        {['', ''].map((item: any, index: number) => {
           return (
             <RequestItem
+              key={index}
               onPress={() => {
                 props.navigation.navigate(SCREENS.RequestDetails.identifier);
               }}
@@ -277,9 +278,9 @@ export default function Home(props: any) {
           </Text>
         </View>
         <View style={{ marginHorizontal: getScaleSize(24), flexDirection: 'row', justifyContent: 'space-between' }}>
-          {['', ''].map((item: any) => {
+          {['', ''].map((item: any, index: number) => {
             return (
-              <View style={{ marginTop: getScaleSize(26) }}>
+              <View key={index} style={{ marginTop: getScaleSize(26) }}>
                 <FavouritesItem
                   itemContainer={{}}
                 />

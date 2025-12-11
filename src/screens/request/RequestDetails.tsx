@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
   View,
   StatusBar,
@@ -21,7 +21,7 @@ import {FONTS, IMAGES} from '../../assets';
 import {ThemeContext, ThemeContextType} from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import {getScaleSize, SHOW_TOAST, useString} from '../../constant';
 
 //COMPONENT
 import {
@@ -37,31 +37,49 @@ import {
 //PACKAGES
 import {useFocusEffect} from '@react-navigation/native';
 import {SCREENS} from '..';
+import { API } from '../../api';
 
 export default function RequestDetails(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
+  const item = props.route.params?.item ?? {};
 
   const rejectRef = useRef<any>(null);
   const acceptRef = useRef<any>(null);
   const paymentRef = useRef<any>(null);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(theme.white);
-        StatusBar.setBarStyle('dark-content');
+  const [isLoading, setLoading] = useState(false);
+  const [serviceDetails, setServiceDetails] = useState<any>({});
+
+  useEffect(() => {
+    console.log('item', item);
+    getServiceDetails();
+  }, []);
+
+  async function getServiceDetails() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getServiceDetails + `/${item?.id}`);
+      setLoading(false);
+      console.log('result', result.status, result)
+      if (result.status) {
+        console.log('serviceDetails==', result?.data?.data)
+        setServiceDetails(result?.data?.data ?? {});
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+        console.log('error==>', result?.data?.message)
       }
-    }, []),
-  );
+    } catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
         onBack={() => {
           props.navigation.goBack();

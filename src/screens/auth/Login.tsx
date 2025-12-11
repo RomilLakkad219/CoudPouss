@@ -35,15 +35,15 @@ export default function Login(props: any) {
   const [countryCode, setCountryCode] = useState('+91');
   const [isPhoneNumber, setIsPhoneNumber] = useState(false);
 
-  useEffect(() => {
-    if (email.length >= 3) {
-      const isNumber = REGEX.phoneRegex.test(email);
-      setIsPhoneNumber(isNumber)
-    }
-    else {
-      setIsPhoneNumber(false)
-    }
-  }, [email])
+  // useEffect(() => {
+  //   if (email.length >= 3) {
+  //     const isNumber = REGEX.phoneRegex.test(email);
+  //     setIsPhoneNumber(isNumber)
+  //   }
+  //   else {
+  //     setIsPhoneNumber(false)
+  //   }
+  // }, [email])
 
 
 
@@ -211,7 +211,7 @@ export default function Login(props: any) {
               font={FONTS.Lato.SemiBold}
               color={theme._2C6587}
               onPress={() => {
-                props.navigation.navigate(SCREENS.AddServices.identifier);
+                props.navigation.navigate(SCREENS.SignupSelect.identifier);
               }}>
               {STRING.sign_up}
             </Text>

@@ -13,6 +13,7 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
     //elderly_user , service_provider
     const [myPlan, setMyPlan] = useState<any>(null)
     //professional, non_professional   
+    const [selectedServices, setSelectedServices] = useState<any>([])
 
 
     return (
@@ -22,7 +23,9 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
             userType,
             setUserType,
             myPlan,
-            setMyPlan
+            setMyPlan,
+            selectedServices,
+            setSelectedServices
         }}>
             {props.children}
         </AuthContext.Provider >
