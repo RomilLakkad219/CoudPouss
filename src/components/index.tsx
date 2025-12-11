@@ -25,6 +25,7 @@ import UploadDocumentsSheet from './UploadDocumentsSheet'
 import TransactionItem from './TransactionItem'
 import SelectCountrySheet from './SelectCountrySheet'
 import BottomSheet from './BottomSheet'
+import ProgressView from './ProgressView'
 
 export {
     Header,
@@ -53,5 +54,6 @@ export {
     UploadDocumentsSheet,
     TransactionItem,
     BottomSheet,
-    SelectCountrySheet
+    SelectCountrySheet,
+    ProgressView
 }

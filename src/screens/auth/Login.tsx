@@ -22,7 +22,7 @@ import { API } from '../../api';
 export default function Login(props: any) {
 
   const STRING = useString();
-  const { setUser, setUserType } = useContext<any>(AuthContext);
+  const { setUser, setUserType, setProfile } = useContext<any>(AuthContext);
   const { theme } = useContext<any>(ThemeContext);
 
   const [email, setEmail] = useState('');
@@ -84,10 +84,20 @@ export default function Login(props: any) {
         Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
         setUser(result?.data?.data);
         setUserType(result?.data?.data?.user_data?.role);
+        const profileData = await getProfileData();
+
+        if (profileData) {
+          console.log("Profile data", profileData);
+        }
+
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: SCREENS.BottomBar.identifier }],
+            routes: [{
+              name: SCREENS.BottomBar.identifier, params: {
+                isEmail: email
+              }
+            }],
           }),
         );
       } else {
@@ -98,6 +108,27 @@ export default function Login(props: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
       console.log(error?.message)
+    }
+  }
+
+  async function getProfileData() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
+      setLoading(false);
+
+      const userDetail = result?.data?.data?.user;
+
+      if (userDetail) {
+        setProfile(userDetail);
+        return userDetail;
+      }
+
+      return null;
+    } catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      return null;
     }
   }
 
@@ -211,7 +242,7 @@ export default function Login(props: any) {
               font={FONTS.Lato.SemiBold}
               color={theme._2C6587}
               onPress={() => {
-                props.navigation.navigate(SCREENS.AddServices.identifier);
+                props.navigation.navigate(SCREENS.SignupSelect.identifier);
               }}>
               {STRING.sign_up}
             </Text>

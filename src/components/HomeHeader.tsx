@@ -67,7 +67,7 @@ const HomeHeader = (props: any) => {
             { marginLeft: getScaleSize(12) },
           ]}
           activeOpacity={1}
-          onPress={() => { }}>
+          onPress={() => { props?.onPressUserProfile()}}>
             
           <Image
             style={styles(theme).placeholderImage}
