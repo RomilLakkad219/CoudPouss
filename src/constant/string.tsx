@@ -1,4 +1,3 @@
-import {stubString} from 'lodash';
 import {useTranslation} from 'react-i18next';
 
 export const useString = () => {
