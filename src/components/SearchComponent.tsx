@@ -88,6 +88,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       fontSize: getScaleSize(18),
       color: theme.black,
       marginLeft: getScaleSize(12),
+      flex: 1.0,
     },
     microPhoneContainer: {
       backgroundColor: theme.white,

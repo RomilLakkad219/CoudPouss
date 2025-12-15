@@ -193,9 +193,9 @@ const Item = (props: any) => {
       return (
         <TouchableOpacity
           onPress={() => { props.onPress(SCREENS.CreateRequest.identifier) }}
-          style={{ alignSelf: 'center' }}>
+          style={{ alignSelf: 'center', marginTop: getScaleSize(-80) }}>
           <Image
-            style={{ height: getScaleSize(98), width: getScaleSize(98), marginTop: getScaleSize(-90) }}
+            style={{ height: getScaleSize(98), width: getScaleSize(98) }}
             resizeMode="contain"
             source={IMAGES.plus}
           />

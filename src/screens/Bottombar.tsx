@@ -13,8 +13,18 @@ import { View } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
-function BottomBar() {
+function BottomBar(props: any) {
   const { userType } = useContext<any>(AuthContext);
+
+  const isProfile = props?.route?.params?.isProfile ?? false;
+
+  function getInitialRouteName() {
+    if (isProfile) {
+      return TABS.Profile.identifier;
+    } else {
+      return TABS.Home.identifier;
+    }
+  }
 
   if (userType === 'service_provider') {
     return (
@@ -53,7 +63,7 @@ function BottomBar() {
           screenOptions={{
             headerShown: false,
           }}
-          initialRouteName={TABS.Home.identifier}
+          initialRouteName={getInitialRouteName()}
           tabBar={props => {
             return <Tabbar {...props} />;
           }}>

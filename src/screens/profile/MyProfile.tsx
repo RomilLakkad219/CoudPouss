@@ -37,15 +37,16 @@ export default function MyProfile(props: any) {
 
     const { profile, fetchProfile } = useContext(AuthContext)
 
+
     const bottomSheetRef = useRef<any>(null);
 
-    const [name, setName] = useState((profile.first_name ?? "") + " " + (profile.last_name ?? ""));
+    const [name, setName] = useState((profile?.first_name ?? "") + " " + (profile?.last_name ?? ""));
     const [nameError, setNameError] = useState('');
-    const [email, setEmail] = useState(profile.email ?? "");
+    const [email, setEmail] = useState(profile?.email ?? "");
     const [emailError, setEmailError] = useState('');
-    const [mobileNumber, setMobileNumber] = useState(profile.phone_number ?? "");
+    const [mobileNumber, setMobileNumber] = useState(profile?.phone_number ?? "");
     const [mobileNumberError, setMobileNumberError] = useState('');
-    const [address, setAddress] = useState(profile.address ?? "");
+    const [address, setAddress] = useState(profile?.address ?? "");
     const [addressError, setAddressError] = useState('');
     const [showCountryCode, setShowCountryCode] = useState(false);
     const [isLoading, setLoading] = useState(false);
@@ -186,14 +187,18 @@ export default function MyProfile(props: any) {
             />
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles(theme).mainContainer}>
-                    {profileImage ? (
-                        <Image source={{ uri: profileImage?.uri }}
+                    {profile?.profile_photo_url ?
+                        <Image source={{ uri: profile?.profile_photo_url }}
                             resizeMode='cover' style={styles(theme).profileContainer} />
-                    ) : (
-                        <View style={[styles(theme).profileContainer, {
-                            backgroundColor: theme._F0EFF0,
-                        }]} />
-                    )
+                        :
+                        profileImage ? (
+                            <Image source={{ uri: profileImage?.uri }}
+                                resizeMode='cover' style={styles(theme).profileContainer} />
+                        ) : (
+                            <View style={[styles(theme).profileContainer, {
+                                backgroundColor: theme._F0EFF0,
+                            }]} />
+                        )
                     }
                     < TouchableOpacity onPress={() => {
                         pickImage()

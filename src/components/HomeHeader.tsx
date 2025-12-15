@@ -67,8 +67,8 @@ const HomeHeader = (props: any) => {
             { marginLeft: getScaleSize(12) },
           ]}
           activeOpacity={1}
-          onPress={() => { props?.onPressUserProfile()}}>
-            
+          onPress={() => { props?.onPressUserProfile() }}>
+
           <Image
             style={styles(theme).placeholderImage}
             source={IMAGES.user_placeholder}
@@ -78,11 +78,13 @@ const HomeHeader = (props: any) => {
       <View style={styles(theme).searchView}>
         <View style={styles(theme).searchBox}>
           <Image style={styles(theme).searchImage} source={IMAGES.search} />
-          <TextInput
-            style={styles(theme).searchInput}
-            placeholderTextColor={'#939393'}
-            placeholder={STRING.Search}
-          />
+          <View style={{ flex: 1.0 }}>
+            <TextInput
+              style={styles(theme).searchInput}
+              placeholderTextColor={'#939393'}
+              placeholder={STRING.Search}
+            />
+          </View>
         </View>
         <TouchableOpacity style={styles(theme).microPhoneContainer}>
           <Image

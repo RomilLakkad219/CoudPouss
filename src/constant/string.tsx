@@ -352,6 +352,8 @@ export const useString = () => {
     quantity: "Quantity",
     product_images: "Product Images",
     want_to_add_more_service_categories: "Want to add more service\ncategories?",
+    Choose_Date_Time: "Choose Date & Time",
+    product: "Product"
   };
 };
 
