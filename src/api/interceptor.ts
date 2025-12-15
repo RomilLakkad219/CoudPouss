@@ -56,7 +56,8 @@ Instance.interceptors.request.use(
 
             const result = JSON.parse(userData)
             console.log('result==>', result)
-            const accessToken = result?.token
+            const accessToken = result?.access_token
+            // const accessToken = ''
 
             if (accessToken) {
                 // const latestToken = accessToken.reduce((a: any, b: any) => b.updatedAt > a.updatedAt ? b : a);

@@ -10,22 +10,22 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../context';
+import { ThemeContext, ThemeContextType } from '../context';
 
 //CONSTANTS & ASSETS
-import {getScaleSize, useString} from '../constant';
-import {FONTS, IMAGES} from '../assets';
+import { getScaleSize, useString } from '../constant';
+import { FONTS, IMAGES } from '../assets';
 
 //COMPONENTS
 import Text from './Text';
-import {flatMap, head} from 'lodash';
+import { flatMap, head } from 'lodash';
 
 const SearchComponent = (props: any) => {
   const STRING = useString();
-  const {theme} = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
 
   return (
     <View style={styles(theme).searchView}>
@@ -35,6 +35,8 @@ const SearchComponent = (props: any) => {
           style={styles(theme).searchInput}
           placeholderTextColor={'#939393'}
           placeholder={STRING.Search}
+          value={props.value}
+          onChangeText={(text) => props.onChangeText(text)}
         />
       </View>
       <TouchableOpacity

@@ -58,6 +58,7 @@ import BankDetails from './profile/BankDetails';
 import WithdrawHistory from './profile/WithdrawHistory';
 import MoneyWithdrawal from './profile/MoneyWithdrawal';
 import ManageSubscription from './subscription/ManageSubscription';
+import Favourites from './home/Favourites';
 
 export const SCREENS = {
   Splash: {
@@ -225,7 +226,7 @@ export const SCREENS = {
     identifier: 'EditProfile',
     component: EditProfile,
   },
-  ApplicationStatus:{
+  ApplicationStatus: {
     identifier: 'ApplicationStatus',
     component: ApplicationStatus,
   },
@@ -249,13 +250,21 @@ export const SCREENS = {
     identifier: 'MoneyWithdrawal',
     component: MoneyWithdrawal,
   },
-  ManageSubscription:{
+  ManageSubscription: {
     identifier: 'ManageSubscription',
     component: ManageSubscription,
   },
   ProfessionalTaskStatus: {
     identifier: 'ProfessionalTaskStatus',
     component: ProfessionalTaskStatus,
+  },
+  Favourites: {
+    identifier: 'Favourites',
+    component: Favourites,
+  },
+  CreateRequest: {
+    identifier: 'CreateRequest',
+    component: CreateRequest,
   },
 };
 
@@ -268,10 +277,7 @@ export const TABS = {
     identifier: 'Request',
     component: Request,
   },
-  CreateRequest: {
-    identifier: 'CreateRequest',
-    component: CreateRequest,
-  },
+ 
   Chat: {
     identifier: 'Chat',
     component: Chat,
@@ -288,5 +294,5 @@ export const TABS = {
     identifier: 'Task',
     component: Task,
   },
- 
+
 };

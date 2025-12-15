@@ -1,9 +1,20 @@
-import { FlatList, Image, StyleSheet, View } from 'react-native'
-import React, { useContext, useState } from 'react'
-import { Header, RatingsReviewsItem, Text } from '../../components';
+import { FlatList, StyleSheet, View } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
+
+//ASSETS
+import { FONTS } from '../../assets';
+
+//API
+import { API } from '../../api';
+
+//COMPONENTS
+import { Header, ProgressView, RatingsReviewsItem, Text } from '../../components';
+
+//CONTEXT
 import { ThemeContext, ThemeContextType } from '../../context';
-import { getScaleSize, useString } from '../../constant';
-import { FONTS, IMAGES } from '../../assets';
+
+//CONSTANTS
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 export default function RatingsReviews(props: any) {
 
@@ -11,6 +22,35 @@ export default function RatingsReviews(props: any) {
     const STRING = useString();
 
     const [showMore, setShowMore] = useState(false);
+    const [isLoading, setLoading] = useState(false);
+
+    useEffect(() => {
+        getRatingReviews()
+    }, [])
+
+    async function getRatingReviews() {
+
+        try {
+
+            setLoading(true)
+            const result = await API.Instance.get(API.API_ROUTES.ratingAndReviews);
+            setLoading(false)
+
+            console.log('RATING REVIEWS RES', JSON.stringify(result))
+
+            if (result?.status) {
+
+            }
+            else {
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
+            }
+
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+        }
+
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -34,17 +74,18 @@ export default function RatingsReviews(props: any) {
                     keyExtractor={(item: any, index: number) => index.toString()}
                     renderItem={({ item, index }) => {
                         return (
-                           <RatingsReviewsItem
-                           itemContainer={{ marginBottom: getScaleSize(24) }}
-                           onPressShowMore={() => {
-                            setShowMore(!showMore);
-                           }}
-                           showMore={showMore}
-                           />
+                            <RatingsReviewsItem
+                                itemContainer={{ marginBottom: getScaleSize(24) }}
+                                onPressShowMore={() => {
+                                    setShowMore(!showMore);
+                                }}
+                                showMore={showMore}
+                            />
                         )
                     }}
                 />
             </View>
+            {isLoading && <ProgressView />}
         </View >
     )
 }
@@ -58,5 +99,5 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
         flex: 1.0,
         marginHorizontal: getScaleSize(24),
     },
-  
+
 })

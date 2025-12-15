@@ -86,9 +86,9 @@ export default function Transactions(props: any) {
             />
             <View style={styles(theme).headerStyle}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {["Status", "Payment Method", "Date"].map((item, index) => {
+                    {["Status", "Payment Method", "Date"].map((item: any, index: number) => {
                         return (
-                            <View style={styles(theme).filterView}>
+                            <View key={index} style={styles(theme).filterView}>
                                 <Text size={getScaleSize(14)} font={FONTS.Lato.Medium} color={theme._2B2B2B}>
                                     {item}
                                 </Text>

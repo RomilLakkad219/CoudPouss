@@ -456,8 +456,9 @@ export default function ProfessionalTaskDetails(props: any) {
               <FlatList
                 data={['']}
                 horizontal
+                keyExtractor={(item: any, index: number) => index.toString()}
                 showsHorizontalScrollIndicator={false}
-                renderItem={(item: any, index: number) => {
+                renderItem={({item, index}) => {
                   return (
                     <Image
                       style={[styles(theme).photosView]}

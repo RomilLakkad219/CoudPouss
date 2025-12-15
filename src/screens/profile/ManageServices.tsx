@@ -40,10 +40,11 @@ export default function ManageServices(props: any) {
                 <View style={styles(theme).divider} />
                 <View style={styles(theme).serviceContainer}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {['DIY', 'Gardening', 'Moving', 'Housekeeping'].map((item, index) => {
+                        {['DIY', 'Gardening', 'Moving', 'Housekeeping'].map((item: any, index: number) => {
                             const isLast = index === ['DIY', 'Gardening', 'Moving', 'Housekeeping'].length - 1;
                             return (
                                 <TouchableOpacity
+                                    key={index}
                                     onPress={() => {
                                         setSelectedService(item);
                                     }}
