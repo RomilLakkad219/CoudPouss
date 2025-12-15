@@ -1,49 +1,35 @@
-import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import {Dimensions, Image, ScrollView, StyleSheet, View} from 'react-native';
+import React, {useContext, useState} from 'react';
 
 //CONTEXT
-import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
+import {ThemeContext, ThemeContextType, AuthContext} from '../../context';
 
 //CONSTANT & ASSETS
-import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, REGEX, SHOW_TOAST, Storage, useString } from '../../constant';
+import {FONTS, IMAGES} from '../../assets';
+import {getScaleSize, SHOW_TOAST, Storage, useString} from '../../constant';
 
 //COMPONENTS
-import { Header, Input, Text, Button, SelectCountrySheet } from '../../components';
+import {Header, Input, Text, Button} from '../../components';
 
 //SCREENS
-import { SCREENS } from '..';
+import {SCREENS} from '..';
 
 //PACKAGES
-import { CommonActions } from '@react-navigation/native';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { API } from '../../api';
+import {CommonActions} from '@react-navigation/native';
+import {API} from '../../api';
+import {upsertUserProfile} from '../../services/chat';
 
 export default function Login(props: any) {
-
   const STRING = useString();
-  const { setUser, setUserType, setProfile } = useContext<any>(AuthContext);
-  const { theme } = useContext<any>(ThemeContext);
 
+  const {theme} = useContext<any>(ThemeContext);
+  const {setUser, setUserType} = useContext<any>(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(true);
   const [passwordError, setPasswordError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isLoading, setLoading] = useState(false);
-  const [visibleCountry, setVisibleCountry] = useState(false);
-  const [countryCode, setCountryCode] = useState('+91');
-  const [isPhoneNumber, setIsPhoneNumber] = useState(false);
-
-  // useEffect(() => {
-  //   if (email.length >= 3) {
-  //     const isNumber = REGEX.phoneRegex.test(email);
-  //     setIsPhoneNumber(isNumber)
-  //   }
-  //   else {
-  //     setIsPhoneNumber(false)
-  //   }
-  // }, [email])
 
   async function onVerification() {
     if (!email) {
@@ -53,78 +39,76 @@ export default function Login(props: any) {
     } else {
       setEmailError('');
       setPasswordError('');
-      onLogin()
+      onLogin();
+    }
+  }
+
+  async function persistUserSession(loginResponse: any) {
+    const authPayload = {
+      token: loginResponse?.access_token,
+      refreshToken: loginResponse?.refresh_token,
+      tokenType: loginResponse?.token_type,
+      accessTokenExpire: loginResponse?.access_token_expire,
+      refreshTokenExpire: loginResponse?.refresh_token_expire,
+      user: loginResponse?.user_data,
+    };
+
+    await Storage.save(Storage.USER_DETAILS, JSON.stringify(authPayload));
+
+    const userData = {
+      ...(loginResponse?.user_data ?? {}),
+      token: loginResponse?.access_token,
+      refreshToken: loginResponse?.refresh_token,
+      tokenType: loginResponse?.token_type,
+    };
+
+    setUser(userData);
+    const role = loginResponse?.user_data?.role;
+    if (role) {
+      setUserType(role);
+    }
+
+    try {
+      await upsertUserProfile({
+        user_id: loginResponse?.user_data?.user_id,
+        name: loginResponse?.user_data?.name,
+        email: loginResponse?.user_data?.email,
+        mobile: loginResponse?.user_data?.mobile,
+        role: loginResponse?.user_data?.role,
+        address: loginResponse?.user_data?.address,
+      });
+    } catch (firestoreError) {
+      console.log('Failed to sync user with Firestore', firestoreError);
     }
   }
 
   async function onLogin() {
-    let params = {}
-    if (isPhoneNumber) {
-      params = {
-        mobile: email,
-        phone_country_code: countryCode,
-        password: password,
-      }
-    } else {
-      params = {
-        email: email,
-        password: password,
-      }
-    }
+    const params = {
+      email: email,
+      password: password,
+    };
+
     try {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
-      setLoading(false);
-      console.log('result', JSON.stringify(result.status), JSON.stringify(result))
-      if (result.status) {
-        console.log('result?.data?.data?', result?.data?.data)
-        Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
-        setUser(result?.data?.data);
-        setUserType(result?.data?.data?.user_data?.role);
-        const profileData = await getProfileData();
-
-        if (profileData) {
-          console.log("Profile data", profileData);
-        }
+      console.log('result', result.status, result);
+      if (result.status && result?.data?.data) {
+        await persistUserSession(result?.data?.data);
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{
-              name: SCREENS.BottomBar.identifier, params: {
-                isEmail: email
-              }
-            }],
+            routes: [{name: SCREENS.BottomBar.identifier}],
           }),
         );
       } else {
-        SHOW_TOAST(result?.data?.message, 'error')
-        console.log('ERR',result?.data?.message)
+        SHOW_TOAST(result?.data?.msg, 'error');
+        console.log(result?.data?.msg);
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log('CATCH ERR',error?.message)
-    }
-  }
-
-  async function getProfileData() {
-    try {
-      setLoading(true);
-      const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
+      console.log(error?.message);
+    } finally {
       setLoading(false);
-
-      const userDetail = result?.data?.data?.user;
-
-      if (userDetail) {
-        setProfile(userDetail);
-        return userDetail;
-      }
-
-      return null;
-    } catch (error: any) {
-      setLoading(false);
-      SHOW_TOAST(error?.message ?? '', 'error');
-      return null;
     }
   }
 
@@ -139,7 +123,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.ExtraBold}
             color={theme._2C6587}
             align="center"
-            style={{ marginBottom: getScaleSize(12) }}>
+            style={{marginBottom: getScaleSize(12)}}>
             {STRING.welcome_back}
           </Text>
           <Text
@@ -147,46 +131,24 @@ export default function Login(props: any) {
             font={FONTS.Lato.SemiBold}
             color={theme._565656}
             align="center"
-            style={{ marginBottom: getScaleSize(36) }}>
+            style={{marginBottom: getScaleSize(36)}}>
             {STRING.enter_your_email_and_password_to_login}
           </Text>
           <View style={styles(theme).inputContainer}>
-            {isPhoneNumber ? (
-              <Input
-                placeholder={STRING.enter_email_or_mobile_number}
-                placeholderTextColor={theme._939393}
-                inputTitle={STRING.email_or_mobile_number}
-                inputColor={false}
-                value={email}
-                maxLength={10}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                countryCode={countryCode ? countryCode : '+91'}
-                onPressCountryCode={() => {
-                  setVisibleCountry(true);
-                }}
-                onChangeText={text => {
-                  setEmail(text);
-                  setEmailError('');
-                }}
-                isError={emailError}
-              />
-            ) : (
-              <Input
-                placeholder={STRING.enter_email_or_mobile_number}
-                placeholderTextColor={theme._939393}
-                inputTitle={STRING.email_or_mobile_number}
-                inputColor={false}
-                value={email}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onChangeText={text => {
-                  setEmail(text);
-                  setEmailError('');
-                }}
-                isError={emailError}
-              />
-            )}
+            <Input
+              placeholder={STRING.enter_email_or_mobile_number}
+              placeholderTextColor={theme._939393}
+              inputTitle={STRING.email_or_mobile_number}
+              inputColor={false}
+              value={email}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onChangeText={text => {
+                setEmail(text);
+                setEmailError('');
+              }}
+              isError={emailError}
+            />
           </View>
           <View style={styles(theme).inputContainer}>
             <Input
@@ -206,22 +168,11 @@ export default function Login(props: any) {
               }}
               isError={passwordError}
             />
-            <Text
-              size={getScaleSize(16)}
-              font={FONTS.Lato.Medium}
-              onPress={() => {
-                props.navigation.navigate(SCREENS.ResetPassword.identifier);
-              }}
-              color={theme._2C6587}
-              align='right'
-              style={{ marginTop: getScaleSize(12) }}>
-              {STRING.forgot_password}
-            </Text>
           </View>
-
           <Button
-            title="Log In"
-            style={{ marginBottom: getScaleSize(24) }}
+            title={isLoading ? 'Logging in...' : 'Log In'}
+            style={{marginTop: getScaleSize(8), marginBottom: getScaleSize(24)}}
+            disabled={isLoading}
             onPress={() => {
               onVerification();
             }}
@@ -231,7 +182,7 @@ export default function Login(props: any) {
             font={FONTS.Lato.Regular}
             color={theme._999999}
             align="center"
-            style={{ marginTop: getScaleSize(12) }}>
+            style={{marginTop: getScaleSize(12)}}>
             {STRING.dont_have_an_account}{' '}
             <Text
               size={getScaleSize(20)}
@@ -243,20 +194,19 @@ export default function Login(props: any) {
               {STRING.sign_up}
             </Text>
           </Text>
+          <Text
+            size={getScaleSize(20)}
+            font={FONTS.Lato.Regular}
+            onPress={() => {
+              props.navigation.navigate(SCREENS.ResetPassword.identifier);
+            }}
+            color={theme._999999}
+            align="center"
+            style={{marginTop: getScaleSize(24)}}>
+            {STRING.forgot_password}
+          </Text>
         </View>
       </ScrollView>
-      <SelectCountrySheet
-        height={getScaleSize(500)}
-        isVisible={visibleCountry}
-        onPress={(e: any) => {
-          console.log('e000', e)
-          setCountryCode(e.dial_code);
-          setVisibleCountry(false);
-        }}
-        onClose={() => {
-          setVisibleCountry(false);
-        }}
-      />
     </View>
   );
 }
@@ -266,13 +216,13 @@ const styles = (theme: ThemeContextType['theme']) =>
     container: {
       flex: 1.0,
       backgroundColor: theme.white,
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     mainContainer: {
       flex: 1.0,
       marginHorizontal: getScaleSize(24),
       marginVertical: getScaleSize(24),
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     logo: {
       width: Dimensions.get('window').width - getScaleSize(240),

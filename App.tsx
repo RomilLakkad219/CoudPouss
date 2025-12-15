@@ -22,6 +22,8 @@ import Toast, {
   ErrorToast,
   InfoToast,
 } from 'react-native-toast-message';
+import PushNotification from 'react-native-push-notification';
+import messaging from '@react-native-firebase/messaging';
 
 LogBox.ignoreAllLogs(true);
 
@@ -29,7 +31,7 @@ const toastConfig = {
   success: (props: any) => (
     <BaseToast
       {...props}
-      style={{backgroundColor: '#FFFFFF', borderLeftColor: '#2E7D32'}}
+      style={{backgroundColor: '#FFFFFF', borderLeftColor: '#FF5959'}}
       contentContainerStyle={{paddingHorizontal: 15}}
       text1NumberOfLines={3}
       text1Style={{
@@ -108,6 +110,54 @@ function App(): any {
       </View>
     );
   }
+
+  useEffect(() => {
+    openApp();
+  }, []);
+
+  const openApp = async () => {
+    PushNotification.createChannel(
+      {
+        channelId: 'coudpouss_notification',
+        channelName: 'CoudPouss Notifications',
+        channelDescription: 'Notifications for CoudPouss app',
+        playSound: true,
+        soundName: 'default',
+        vibrate: true,
+      },
+      (created: any) => console.log(`createChannel returned index'${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+    );
+
+    messaging().onMessage((remoteMessage: any) => {
+      const {notification, messageId, data} = remoteMessage;
+      console.log('notification:::>>', JSON.stringify(remoteMessage));
+      if (notification) {
+        PushNotification.localNotification({
+          // message: notification?.body ? notification?.body : '',
+          // channelId: 'my-channel',
+          // title: notification?.title ? notification?.title : 'Lushful',
+          // vibration: 300, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
+          // priority: 'high', // (optional) set notification priority, default: high
+          // importance: 'high',
+          // soundName: 'default',
+          // playSound: false,
+          // invokeApp: true, // Ensures the app opens when tapped
+          // data: data,
+
+          title: remoteMessage?.notification?.title || 'New Message',
+          message: remoteMessage?.notification?.body || '',
+          channelId: 'coudpouss_notification',
+          vibration: 300,
+          priority: 'high',
+          importance: 'high',
+          soundName: 'default',
+          playSound: false,
+          invokeApp: true, // Ensures the app opens when tapped
+          data: data,
+        });
+      }
+    });
+  };
 
   return (
     <View style={{flex: 1.0}}>

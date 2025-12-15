@@ -18,10 +18,10 @@ import {
 import {FONTS, IMAGES} from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import {ThemeContext, ThemeContextType, AuthContext} from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import {getScaleSize, useString, getPeerUser} from '../../constant';
 
 //COMPONENT
 import {
@@ -40,6 +40,7 @@ import {SCREENS} from '..';
 export default function Task(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
+  const {user} = useContext<any>(AuthContext);
 
   const [activeTab, setActiveTab] = useState(0);
   const tabs = ['Quote Sent', 'Accepted', 'Completed'];
@@ -151,7 +152,10 @@ export default function Task(props: any) {
                 props.navigation.navigate(SCREENS.TaskStatus.identifier);
               }}
               onPressChat={() => {
-                props.navigation.navigate(SCREENS.ChatDetails.identifier);
+                const peerUser = getPeerUser(user?.user_id);
+                props.navigation.navigate(SCREENS.ChatDetails.identifier, {
+                  peerUser,
+                });
               }}
             />
           );

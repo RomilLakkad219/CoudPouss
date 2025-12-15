@@ -18,10 +18,10 @@ import {
 import {FONTS, IMAGES} from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import {ThemeContext, ThemeContextType, AuthContext} from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import {getScaleSize, useString, getPeerUser} from '../../constant';
 
 //COMPONENT
 import {
@@ -43,6 +43,7 @@ import {SCREENS} from '..';
 export default function ProfessionalTaskDetails(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
+  const {user} = useContext<any>(AuthContext);
 
   const [isStatus, setIsStatus] = useState(false);
   const [visibleTaskDetails, setVisibleTaskDetails] = useState(false);
@@ -318,7 +319,10 @@ export default function ProfessionalTaskDetails(props: any) {
                 {marginRight: getScaleSize(6), width: getScaleSize(86)},
               ]}
               onPress={() => {
-                props.navigation.navigate(SCREENS.ChatDetails.identifier);
+                const peerUser = getPeerUser(user?.user_id);
+                props.navigation.navigate(SCREENS.ChatDetails.identifier, {
+                  peerUser,
+                });
               }}>
               <Text
                 size={getScaleSize(14)}
@@ -343,7 +347,7 @@ export default function ProfessionalTaskDetails(props: any) {
               source={IMAGES.map_pin}
             />
             <Text
-              style={{flex: 1.0, marginLeft:getScaleSize(4)}}
+              style={{flex: 1.0, marginLeft: getScaleSize(4)}}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
