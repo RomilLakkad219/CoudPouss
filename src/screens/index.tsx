@@ -277,7 +277,7 @@ export const TABS = {
     identifier: 'Request',
     component: Request,
   },
- 
+
   Chat: {
     identifier: 'Chat',
     component: Chat,
@@ -294,5 +294,8 @@ export const TABS = {
     identifier: 'Task',
     component: Task,
   },
-
+  CreateRequest: {
+    identifier: 'CreateRequest',
+    component: CreateRequest,
+  },
 };

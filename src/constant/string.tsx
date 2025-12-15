@@ -356,6 +356,18 @@ export const useString = () => {
     please_enter_your_address: 'Please enter your address',
     password_validation_message:
       'Password must be at least 8 characters and include an uppercase letter, a number, and a special character',
+    barter_product_details: 'Barter Product Details',
+    profile_updated_successfully: 'Profile updated successfully',
+    add_details_of_the_product_or_thing_you_want_to_offer_in_exchange_for_the_service:
+      'Add details of the product or thing you want to offer in exchange for the service.',
+    add_product_name: 'Add Product Name',
+    upload_photos_of_a_product: 'Upload Photos of a Product',
+    quantity: 'Quantity',
+    product_images: 'Product Images',
+    want_to_add_more_service_categories:
+      'Want to add more service\ncategories?',
+    Choose_Date_Time: 'Choose Date & Time',
+    product: 'Product',
   };
 };
 

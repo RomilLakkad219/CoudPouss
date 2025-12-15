@@ -1,6 +1,7 @@
 import React, {createContext, useState, useEffect} from 'react';
 import {Storage} from '../constant';
 import {upsertUserProfile} from '../services/chat';
+import {API} from '../api';
 
 interface AuthProviderProps {
   children: any;
@@ -15,8 +16,29 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
   const [userType, setUserType] = useState<any>('service_provider');
   //elderly_user , service_provider
   const [myPlan, setMyPlan] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [selectedServices, setSelectedServices] = useState<any>([]);
   //professional_certified, non_certified_provider
 
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  async function fetchProfile() {
+    try {
+      const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
+
+      console.log('PROFILE', JSON.stringify(result));
+      if (result.status) {
+        const userDetail = result?.data?.data?.user;
+        setProfile(userDetail);
+        return userDetail;
+      }
+      return null;
+    } catch (error: any) {
+      return null;
+    }
+  }
   // Load user data from storage on app start and sync to Firestore
   useEffect(() => {
     async function loadUserFromStorage() {
@@ -75,6 +97,11 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
         setUserType,
         myPlan,
         setMyPlan,
+        profile,
+        setProfile,
+        fetchProfile,
+        selectedServices,
+        setSelectedServices,
       }}>
       {props.children}
     </AuthContext.Provider>

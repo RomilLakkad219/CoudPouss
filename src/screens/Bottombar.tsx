@@ -15,7 +15,7 @@ import messaging from '@react-native-firebase/messaging';
 
 const Tab = createBottomTabNavigator();
 
-function BottomBar() {
+function BottomBar(props: any) {
   const {userType} = useContext<any>(AuthContext);
 
   useEffect(() => {
@@ -64,7 +64,14 @@ function BottomBar() {
     }
     return true;
   }
-
+  const isProfile = props?.route?.params?.isProfile ?? false;
+  function getInitialRouteName() {
+    if (isProfile) {
+      return TABS.Profile.identifier;
+    } else {
+      return TABS.Home.identifier;
+    }
+  }
   useEffect(() => {
     (async () => {
       await requestPermission();
@@ -112,7 +119,7 @@ function BottomBar() {
           screenOptions={{
             headerShown: false,
           }}
-          initialRouteName={TABS.Home.identifier}
+          initialRouteName={getInitialRouteName()}
           tabBar={props => {
             return <Tabbar {...props} />;
           }}>
