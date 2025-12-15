@@ -69,7 +69,6 @@ export default function ReviewServices(props: any) {
                 serviceIds.push(e.id);
             });
         });
-
         const params = {
             sub_category_ids: serviceIds
         }

@@ -285,6 +285,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(18),
       backgroundColor: '#FBFBFB',
       flexDirection: 'row',
+      marginBottom: getScaleSize(4),
     },
     nextImage: {
       height: getScaleSize(24),

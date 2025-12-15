@@ -86,7 +86,6 @@ export default function Login(props: any) {
         if (profileData) {
           console.log("Profile data", profileData);
         }
-
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,

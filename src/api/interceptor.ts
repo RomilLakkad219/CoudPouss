@@ -114,6 +114,17 @@ const errorValidator = (error: any) => {
     if (error?.response?.status == 401) {
         EventRegister.emit('onInvalidToken')
     }
+
+    if (error?.message === 'canceled') {
+        return {
+            error: error,
+            message: 'Request canceled',
+            code: 408,
+            data: null,
+            status: false
+        };
+    }
+
     return {
         error: error,
         code: error?.response?.status,

@@ -40,25 +40,22 @@ import {
 } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
+import {CommonActions, useFocusEffect} from '@react-navigation/native';
+import { SCREENS } from '..';
 
 export default function Thankyou(props: any) {
   const {theme} = useContext<any>(ThemeContext);
 
   useEffect(()=>{
     setTimeout(() => {
-      props.navigation.goBack()
+      props?.navigation?.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: SCREENS.BottomBar.identifier }],
+        }),
+      );
     }, 4000);
   },[])
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(theme.white);
-        StatusBar.setBarStyle('dark-content');
-      }
-    }, []),
-  );
 
   return (
      <View style={styles(theme).container}>
