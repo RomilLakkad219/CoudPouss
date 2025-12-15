@@ -79,6 +79,29 @@ export default function Home(props: any) {
     }
   }
 
+  async function getFavoriteProfessionals() {
+    // try {
+    //   setLoading(true);
+    //   const result = await API.Instance.get(API.API_ROUTES.getFavoriteProfessionals);
+    //   setLoading(false);
+    //   console.log('result', result.status, result)
+    //   if (result.status) {
+    //     console.log('homeDTAtatata==', result?.data?.data)
+    //     setAllServices(result?.data?.data?.services);
+    //     setRecentRequests(result?.data?.data?.recent_requests?.records ?? []);
+    //   } else {
+    //     SHOW_TOAST(result?.data?.message ?? '', 'error')
+    //     console.log('error==>', result?.data?.message)
+    //   }
+    // } catch (error: any) {
+    //   setLoading(false);
+    //   SHOW_TOAST(error?.message ?? '', 'error');
+    //   console.log(error?.message)
+    // } finally {
+    //   setLoading(false);
+    // }
+  }
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.primary }}>
