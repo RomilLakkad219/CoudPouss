@@ -1,14 +1,9 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {
   View,
   StatusBar,
   StyleSheet,
-  Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Alert,
   ScrollView,
-  FlatList,
   TouchableOpacity,
   Image,
   Platform,
@@ -24,7 +19,7 @@ import {ThemeContext, ThemeContextType} from '../../context';
 import {getScaleSize, useString} from '../../constant';
 
 //COMPONENT
-import {Header, SearchComponent, Text} from '../../components';
+import {SearchComponent, Text} from '../../components';
 
 //PACKAGES
 import {useFocusEffect} from '@react-navigation/native';
@@ -70,20 +65,25 @@ export default function Chat(props: any) {
               style={styles(theme).itemContainer}
               activeOpacity={1}
               onPress={() => {
-                props.navigation.navigate(SCREENS.ChatDetails.identifier)
+                props.navigation.navigate(SCREENS.ChatDetails.identifier);
               }}>
               <Image
                 style={styles(theme).userImage}
                 source={IMAGES.user_placeholder}
               />
-              <View style={{alignSelf:'center', marginLeft:getScaleSize(12), flex:1.0}}>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  marginLeft: getScaleSize(12),
+                  flex: 1.0,
+                }}>
                 <Text
                   size={getScaleSize(16)}
                   font={FONTS.Lato.Medium}
                   color={theme._2B2B2B}>
                   {'Emily Johnson'}
                 </Text>
-                 <Text
+                <Text
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Regular}
                   color={theme._ACADAD}>
@@ -123,14 +123,14 @@ const styles = (theme: ThemeContextType['theme']) =>
       marginTop: getScaleSize(24),
       flexDirection: 'row',
     },
-    messageContainer:{
-      height:getScaleSize(24),
-      width:getScaleSize(24),
-      borderRadius:getScaleSize(12),
-      alignSelf:'center',
-      backgroundColor:theme._F0B52C,
-      justifyContent:'center',
-      alignItems:'center',
-      marginRight:getScaleSize(2)
-    }
+    messageContainer: {
+      height: getScaleSize(24),
+      width: getScaleSize(24),
+      borderRadius: getScaleSize(12),
+      alignSelf: 'center',
+      backgroundColor: theme._F0B52C,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: getScaleSize(2),
+    },
   });

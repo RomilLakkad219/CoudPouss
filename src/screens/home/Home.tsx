@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   StatusBar,
@@ -21,25 +21,19 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
-import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
-import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
-import {
-  Text,
-  HomeHeader,
-  SearchComponent,
-  RequestItem,
-  FavouritesItem,
-} from '../../components';
-import { CommonActions, useFocusEffect } from '@react-navigation/native';
-import { SCREENS, TABS } from '..';
-import { API } from '../../api';
+import {AuthContext, ThemeContext, ThemeContextType} from '../../context';
+import {FONTS, IMAGES} from '../../assets';
+import {getScaleSize, SHOW_TOAST, useString} from '../../constant';
+import {Text, HomeHeader, RequestItem, FavouritesItem} from '../../components';
+import {CommonActions, useFocusEffect} from '@react-navigation/native';
+import {SCREENS, TABS} from '..';
+import {API} from '../../api';
 
 const HEADER_HEIGHT = 500;
 
 export default function Home(props: any) {
   const STRING = useString();
-  const { theme } = useContext<any>(ThemeContext);
+  const {theme} = useContext<any>(ThemeContext);
 
   const [isLoading, setLoading] = useState(false);
   const [allServices, setAllServices] = useState([]);
@@ -61,27 +55,26 @@ export default function Home(props: any) {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getHomeData);
       setLoading(false);
-      console.log('result', result.status, result)
+      console.log('result', result.status, result);
       if (result.status) {
-        console.log('homeDTAtatata==', result?.data?.data)
+        console.log('homeDTAtatata==', result?.data?.data);
         setAllServices(result?.data?.data?.services);
         setRecentRequests(result?.data?.data?.recent_requests?.records ?? []);
       } else {
-        SHOW_TOAST(result?.data?.message ?? '', 'error')
-        console.log('error==>', result?.data?.message)
+        SHOW_TOAST(result?.data?.message ?? '', 'error');
+        console.log('error==>', result?.data?.message);
       }
     } catch (error: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log(error?.message)
+      console.log(error?.message);
     } finally {
       setLoading(false);
     }
   }
 
-
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.primary }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: theme.primary}}>
       <View style={styles(theme).container}>
         <StatusBar
           barStyle="light-content"
@@ -105,7 +98,7 @@ export default function Home(props: any) {
                     routes: [
                       {
                         name: SCREENS.BottomBar.identifier,
-                        params: { isProfile: true },
+                        params: {isProfile: true},
                       },
                     ],
                   }),
@@ -123,20 +116,23 @@ export default function Home(props: any) {
             color={theme._323232}>
             {STRING.explore_all_service}
           </Text>
-          <TouchableOpacity style={styles(theme).bannerContainer}
+          <TouchableOpacity
+            style={styles(theme).bannerContainer}
             activeOpacity={1}
             onPress={() => {
-              const service = allServices.find((item: any) => item.name === "Home Assistance");
+              const service = allServices.find(
+                (item: any) => item.name === 'Home Assistance',
+              );
               if (service) {
                 props.navigation.navigate(SCREENS.Assistance.identifier, {
-                  service: service
-                })
+                  service: service,
+                });
               } else {
                 SHOW_TOAST('Service not found', 'error');
               }
             }}>
             <Text
-              style={{ flex: 1.0, alignSelf: 'center' }}
+              style={{flex: 1.0, alignSelf: 'center'}}
               size={getScaleSize(24)}
               font={FONTS.Lato.Bold}
               color={theme._323232}>
@@ -151,15 +147,17 @@ export default function Home(props: any) {
             <TouchableOpacity
               style={[
                 styles(theme).imageContainer,
-                { borderTopLeftRadius: getScaleSize(40) },
+                {borderTopLeftRadius: getScaleSize(40)},
               ]}
               activeOpacity={1}
               onPress={() => {
-                const service = allServices.find((item: any) => item.name === "Transport");
+                const service = allServices.find(
+                  (item: any) => item.name === 'Transport',
+                );
                 if (service) {
                   props.navigation.navigate(SCREENS.Assistance.identifier, {
-                    service: service
-                  })
+                    service: service,
+                  });
                 } else {
                   SHOW_TOAST('Service not found', 'error');
                 }
@@ -167,11 +165,12 @@ export default function Home(props: any) {
               <Image
                 resizeMode="contain"
                 style={styles(theme).iconImage}
-                source={IMAGES.transport} />
+                source={IMAGES.transport}
+              />
               <Text
                 size={getScaleSize(16)}
                 font={FONTS.Lato.Medium}
-                style={{ marginTop: getScaleSize(8) }}
+                style={{marginTop: getScaleSize(8)}}
                 color={theme._787878}>
                 {STRING.Transport}
               </Text>
@@ -179,15 +178,17 @@ export default function Home(props: any) {
             <TouchableOpacity
               style={[
                 styles(theme).imageContainer,
-                { marginHorizontal: getScaleSize(12) },
+                {marginHorizontal: getScaleSize(12)},
               ]}
               activeOpacity={1}
               onPress={() => {
-                const service = allServices.find((item: any) => item.name === "Personal Care");
+                const service = allServices.find(
+                  (item: any) => item.name === 'Personal Care',
+                );
                 if (service) {
                   props.navigation.navigate(SCREENS.Assistance.identifier, {
-                    service: service
-                  })
+                    service: service,
+                  });
                 } else {
                   SHOW_TOAST('Service not found', 'error');
                 }
@@ -200,7 +201,7 @@ export default function Home(props: any) {
               <Text
                 size={getScaleSize(16)}
                 font={FONTS.Lato.Medium}
-                style={{ marginTop: getScaleSize(8) }}
+                style={{marginTop: getScaleSize(8)}}
                 color={theme._787878}>
                 {STRING.PersonalCare}
               </Text>
@@ -208,15 +209,17 @@ export default function Home(props: any) {
             <TouchableOpacity
               style={[
                 styles(theme).imageContainer,
-                { borderTopRightRadius: getScaleSize(40) },
+                {borderTopRightRadius: getScaleSize(40)},
               ]}
               activeOpacity={1}
               onPress={() => {
-                const service = allServices.find((item: any) => item.name === "Tech Support");
+                const service = allServices.find(
+                  (item: any) => item.name === 'Tech Support',
+                );
                 if (service) {
                   props.navigation.navigate(SCREENS.Assistance.identifier, {
-                    service: service
-                  })
+                    service: service,
+                  });
                 } else {
                   SHOW_TOAST('Service not found', 'error');
                 }
@@ -229,7 +232,7 @@ export default function Home(props: any) {
               <Text
                 size={getScaleSize(16)}
                 font={FONTS.Lato.Medium}
-                style={{ marginTop: getScaleSize(8) }}
+                style={{marginTop: getScaleSize(8)}}
                 color={theme._787878}>
                 {STRING.TechSupport}
               </Text>
@@ -245,7 +248,7 @@ export default function Home(props: any) {
             <Text
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
-              style={{ flex: 1.0 }}
+              style={{flex: 1.0}}
               color={theme._323232}>
               {STRING.ResentRequests}
             </Text>
@@ -255,7 +258,7 @@ export default function Home(props: any) {
               onPress={() => {
                 props.navigation.navigate(TABS.Request.identifier);
               }}
-              style={{ alignSelf: 'center' }}
+              style={{alignSelf: 'center'}}
               color={theme._999999}>
               {STRING.ViewAll}
             </Text>
@@ -266,8 +269,8 @@ export default function Home(props: any) {
                 key={index}
                 item={item}
                 onPress={() => {
-                  props.navigation.navigate(SCREENS.RequestDetails.identifier,{
-                    item: item
+                  props.navigation.navigate(SCREENS.RequestDetails.identifier, {
+                    item: item,
                   });
                 }}
               />
@@ -282,7 +285,7 @@ export default function Home(props: any) {
             <Text
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
-              style={{ flex: 1.0 }}
+              style={{flex: 1.0}}
               color={theme._323232}>
               {STRING.FavoriteProfessionals}
             </Text>
@@ -292,23 +295,26 @@ export default function Home(props: any) {
               }}
               size={getScaleSize(16)}
               font={FONTS.Lato.Regular}
-              style={{ alignSelf: 'center' }}
+              style={{alignSelf: 'center'}}
               color={theme._999999}>
               {STRING.ViewAll}
             </Text>
           </View>
-          <View style={{ marginHorizontal: getScaleSize(24), flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View
+            style={{
+              marginHorizontal: getScaleSize(24),
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
             {['', ''].map((item: any, index: number) => {
               return (
-                <View key={index} style={{ marginTop: getScaleSize(26) }}>
-                  <FavouritesItem
-                    itemContainer={{}}
-                  />
+                <View key={index} style={{marginTop: getScaleSize(26)}}>
+                  <FavouritesItem itemContainer={{}} />
                 </View>
               );
             })}
           </View>
-          <View style={{ height: getScaleSize(32) }} />
+          <View style={{height: getScaleSize(32)}} />
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -317,7 +323,7 @@ export default function Home(props: any) {
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.white },
+    container: {flex: 1, backgroundColor: theme.white},
     bannerContainer: {
       height: getScaleSize(105),
       flex: 1.0,
