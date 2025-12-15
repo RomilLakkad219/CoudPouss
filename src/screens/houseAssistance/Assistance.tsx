@@ -129,7 +129,7 @@ export default function Assistance(props: any) {
         onBack={() => {
           props.navigation.goBack();
         }}
-        screenName={selectedCategory ? selectedCategory?.name : service?.name}
+        screenName={selectedCategory ? selectedCategory?.category_name : service?.name}
       />
       <View
         style={{

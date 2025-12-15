@@ -43,6 +43,7 @@ export default function Home(props: any) {
 
   const [isLoading, setLoading] = useState(false);
   const [allServices, setAllServices] = useState([]);
+  const [recentRequests, setRecentRequests] = useState([]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -64,6 +65,7 @@ export default function Home(props: any) {
       if (result.status) {
         console.log('homeDTAtatata==', result?.data?.data)
         setAllServices(result?.data?.data?.services);
+        setRecentRequests(result?.data?.data?.recent_requests?.records ?? []);
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
         console.log('error==>', result?.data?.message)
@@ -97,7 +99,17 @@ export default function Home(props: any) {
                 props.navigation.navigate(SCREENS.Notification.identifier);
               }}
               onPressUserProfile={() => {
-                props.navigation.navigate(SCREENS.MyProfile.identifier);
+                props.navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [
+                      {
+                        name: SCREENS.BottomBar.identifier,
+                        params: { isProfile: true },
+                      },
+                    ],
+                  }),
+                );
               }}
             />
           </View>
@@ -248,12 +260,15 @@ export default function Home(props: any) {
               {STRING.ViewAll}
             </Text>
           </View>
-          {['', ''].map((item: any, index: number) => {
+          {recentRequests.map((item: any, index: number) => {
             return (
               <RequestItem
                 key={index}
+                item={item}
                 onPress={() => {
-                  props.navigation.navigate(SCREENS.RequestDetails.identifier);
+                  props.navigation.navigate(SCREENS.RequestDetails.identifier,{
+                    item: item
+                  });
                 }}
               />
             );

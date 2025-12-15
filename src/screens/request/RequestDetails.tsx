@@ -53,14 +53,18 @@ export default function RequestDetails(props: any) {
   const [serviceDetails, setServiceDetails] = useState<any>({});
 
   useEffect(() => {
-    console.log('item', item);
-    getServiceDetails();
+    if (item) {
+      getServiceDetails();
+    }
   }, []);
 
   async function getServiceDetails() {
     try {
+      const params = {
+        service_id: item?.id
+      }
       setLoading(true);
-      const result = await API.Instance.get(API.API_ROUTES.getServiceDetails + `/${item?.id}`);
+      const result = await API.Instance.post(API.API_ROUTES.getServiceDetails, params);
       setLoading(false);
       console.log('result', result.status, result)
       if (result.status) {
@@ -107,7 +111,7 @@ export default function RequestDetails(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {serviceDetails?.sub_category}
+            {serviceDetails?.subcategory_name}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -124,7 +128,7 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {serviceDetails?.chosen_date_time ? moment(serviceDetails?.chosen_date_time).format('DD MMM, YYYY') : '-'}
+                  {serviceDetails?.chosen_datetime ? moment(serviceDetails?.chosen_datetime).format('DD MMM, YYYY') : '-'}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -140,7 +144,7 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {serviceDetails?.chosen_date_time ? moment(serviceDetails?.chosen_date_time).format('hh:mm A') : '-'}
+                  {serviceDetails?.chosen_datetime ? moment(serviceDetails?.chosen_datetime).format('hh:mm A') : '-'}
                 </Text>
               </View>
             </View>
@@ -162,7 +166,7 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {serviceDetails?.category}
+                  {serviceDetails?.category_name}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
