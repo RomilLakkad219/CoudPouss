@@ -3,10 +3,6 @@ import {
   View,
   StatusBar,
   StyleSheet,
-  Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Alert,
   ScrollView,
   FlatList,
   TouchableOpacity,
@@ -29,8 +25,6 @@ import {
   Header,
   PaymentBottomPopup,
   RejectBottomPopup,
-  RequestItem,
-  SearchComponent,
   Text,
 } from '../../components';
 

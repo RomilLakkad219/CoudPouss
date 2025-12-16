@@ -1,47 +1,33 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, {useContext} from 'react';
 import {
   View,
   StatusBar,
   StyleSheet,
-  Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Alert,
   ScrollView,
-  FlatList,
   TouchableOpacity,
   Image,
   Platform,
 } from 'react-native';
 
 //ASSETS
-import { FONTS, IMAGES } from '../../assets';
+import {FONTS, IMAGES} from '../../assets';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import {ThemeContext, ThemeContextType} from '../../context';
 
 //CONSTANT
-import { getScaleSize, useString } from '../../constant';
+import {getScaleSize, useString} from '../../constant';
 
 //COMPONENT
-import {
-  AcceptBottomPopup,
-  Button,
-  Header,
-  PaymentBottomPopup,
-  RejectBottomPopup,
-  RequestItem,
-  SearchComponent,
-  Text,
-} from '../../components';
+import {Button, Header, Text} from '../../components';
 
 //PACKAGES
-import { useFocusEffect } from '@react-navigation/native';
-import { SCREENS } from '..';
+import {useFocusEffect} from '@react-navigation/native';
+import {SCREENS} from '..';
 
 export default function ServiceConfirmed(props: any) {
   const STRING = useString();
-  const { theme } = useContext<any>(ThemeContext);
+  const {theme} = useContext<any>(ThemeContext);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -70,7 +56,7 @@ export default function ServiceConfirmed(props: any) {
         showsVerticalScrollIndicator={false}>
         <Image style={styles(theme).doneIcon} source={IMAGES.confirmed_icon} />
         <Text
-          style={{ marginTop: getScaleSize(24) }}
+          style={{marginTop: getScaleSize(24)}}
           size={getScaleSize(19)}
           align="center"
           font={FONTS.Lato.Medium}
@@ -123,7 +109,7 @@ export default function ServiceConfirmed(props: any) {
             <View
               style={[
                 styles(theme).horizontalView,
-                { marginTop: getScaleSize(12) },
+                {marginTop: getScaleSize(12)},
               ]}>
               <View style={styles(theme).itemView}>
                 <Image
@@ -169,7 +155,7 @@ export default function ServiceConfirmed(props: any) {
           </Text>
           <View style={styles(theme).newhorizontalView}>
             <Text
-              style={{ flex: 1.0 }}
+              style={{flex: 1.0}}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
@@ -184,7 +170,7 @@ export default function ServiceConfirmed(props: any) {
           </View>
           <View style={styles(theme).newhorizontalView}>
             <Text
-              style={{ flex: 1.0 }}
+              style={{flex: 1.0}}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
@@ -199,7 +185,7 @@ export default function ServiceConfirmed(props: any) {
           </View>
           <View style={styles(theme).newhorizontalView}>
             <Text
-              style={{ flex: 1.0 }}
+              style={{flex: 1.0}}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
@@ -215,7 +201,7 @@ export default function ServiceConfirmed(props: any) {
           <View style={styles(theme).dotView} />
           <View style={styles(theme).newhorizontalView}>
             <Text
-              style={{ flex: 1.0 }}
+              style={{flex: 1.0}}
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={'#0F232F'}>
@@ -241,16 +227,16 @@ export default function ServiceConfirmed(props: any) {
           <View
             style={[
               styles(theme).horizontalView,
-              { marginTop: getScaleSize(16) },
+              {marginTop: getScaleSize(16)},
             ]}>
             <Image
               style={styles(theme).profilePicView}
               source={IMAGES.user_placeholder}
             />
-            <View style={{ flex: 1.0 }}>
+            <View style={{flex: 1.0}}>
               <View style={styles(theme).flexRow}>
                 <Text
-                  style={{ alignSelf: 'center', marginLeft: getScaleSize(16) }}
+                  style={{alignSelf: 'center', marginLeft: getScaleSize(16)}}
                   size={getScaleSize(20)}
                   font={FONTS.Lato.SemiBold}
                   color={'#0F232F'}>
@@ -265,8 +251,15 @@ export default function ServiceConfirmed(props: any) {
                   source={IMAGES.verify}
                 />
               </View>
-              <View style={[styles(theme).flexRow, { marginLeft: getScaleSize(16), marginTop: getScaleSize(6) }]}>
-                <Image source={IMAGES.ic_phone} style={styles(theme).phoneIcon} />
+              <View
+                style={[
+                  styles(theme).flexRow,
+                  {marginLeft: getScaleSize(16), marginTop: getScaleSize(6)},
+                ]}>
+                <Image
+                  source={IMAGES.ic_phone}
+                  style={styles(theme).phoneIcon}
+                />
                 <Text
                   style={{}}
                   size={getScaleSize(12)}
@@ -275,12 +268,11 @@ export default function ServiceConfirmed(props: any) {
                   {'+91751111111'}
                 </Text>
               </View>
-
             </View>
-            <View style={{ flex: 1.0 }} />
+            <View style={{flex: 1.0}} />
             <TouchableOpacity
               activeOpacity={1}
-              style={[styles(theme).newButton, { marginLeft: getScaleSize(6) }]}
+              style={[styles(theme).newButton, {marginLeft: getScaleSize(6)}]}
               onPress={() => {
                 props.navigation.navigate(SCREENS.OtherUserProfile.identifier);
               }}>
@@ -293,11 +285,14 @@ export default function ServiceConfirmed(props: any) {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ height: getScaleSize(32) }}></View>
+        <View style={{height: getScaleSize(32)}}></View>
       </ScrollView>
       <Button
         title={STRING.Trackservice}
-        style={{ marginHorizontal: getScaleSize(22), marginBottom: getScaleSize(16) }}
+        style={{
+          marginHorizontal: getScaleSize(22),
+          marginBottom: getScaleSize(16),
+        }}
         onPress={() => {
           props.navigation.navigate(SCREENS.Otp.identifier, {
             isFromSignup: true,
@@ -310,7 +305,7 @@ export default function ServiceConfirmed(props: any) {
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.white },
+    container: {flex: 1, backgroundColor: theme.white},
     scrolledContainer: {
       marginTop: getScaleSize(19),
       marginHorizontal: getScaleSize(24),
@@ -382,5 +377,5 @@ const styles = (theme: ThemeContextType['theme']) =>
       height: getScaleSize(20),
       width: getScaleSize(20),
       marginRight: getScaleSize(6),
-    }
+    },
   });
