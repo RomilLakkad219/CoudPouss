@@ -65,11 +65,8 @@ export default function Signup(props: any) {
                 console.log('result', result.status, result)
                 if (result.status) {
                     SHOW_TOAST(result?.data?.message ?? '', 'success')
-                    const profileData = await getProfileData();
+                    getProfileData();
 
-                    if (profileData) {
-                        console.log("Profile data", profileData);
-                    }
                     props.navigation.navigate(SCREENS.Otp.identifier, {
                         isFromSignup: true,
                         email: email,
@@ -94,14 +91,22 @@ export default function Signup(props: any) {
             const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
             setLoading(false);
 
-            const userDetail = result?.data?.data?.user;
-
-            if (userDetail) {
-                setProfile(userDetail);
-                return userDetail;
+            if (result.status) {
+                setProfile(result?.data?.data?.user)
+                props.navigation.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{
+                            name: SCREENS.BottomBar.identifier, params: {
+                                isEmail: email
+                            }
+                        }],
+                    }),
+                )
+            } else {
+                setLoading(false);
+                SHOW_TOAST(result?.data?.message, 'error')
             }
-
-            return null;
         } catch (error: any) {
             setLoading(false);
             SHOW_TOAST(error?.message ?? '', 'error');

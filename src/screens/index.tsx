@@ -35,6 +35,7 @@ import AddQuote from './service/AddQuote';
 import Success from './service/Success';
 import ProfessionalTaskDetails from './task/ProfessionalTaskDetails';
 import ProfessionalTaskStatus from './task/ProfessionalTaskStatus';
+import ExploreServiceRequest from './service/ExploreServiceRequest';
 
 //BOTTOMBAR
 import Home from './home/Home';
@@ -266,6 +267,10 @@ export const SCREENS = {
     identifier: 'CreateRequest',
     component: CreateRequest,
   },
+  ExploreServiceRequest: {
+    identifier: 'ExploreServiceRequest',
+    component: ExploreServiceRequest,
+  },
 };
 
 export const TABS = {
@@ -277,7 +282,7 @@ export const TABS = {
     identifier: 'Request',
     component: Request,
   },
- 
+
   Chat: {
     identifier: 'Chat',
     component: Chat,

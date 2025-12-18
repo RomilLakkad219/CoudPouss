@@ -75,35 +75,18 @@ export default function Login(props: any) {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
       setLoading(false);
-      console.log('result', JSON.stringify(result.status), JSON.stringify(result))
+
       if (result.status) {
-        console.log('result?.data?.data?', result?.data?.data)
         Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
         setUser(result?.data?.data);
         setUserType(result?.data?.data?.user_data?.role);
-        const profileData = await getProfileData();
-
-        if (profileData) {
-          console.log("Profile data", profileData);
-        }
-        props.navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{
-              name: SCREENS.BottomBar.identifier, params: {
-                isEmail: email
-              }
-            }],
-          }),
-        );
+        getProfileData();
       } else {
         SHOW_TOAST(result?.data?.message, 'error')
-        console.log('ERR',result?.data?.message)
       }
     } catch (error: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log('CATCH ERR',error?.message)
     }
   }
 
@@ -113,14 +96,21 @@ export default function Login(props: any) {
       const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
       setLoading(false);
 
-      const userDetail = result?.data?.data?.user;
-
-      if (userDetail) {
-        setProfile(userDetail);
-        return userDetail;
+      if (result.status) {
+        setProfile(result?.data?.data?.user)
+        props.navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{
+              name: SCREENS.BottomBar.identifier, 
+            }],
+          }),
+        )
+      } else {
+        setLoading(false);
+        SHOW_TOAST(result?.data?.message, 'error')
+        console.log('ERR', result?.data?.message)
       }
-
-      return null;
     } catch (error: any) {
       setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
