@@ -28,6 +28,7 @@ import {
   AcceptBottomPopup,
   Header,
   PaymentBottomPopup,
+  ProgressView,
   RejectBottomPopup,
   RequestItem,
   SearchComponent,
@@ -201,7 +202,7 @@ export default function RequestDetails(props: any) {
             size={getScaleSize(27)}
             font={FONTS.Lato.Bold}
             color={theme._323232}>
-            {`€${serviceDetails?.total_renegotiated}`}
+            {`€${serviceDetails?.total_renegotiated ?? 0}`}
           </Text>
           <TouchableOpacity
             style={styles(theme).negociateButton}
@@ -351,14 +352,16 @@ export default function RequestDetails(props: any) {
           {STRING.Shortvideos}
         </Text>
         <FlatList
-          data={['']}
+          data={serviceDetails?.supporting_photo_urls ?? []}
           horizontal
           showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: getScaleSize(16), marginBottom: getScaleSize(24) }}
           renderItem={({ item, index }) => {
             return (
               <Image
                 style={[styles(theme).photosView]}
-                source={{ uri: 'https://picsum.photos/id/1/200/300' }}
+                resizeMode="cover"
+                source={{ uri: item }}
               />
             );
           }}
@@ -427,6 +430,7 @@ export default function RequestDetails(props: any) {
           }, 1000);
         }}
       />
+      {isLoading && <ProgressView />}
     </View>
   );
 }
@@ -540,10 +544,9 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     photosView: {
       height: getScaleSize(144),
-      width: getScaleSize(180),
+      width: (Dimensions.get('window').width - getScaleSize(66)) / 2,
       borderRadius: 8,
-      resizeMode: 'cover',
-      marginTop: getScaleSize(18),
+      marginTop: getScaleSize(12),
     },
     buttonContainer: {
       flexDirection: 'row',

@@ -102,4 +102,5 @@ export const IMAGES = {
   ic_phone: require('./ic_phone.png'),
   quantity_remove: require('./quantity_remove.png'),
   quantity_add: require('./quantity_add.png'),
+  serviceCancelledIcon: require('./serviceCancelledIcon.png'),
 };

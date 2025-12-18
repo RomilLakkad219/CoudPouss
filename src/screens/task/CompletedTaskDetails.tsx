@@ -29,6 +29,7 @@ import {
   Button,
   Header,
   PaymentBottomPopup,
+  ProgressView,
   RejectBottomPopup,
   RequestItem,
   SearchComponent,
@@ -40,10 +41,11 @@ import {
 import {useFocusEffect} from '@react-navigation/native';
 import {SCREENS} from '..';
 
-export default function TaskDetails(props: any) {
+export default function CompletedTaskDetails(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
 
+  const [isLoading, setLoading] = useState(false);
   const [isStatus, setIsStatus] = useState(false);
   const [visibleTaskDetails, setVisibleTaskDetails] = useState(false);
 
@@ -532,6 +534,7 @@ export default function TaskDetails(props: any) {
          props.navigation.navigate(SCREENS.WriteReview.identifier)
         }}
       />
+      {isLoading && <ProgressView />}
     </View>
   );
 }

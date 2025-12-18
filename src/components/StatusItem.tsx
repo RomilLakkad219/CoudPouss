@@ -4,17 +4,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Image,
-  Dimensions,
-  Animated,
-  Easing,
-  Text,
+  Image
 } from 'react-native';
 import { ThemeContext, ThemeContextType } from '../context';
 import { getScaleSize, useString } from '../constant';
 import { FONTS, IMAGES } from '../assets';
 import { constant } from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import Text from './Text';
 
 const StatusItem = (props: any) => {
   const STRING = useString();
@@ -48,6 +45,16 @@ const StatusItem = (props: any) => {
           }}
           source={getImage()}
         />
+        {!props?.item?.completed && props?.item?.number && (
+          <Text
+            style={{ position: 'absolute', top: getScaleSize(4) }}
+            size={getScaleSize(12)}
+            font={FONTS.Lato.Medium}
+            color={theme.white}
+          >
+            {props?.item?.number}
+          </Text>
+        )}
         {!props?.isLast && (
           <View
             style={[
@@ -75,7 +82,7 @@ const StatusItem = (props: any) => {
           style={styles(theme).date}>
           {props?.item?.date}
         </Text>
-        {props?.item?.serviceRunning && (
+        {props?.item?.securityCode && (
           <>
             <Text style={[styles(theme).date, { marginTop: getScaleSize(8) }]}>
               {

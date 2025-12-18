@@ -25,12 +25,13 @@ const CategoryDropdown = (props: DropdownProps) => {
     const [isFocus, setIsFocus] = useState(false);
 
     const renderItem = (item: any) => {
+        console.log('item==>', item?.category_logo);
         const isSelected = item?.id === selectedItem?.id;
         return (
             <View style={styles(theme).item}>
                 <View style={styles(theme).iconLabelContainer}>
                     <Image
-                        source={item.icon}
+                        source={item.category_logo}
                         style={[styles(theme).icon, { tintColor: isSelected ? theme._2C6587 : theme._C1C1C1 }]}
                     />
                     <Text

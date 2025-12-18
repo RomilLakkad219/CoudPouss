@@ -25,7 +25,7 @@ import RequestDetails from './request/RequestDetails';
 import OtherUserProfile from './profile/OtherUserProfile';
 import ServiceConfirmed from './request/ServiceConfirmed';
 import Notification from './notification/Notification';
-import TaskDetails from './task/TaskDetails';
+import CompletedTaskDetails from './task/CompletedTaskDetails';  
 import WriteReview from './review/WriteReview';
 import TaskStatus from './task/TaskStatus';
 import Assistance from './houseAssistance/Assistance';
@@ -42,7 +42,7 @@ import Request from './request/Request';
 import Chat from './chat/Chat';
 import Profile from './profile/Profile';
 import ProfessionalHome from './home/ProfessionalHome';
-import Task from './task/Task';
+import OpenRequestDetails from './task/OpenRequestDetails';
 
 //PROFILE
 import MyProfile from './profile/MyProfile';
@@ -59,6 +59,9 @@ import WithdrawHistory from './profile/WithdrawHistory';
 import MoneyWithdrawal from './profile/MoneyWithdrawal';
 import ManageSubscription from './subscription/ManageSubscription';
 import Favourites from './home/Favourites';
+import Task from './task/Task';
+import ServiceCancelled from './request/ServiceCancelled';
+import Search from './home/Search';
 
 export const SCREENS = {
   Splash: {
@@ -182,9 +185,9 @@ export const SCREENS = {
     identifier: 'Notification',
     component: Notification,
   },
-  TaskDetails: {
-    identifier: 'TaskDetails',
-    component: TaskDetails,
+  CompletedTaskDetails: {
+    identifier: 'CompletedTaskDetails',
+    component: CompletedTaskDetails,
   },
   WriteReview: {
     identifier: 'WriteReview',
@@ -265,6 +268,18 @@ export const SCREENS = {
   CreateRequest: {
     identifier: 'CreateRequest',
     component: CreateRequest,
+  },
+  OpenRequestDetails: {
+    identifier: 'OpenRequestDetails',
+    component: OpenRequestDetails,
+  },
+  ServiceCancelled: {
+    identifier: 'ServiceCancelled',
+    component: ServiceCancelled,
+  },
+  Search: {
+    identifier: 'Search',
+    component: Search,
   },
 };
 

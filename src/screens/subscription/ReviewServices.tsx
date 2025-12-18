@@ -39,42 +39,18 @@ export default function ReviewServices(props: any) {
     console.log('selectedServices==>', selectedServices)
 
     async function onSelectedCategories() {
-        const categoryIds = selectedServices.map((item: any) => item.category?.id);
+        const output = selectedServices.map((item: any) => ({
+            category_id: item.category.id,
+            sub_category_ids: item.service.map((e: any) => e.id),
+        }));
         const params = {
-            category_ids: categoryIds
+            services: output
         }
-        try {
-            setLoading(true);
-            const result = await API.Instance.post(API.API_ROUTES.onSelectedCategories, params);
-            console.log('result', result.status, result)
-            if (result.status) {
-                console.log('result?.data?.data?', result?.data?.data)
-                onSelectedServices()
-            } else {
-                SHOW_TOAST(result?.data?.message, 'error')
-                console.log('ERR', result?.data?.message)
-            }
-        } catch (error: any) {
-            SHOW_TOAST(error?.message ?? '', 'error');
-            console.log(error?.message)
-        } finally {
-            setLoading(false);
-        }
-    }
 
-    async function onSelectedServices() {
-        const serviceIds: any = [];
-        selectedServices.forEach((item: any) => {
-            item.service?.forEach((e: any) => {
-                serviceIds.push(e.id);
-            });
-        });
-        const params = {
-            sub_category_ids: serviceIds
-        }
+        console.log('params==>', params)
         try {
             setLoading(true);
-            const result = await API.Instance.post(API.API_ROUTES.onSelectedServices, params);
+            const result = await API.Instance.post(API.API_ROUTES.onSendCategoryIds, params);
             console.log('result', result.status, result)
             if (result.status) {
                 console.log('result?.data?.data?', result?.data?.data)
@@ -123,11 +99,11 @@ export default function ReviewServices(props: any) {
                             return (
                                 <View key={index} style={styles(theme).itemContainer}>
                                     <View style={styles(theme).sectionHeaderContainer}>
-                                        <Image source={section.icon} style={styles(theme).sectionHeaderIcon} />
+                                        <Image source={section?.category?.category_logo} style={styles(theme).sectionHeaderIcon} />
                                         <Text size={getScaleSize(16)}
                                             font={FONTS.Lato.SemiBold}
                                             color={theme._2C6587}>
-                                            {section?.category?.name ?? ''}
+                                            {section?.category?.category_name ?? ''}
                                         </Text>
                                     </View>
                                     {(section?.service ?? []).map((item: any, index: number) => {

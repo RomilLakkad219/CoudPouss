@@ -9,7 +9,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { getScaleSize, REGEX, SHOW_TOAST, Storage, useString } from '../../constant';
 
 //COMPONENTS
-import { Header, Input, Text, Button, SelectCountrySheet } from '../../components';
+import { Header, Input, Text, Button, SelectCountrySheet, ProgressView } from '../../components';
 
 //SCREENS
 import { SCREENS } from '..';
@@ -74,15 +74,12 @@ export default function Login(props: any) {
     try {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
-      setLoading(false);
-      console.log('result', JSON.stringify(result.status), JSON.stringify(result))
       if (result.status) {
         console.log('result?.data?.data?', result?.data?.data)
         Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
         setUser(result?.data?.data);
         setUserType(result?.data?.data?.user_data?.role);
         const profileData = await getProfileData();
-
         if (profileData) {
           console.log("Profile data", profileData);
         }
@@ -101,9 +98,10 @@ export default function Login(props: any) {
         console.log('ERR',result?.data?.message)
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log('CATCH ERR',error?.message)
+      console.log(' ERCATCHR',error?.message)
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -257,6 +255,7 @@ export default function Login(props: any) {
           setVisibleCountry(false);
         }}
       />
+      {isLoading && <ProgressView />}
     </View>
   );
 }

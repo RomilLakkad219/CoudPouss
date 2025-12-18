@@ -353,7 +353,16 @@ export const useString = () => {
     product_images: "Product Images",
     want_to_add_more_service_categories: "Want to add more service\ncategories?",
     Choose_Date_Time: "Choose Date & Time",
-    product: "Product"
+    product: "Product",
+    service_cancelled: "Service Cancelled",
+    cancelled_message: "This cancellation is happened in less than 48 hours before the scheduled service time. According to policy, your payment will not be fully refunded. A 5% service fee is charged.",
+    service_cancelled_message: "Your service has been successfully cancelled. Here are the details regarding your payment and the cancellation policy.",
+    service_fee: "Service Fee (5%)",
+    cancel_scheduled_service: "Cancel Scheduled Service",
+    are_you_sure_you_want_to_cancel_your_scheduled_service_with_the_expert: "Are you sure you want to cancel your scheduled service with the expert?",
+    payment_breakdown: "Payment Breakdown",
+    confirm_cancellation: "Confirm Cancellation",
+    keep_booking: "Keep Booking"
   };
 };
 

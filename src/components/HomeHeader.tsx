@@ -2,6 +2,7 @@ import {
   FlexAlignType,
   Image,
   ImageBackground,
+  Pressable,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -22,6 +23,7 @@ import { FONTS, IMAGES } from '../assets';
 //COMPONENTS
 import Text from './Text';
 import { flatMap, head } from 'lodash';
+import { SCREENS } from '../screens';
 
 const HEADER_HEIGHT = 260;
 
@@ -78,13 +80,16 @@ const HomeHeader = (props: any) => {
       <View style={styles(theme).searchView}>
         <View style={styles(theme).searchBox}>
           <Image style={styles(theme).searchImage} source={IMAGES.search} />
-          <View style={{ flex: 1.0 }}>
+          <Pressable
+          onPress={props?.onSearchPress}
+           style={{ flex: 1.0 }}>
             <TextInput
               style={styles(theme).searchInput}
               placeholderTextColor={'#939393'}
               placeholder={STRING.Search}
+              editable={false}
             />
-          </View>
+          </Pressable>
         </View>
         <TouchableOpacity style={styles(theme).microPhoneContainer}>
           <Image
@@ -103,7 +108,7 @@ const HomeHeader = (props: any) => {
               size={getScaleSize(48)}
               font={FONTS.Lato.Bold}
               color={theme.white}>
-              {'10 '}
+              {props?.professionalConnectedCount ?? '0'}{' '}
             </Text>
             <Text
               size={getScaleSize(20)}

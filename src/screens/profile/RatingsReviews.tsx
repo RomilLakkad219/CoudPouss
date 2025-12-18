@@ -23,33 +23,28 @@ export default function RatingsReviews(props: any) {
 
     const [showMore, setShowMore] = useState(false);
     const [isLoading, setLoading] = useState(false);
+    const [ratingsReviews, setRatingsReviews] = useState<any>([]);
 
     useEffect(() => {
         getRatingReviews()
     }, [])
 
     async function getRatingReviews() {
-
         try {
-
             setLoading(true)
-            const result = await API.Instance.get(API.API_ROUTES.ratingAndReviews);
-            setLoading(false)
-
-            console.log('RATING REVIEWS RES', JSON.stringify(result))
-
+            const result: any = await API.Instance.get(API.API_ROUTES.fetchTransactions + `?section=ratings_reviews`);
             if (result?.status) {
-
+                setRatingsReviews(result?.data?.data?.reviews_ratings ?? []);
             }
             else {
                 SHOW_TOAST(result?.data?.message, 'error')
                 console.log('ERR', result?.data?.message)
             }
-
         } catch (error: any) {
             SHOW_TOAST(error?.message ?? '', 'error');
+        } finally {
+            setLoading(false);
         }
-
     }
 
     return (
@@ -69,12 +64,14 @@ export default function RatingsReviews(props: any) {
                     {STRING.recent_works_reviews}
                 </Text>
                 <FlatList
-                    data={['', '']}
+                    data={ratingsReviews}
                     showsVerticalScrollIndicator={false}
                     keyExtractor={(item: any, index: number) => index.toString()}
                     renderItem={({ item, index }) => {
                         return (
                             <RatingsReviewsItem
+                                key={index}
+                                item={item}
                                 itemContainer={{ marginBottom: getScaleSize(24) }}
                                 onPressShowMore={() => {
                                     setShowMore(!showMore);

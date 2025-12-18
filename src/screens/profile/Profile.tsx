@@ -52,6 +52,8 @@ export default function Profile(props: any) {
     }
   }
 
+  
+
 
   function logout() {
     props.navigation.dispatch(
@@ -89,7 +91,7 @@ export default function Profile(props: any) {
             font={FONTS.Lato.SemiBold}
             align="center"
             color={theme._2B2B2B}>
-            {user?.user_data?.name ?? ''}
+            {(profile?.first_name ?? "") + " " + (profile?.last_name ?? "")}
           </Text>
           {userType === 'service_provider' && (
             <View style={styles(theme).checkStatusContainer}>

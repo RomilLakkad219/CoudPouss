@@ -147,7 +147,8 @@ export default function Assistance(props: any) {
       {bannerData ? (
         <Image
           style={styles(theme).bannerContainer}
-          source={{ uri: bannerData?.image }}
+          resizeMode='cover'
+          source={{ uri: bannerData?.url }}
         />
       ) : (
         <View style={styles(theme).bannerContainer} />
@@ -184,6 +185,7 @@ export default function Assistance(props: any) {
                     setSelectedCategory(item);
                   }}>
                   <Image
+                  resizeMode='cover'
                     style={styles(theme).categoryImage}
                     source={{ uri: item?.category_logo }}
                   />

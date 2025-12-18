@@ -43,9 +43,9 @@ export default function Request(props: any) {
     hasMore: true,
     isLoading: true,
     isMoreLoading: false,
+    searchValue: '',
+    searchDebouncedText: '',
   });
-  const [searchDebouncedText, setSearchDebouncedText] = useState('');
-  const [searchValue, setSearchValue] = useState('');
 
   const data = [
     { id: '1', title: 'All', filter: 'all' },
@@ -62,10 +62,18 @@ export default function Request(props: any) {
 
   useEffect(() => {
     getAllRequests();
-  }, [searchDebouncedText]);
+  }, [requestData?.searchDebouncedText]);
 
   const debouncedSearch = useCallback(debounce((text: string) => {
-    setSearchDebouncedText(text);
+    setRequestData((prev: any) => ({
+      ...prev,
+      searchDebouncedText: text,
+      page: 1,
+      hasMore: true,
+      allRequests: [],
+      isLoading: true,
+      isMoreLoading: false,
+    }));
   }, 500), []);
 
   async function getAllRequests() {
@@ -79,10 +87,8 @@ export default function Request(props: any) {
     abortControllerRef.current = abortController;
 
     try {
-      console.log('searchValue', searchValue);
-      const result: any = await API.Instance.get(API.API_ROUTES.getAllRequests + `?page=${requestData?.page}&limit=${PAGE_SIZE}&status=${requestData?.selectedFilter?.filter}&search=${searchValue}`, {
-        signal: abortController.signal
-      });
+      console.log('searchValue', requestData?.searchDebouncedText);
+      const result: any = await API.Instance.get(API.API_ROUTES.getAllRequests + `?page=${requestData?.page}&limit=${PAGE_SIZE}&status=${requestData?.selectedFilter?.filter}&search=${requestData?.searchDebouncedText}`);
       if (result.status) {
         const newData: any = result?.data?.data?.recent_requests?.items ?? []
         if (newData.length < PAGE_SIZE) {
@@ -149,9 +155,19 @@ export default function Request(props: any) {
             <RequestItem
               selectedFilter={requestData?.selectedFilter}
               onPress={() => {
-                props.navigation.navigate(SCREENS.RequestDetails.identifier, {
-                  item: item
-                })
+                if(item?.status === 'open') { 
+                  props.navigation.navigate(SCREENS.OpenRequestDetails.identifier, {
+                    item: item
+                  })
+                }else if (item?.status === 'accepted') {
+                  props.navigation.navigate(SCREENS.RequestDetails.identifier, {
+                    item: item
+                  })
+                } else if (item?.status === 'completed') {
+                  props.navigation.navigate(SCREENS.CompletedTaskDetails.identifier, {
+                    item: item
+                  })
+                }
               }}
               item={item} />
           )}
@@ -206,9 +222,12 @@ export default function Request(props: any) {
         screenName={STRING.Request} />
       <View style={{ marginTop: getScaleSize(16), marginHorizontal: getScaleSize(22) }}>
         <SearchComponent 
-        value={searchValue}
+        value={requestData?.searchValue}
         onChangeText={(text: string) => {
-          setSearchValue(text);
+          setRequestData((prev: any) => ({
+            ...prev,
+            searchValue: text,
+          }));
           debouncedSearch(text);
         }}
         />

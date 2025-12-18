@@ -44,6 +44,8 @@ export default function Home(props: any) {
   const [isLoading, setLoading] = useState(false);
   const [allServices, setAllServices] = useState([]);
   const [recentRequests, setRecentRequests] = useState([]);
+  const [favoriteProfessionals, setFavoriteProfessionals] = useState([]);
+  const [professionalConnectedCount, setProfessionalConnectedCount] = useState(0);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -54,24 +56,38 @@ export default function Home(props: any) {
 
   useEffect(() => {
     getHomeData();
+    getFavoriteProfessionals()
+    getAllRequests()
   }, []);
 
   async function getHomeData() {
     try {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getHomeData);
-      setLoading(false);
-      console.log('result', result.status, result)
       if (result.status) {
-        console.log('homeDTAtatata==', result?.data?.data)
+        setProfessionalConnectedCount(result?.data?.data?.professional_connected_count);
         setAllServices(result?.data?.data?.services);
-        setRecentRequests(result?.data?.data?.recent_requests?.records ?? []);
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
-        console.log('error==>', result?.data?.message)
       }
     } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
       setLoading(false);
+    }
+  }
+
+  async function getFavoriteProfessionals() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getFavoriteProfessionals + `?page=${1}&limit=${2}`);
+      if (result.status) {
+        console.log('favoriteProfessionals==', result?.data?.data?.results)
+        setFavoriteProfessionals(result?.data?.data ?? []);
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
       SHOW_TOAST(error?.message ?? '', 'error');
       console.log(error?.message)
     } finally {
@@ -79,29 +95,23 @@ export default function Home(props: any) {
     }
   }
 
-  async function getFavoriteProfessionals() {
-    // try {
-    //   setLoading(true);
-    //   const result = await API.Instance.get(API.API_ROUTES.getFavoriteProfessionals);
-    //   setLoading(false);
-    //   console.log('result', result.status, result)
-    //   if (result.status) {
-    //     console.log('homeDTAtatata==', result?.data?.data)
-    //     setAllServices(result?.data?.data?.services);
-    //     setRecentRequests(result?.data?.data?.recent_requests?.records ?? []);
-    //   } else {
-    //     SHOW_TOAST(result?.data?.message ?? '', 'error')
-    //     console.log('error==>', result?.data?.message)
-    //   }
-    // } catch (error: any) {
-    //   setLoading(false);
-    //   SHOW_TOAST(error?.message ?? '', 'error');
-    //   console.log(error?.message)
-    // } finally {
-    //   setLoading(false);
-    // }
-  }
+  async function getAllRequests() {
 
+    try {
+      const result: any = await API.Instance.get(API.API_ROUTES.getAllRequests + `?page=${1}&limit=${2}&status=all`);
+      if (result.status) {
+        const newData: any = result?.data?.data?.recent_requests?.items ?? []
+        setRecentRequests(newData);
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.primary }}>
@@ -118,6 +128,10 @@ export default function Home(props: any) {
           style={[styles(theme).container]}>
           <View>
             <HomeHeader
+              professionalConnectedCount={professionalConnectedCount}
+              onSearchPress={() => {
+                props.navigation.navigate(SCREENS.Search.identifier);
+              }}
               onPressNotification={() => {
                 props.navigation.navigate(SCREENS.Notification.identifier);
               }}
@@ -272,65 +286,96 @@ export default function Home(props: any) {
               color={theme._323232}>
               {STRING.ResentRequests}
             </Text>
-            <Text
-              size={getScaleSize(16)}
-              font={FONTS.Lato.Regular}
-              onPress={() => {
-                props.navigation.navigate(TABS.Request.identifier);
-              }}
-              style={{ alignSelf: 'center' }}
-              color={theme._999999}>
-              {STRING.ViewAll}
-            </Text>
-          </View>
-          {recentRequests.map((item: any, index: number) => {
-            return (
-              <RequestItem
-                key={index}
-                item={item}
+            {recentRequests.length > 0 &&
+              <Text
+                size={getScaleSize(16)}
+                font={FONTS.Lato.Regular}
                 onPress={() => {
-                  props.navigation.navigate(SCREENS.RequestDetails.identifier,{
-                    item: item
-                  });
+                  props.navigation.navigate(TABS.Request.identifier);
                 }}
-              />
-            );
-          })}
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: getScaleSize(31),
-              marginHorizontal: getScaleSize(22),
-            }}>
-            <Text
-              size={getScaleSize(20)}
-              font={FONTS.Lato.SemiBold}
-              style={{ flex: 1.0 }}
-              color={theme._323232}>
-              {STRING.FavoriteProfessionals}
-            </Text>
-            <Text
-              onPress={() => {
-                props.navigation.navigate(SCREENS.Favourites.identifier);
-              }}
-              size={getScaleSize(16)}
-              font={FONTS.Lato.Regular}
-              style={{ alignSelf: 'center' }}
-              color={theme._999999}>
-              {STRING.ViewAll}
-            </Text>
+                style={{ alignSelf: 'center' }}
+                color={theme._999999}>
+                {STRING.ViewAll}
+              </Text>
+            }
           </View>
-          <View style={{ marginHorizontal: getScaleSize(24), flexDirection: 'row', justifyContent: 'space-between' }}>
-            {['', ''].map((item: any, index: number) => {
-              return (
-                <View key={index} style={{ marginTop: getScaleSize(26) }}>
-                  <FavouritesItem
-                    itemContainer={{}}
+          {recentRequests.length > 0 ? (
+            <>
+              {recentRequests.map((item: any, index: number) => {
+                return (
+                  <RequestItem
+                    key={index}
+                    item={item}
+                    onPress={() => {
+                      if (item?.status === 'open') {
+                        props.navigation.navigate(SCREENS.OpenRequestDetails.identifier, {
+                          item: item
+                        })
+                      } else {
+                        props.navigation.navigate(SCREENS.RequestDetails.identifier, {
+                          item: item
+                        })
+                      }
+                    }}
                   />
-                </View>
-              );
-            })}
-          </View>
+                );
+              })}
+              {favoriteProfessionals?.length > 0 &&
+                <>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginTop: getScaleSize(31),
+                      marginHorizontal: getScaleSize(22),
+                    }}>
+                    <Text
+                      size={getScaleSize(20)}
+                      font={FONTS.Lato.SemiBold}
+                      style={{ flex: 1.0 }}
+                      color={theme._323232}>
+                      {STRING.FavoriteProfessionals}
+                    </Text>
+                    <Text
+                      onPress={() => {
+                        props.navigation.navigate(SCREENS.Favourites.identifier);
+                      }}
+                      size={getScaleSize(16)}
+                      font={FONTS.Lato.Regular}
+                      style={{ alignSelf: 'center' }}
+                      color={theme._999999}>
+                      {STRING.ViewAll}
+                    </Text>
+                  </View>
+                  <View style={{ marginHorizontal: getScaleSize(24), flexDirection: 'row', justifyContent: 'space-between' }}>
+                    {favoriteProfessionals?.length > 0 && favoriteProfessionals.map((item: any, index: number) => {
+                      return (
+                        <View key={index} style={{ marginTop: getScaleSize(26) }}>
+                          <FavouritesItem
+                            item={item}
+                            itemContainer={{}}
+                          />
+                        </View>
+                      );
+                    })}
+                  </View>
+                </>
+              }
+            </>
+          ) : (
+            <View style={styles(theme).emptyView}>
+              <Image style={styles(theme).emptyImage} source={IMAGES.empty} />
+              <Text
+                size={getScaleSize(16)}
+                font={FONTS.Lato.Regular}
+                align="center"
+                color={theme._939393}
+                style={{
+                  marginTop: getScaleSize(20),
+                }}>
+                {STRING.Youhavenotcreatedanyrequest}
+              </Text>
+            </View>
+          )}
           <View style={{ height: getScaleSize(32) }} />
         </ScrollView>
       </View>
@@ -381,5 +426,15 @@ const styles = (theme: ThemeContextType['theme']) =>
       marginTop: getScaleSize(35),
       height: getScaleSize(6),
       backgroundColor: '#F8F8F8',
+    },
+    emptyView: {
+      flex: 1.0,
+      alignSelf: 'center',
+      marginTop: getScaleSize(26),
+    },
+    emptyImage: {
+      height: getScaleSize(140),
+      width: getScaleSize(119),
+      alignSelf: 'center',
     },
   });

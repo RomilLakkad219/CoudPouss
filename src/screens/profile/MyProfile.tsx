@@ -37,6 +37,7 @@ export default function MyProfile(props: any) {
 
     const { profile, fetchProfile } = useContext(AuthContext)
 
+    console.log('profile==', profile)
 
     const bottomSheetRef = useRef<any>(null);
 
@@ -116,12 +117,12 @@ export default function MyProfile(props: any) {
 
         try {
             const params = {
-                "first_name": firstName,
-                "last_name": lastName,
-                // "email" :"",
-                // "phone_country_code": "",
-                // "phone_number": "",
-                "address": address
+                user_data: {
+                    first_name: firstName,
+                    // phone_country_code: countryCode,
+                    // phone_number: mobileNumber,
+                    address: address
+                }
             }
 
             console.log('EDIT PARAMS', params)
@@ -191,14 +192,10 @@ export default function MyProfile(props: any) {
                         <Image source={{ uri: profile?.profile_photo_url }}
                             resizeMode='cover' style={styles(theme).profileContainer} />
                         :
-                        profileImage ? (
-                            <Image source={{ uri: profileImage?.uri }}
-                                resizeMode='cover' style={styles(theme).profileContainer} />
-                        ) : (
-                            <View style={[styles(theme).profileContainer, {
-                                backgroundColor: theme._F0EFF0,
-                            }]} />
-                        )
+                        <View style={[styles(theme).profileContainer, {
+                            backgroundColor: theme._F0EFF0,
+                        }]} />
+
                     }
                     < TouchableOpacity onPress={() => {
                         pickImage()
