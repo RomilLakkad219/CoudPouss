@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://101.53.145.125:5000/"
+const API_BASE_URL = "http://163.227.92.122:4001/"
 
 const DISABLE_API_LOGS = false
 
@@ -28,7 +28,11 @@ const API_ROUTES = {
     allRequests: "service_confirmation/service_accept/get_services",
     onSelectedCategories: "userService/auth/select-categories",
     onSelectedServices: "userService/auth/select-sub-categories",
-    getServiceDetails: "service_confirmation/service_accept/get_service"
+    getServiceDetails: "service_confirmation/service_accept/get_service",
+    getProfessionalAllServices: "quote_request/open-services",
+    getProfessionalServiceDetails: "quote_request/service-info",
+    sendQuoteRequest: "quote_request/quoterequest",
+    fileUploadProfessionalServices:"service_request/upload"
 }
 
 export { API_ROUTES, API_BASE_URL, DISABLE_API_LOGS }

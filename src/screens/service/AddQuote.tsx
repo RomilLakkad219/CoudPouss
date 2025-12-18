@@ -1,62 +1,299 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   StatusBar,
   StyleSheet,
-  Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Alert,
   ScrollView,
-  FlatList,
   TouchableOpacity,
   Image,
   Platform,
   TextInput,
 } from 'react-native';
 
+//API
+import { API } from '../../api';
+
 //ASSETS
-import {FONTS, IMAGES} from '../../assets';
+import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import { getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
-  AcceptBottomPopup,
   Button,
   Header,
   Input,
-  PaymentBottomPopup,
-  RejectBottomPopup,
-  RequestItem,
-  SearchComponent,
-  StatusItem,
+  ProgressView,
   Text,
 } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS} from '..';
+import { launchImageLibrary } from 'react-native-image-picker';
+import moment from 'moment';
+import { createThumbnail } from 'react-native-create-thumbnail';
+
+//SCREENS
+import { SCREENS } from '..';
 
 export default function AddQuote(props: any) {
+
+  const serviceDetails = props?.route?.params?.item
+  const isItem = props?.route?.params?.isItem
+
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+
+  const { theme } = useContext<any>(ThemeContext);
+
+  const { profile } = useContext(AuthContext)
 
   const [amount, setAmount] = useState('');
   const [desctiption, setDescription] = useState('');
+  const [isLoading, setLoading] = useState(false);
+  const [doc1, setDoc1] = useState<any>(null);
+  const [doc2, setDoc2] = useState<any>(null);
+  const [video, setVideo] = useState<any>(null);
+  const [photoIds, setPhotoIds] = useState<string[]>([]);
+  const [videoIds, setVideoIds] = useState<string[]>([]);
+  const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
+  const [isServiceDetails, setServiceDetails] = useState<any>(serviceDetails ?? '')
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(theme.white);
-        StatusBar.setBarStyle('dark-content');
+  useEffect(() => {
+    if (!isServiceDetails && isItem) {
+      getServicesDetails()
+    }
+  }, [])
+
+  async function getServicesDetails() {
+    try {
+      setLoading(true)
+      const result = await API.Instance.get(API.API_ROUTES.getProfessionalServiceDetails + `/${isItem?.service_id}`);
+      setLoading(false)
+
+      if (result?.status) {
+        setServiceDetails(result?.data)
       }
-    }, []),
-  );
+      else {
+        SHOW_TOAST(result?.data?.message, 'error')
+      }
+    }
+    catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+    }
+  }
+
+  const uploadFile = async (asset: any) => {
+    const formData = new FormData();
+
+    formData.append('file', {
+      uri:
+        Platform.OS === 'ios'
+          ? asset.uri.replace('file://', '')
+          : asset.uri,
+      name: asset.fileName || `file_${Date.now()}`,
+      type: asset.type || 'image/jpeg',
+    } as any);
+
+    const res: any = await API.Instance.post(
+      API.API_ROUTES.fileUploadProfessionalServices,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    if (!res?.status) {
+      throw new Error(res?.message || 'File upload failed');
+    }
+
+    return res.data.storage_key;
+  };
+
+  const pickDocument = async (index: number) => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        selectionLimit: 1,
+      },
+      async response => {
+        if (response.didCancel) return;
+
+        if (response.errorCode) {
+          SHOW_TOAST(response.errorMessage || 'Error', 'error');
+          return;
+        }
+
+        const asset = response.assets?.[0];
+        if (!asset) return;
+
+        try {
+          setLoading(true);
+
+          const id = await uploadFile(asset);
+
+          setPhotoIds(prev => [...prev, id]);
+
+          if (index === 1) setDoc1(asset);
+          if (index === 2) setDoc2(asset);
+
+          SHOW_SUCCESS_TOAST('Document uploaded successfully');
+        } catch (e: any) {
+          SHOW_TOAST(e.message || 'Upload failed', 'error');
+        } finally {
+          setLoading(false);
+        }
+      }
+    );
+  };
+
+  const pickVideo = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'video',
+        videoQuality: 'high',
+      },
+      async response => {
+        if (response.didCancel) return;
+        if (response.errorCode) {
+          SHOW_TOAST(response.errorMessage || 'Error', 'error');
+          return;
+        }
+
+        const asset = response.assets?.[0];
+        if (!asset) return;
+
+        if (!asset.uri) {
+          SHOW_TOAST('Invalid video file', 'error');
+          return;
+        }
+
+        if (asset.duration && asset.duration > 120) {
+          SHOW_TOAST('Video must be less than 2 minutes', 'error');
+          return;
+        }
+
+        try {
+          setLoading(true);
+
+          //  Upload video
+          const id = await uploadFile(asset);
+          setVideo(asset);
+          setVideoIds(prev => [...prev, id]);
+
+          //  Create thumbnail
+          const thumbnail = await createThumbnail({
+            url: asset.uri,
+            timeStamp: 1000,
+          });
+
+          setVideoThumbnail(thumbnail.path);
+
+          SHOW_SUCCESS_TOAST('Video uploaded successfully');
+        } catch (e: any) {
+          SHOW_TOAST(e.message || 'Upload failed', 'error');
+        } finally {
+          setLoading(false);
+        }
+      }
+    );
+  };
+
+  // async function sendQuote() {
+  //   if (!amount) return SHOW_TOAST('Please enter amount', 'error');
+  //   if (!desctiption) return SHOW_TOAST('Please enter short description', 'error');
+
+  //   try {
+  //     setLoading(true);
+  //     const payload = {
+  //       servicesid: serviceDetails?.service_id,
+  //       provider_quote_amount: amount,
+  //       description: desctiption,
+  //       offer_photoids: photoIds,
+  //       offer_videoids: videoIds,
+  //     };
+
+  //     const result: any = await API.Instance.post(
+  //       API.API_ROUTES.sendQuoteRequest,
+  //       payload
+  //     );
+  //     setLoading(false);
+
+  //     if (result?.status) {
+  //       props.navigation.navigate(SCREENS.Success.identifier);
+  //     } else {
+  //       SHOW_TOAST(result?.message, 'error');
+  //     }
+  //   } catch (e: any) {
+  //     setLoading(false);
+  //     SHOW_TOAST(e?.message || 'Something went wrong', 'error');
+  //   }
+  // }
+
+  async function sendQuote() {
+
+    // amount validation only for professional
+    if (profile?.service_provider_type === 'professional' && !amount) {
+      return SHOW_TOAST('Please enter amount', 'error');
+    }
+
+    if (!desctiption) {
+      return SHOW_TOAST('Please enter short description', 'error');
+    }
+
+    try {
+      setLoading(true);
+
+      let payload: any = {
+        servicesid: isServiceDetails?.service_id,
+        description: desctiption,
+      };
+
+      // PROFESSIONAL PAYLOAD
+      if (profile?.service_provider_type === 'professional') {
+        payload = {
+          ...payload,
+          provider_quote_amount: amount,
+          offer_photoids: photoIds,
+          offer_videoids: videoIds,
+        };
+      }
+
+      // NON-PROFESSIONAL PAYLOAD
+      if (profile?.service_provider_type === 'non_professional') {
+        payload = {
+          ...payload,
+          offer_photos: photoIds.map(key => ({
+            storage_key: key,
+          })),
+          offer_videos: videoIds.map(key => ({
+            storage_key: key,
+          })),
+        };
+      }
+
+      const result: any = await API.Instance.post(
+        API.API_ROUTES.sendQuoteRequest,
+        payload
+      );
+
+      setLoading(false);
+
+      if (result?.status) {
+        props.navigation.navigate(SCREENS.Success.identifier);
+      } else {
+        SHOW_TOAST(result?.message || 'Failed to send quote', 'error');
+      }
+    } catch (e: any) {
+      setLoading(false);
+      SHOW_TOAST(e?.message || 'Something went wrong', 'error');
+    }
+  }
 
   return (
     <View style={styles(theme).container}>
@@ -75,10 +312,18 @@ export default function AddQuote(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          <Image
-            style={styles(theme).imageView}
-            source={{uri: 'https://picsum.photos/id/1/200/300'}}
-          />
+          {isServiceDetails?.subcategory_info?.sub_category_name?.service_photo === null ?
+            <View style={[styles(theme).imageView, {
+              backgroundColor: 'gray'
+            }]}>
+            </View>
+            :
+            <Image
+              style={styles(theme).imageView}
+              resizeMode='contain'
+              source={{ uri: isServiceDetails?.subcategory_info?.sub_category_name?.service_photo }}
+            />
+          }
           <Text
             style={{
               marginVertical: getScaleSize(12),
@@ -87,7 +332,7 @@ export default function AddQuote(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {'Furniture Assembly'}
+            {isServiceDetails?.subcategory_info?.sub_category_name?.name}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -104,7 +349,7 @@ export default function AddQuote(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'16 Aug, 2025'}
+                  {moment(isServiceDetails?.date).format('DD MMM, YYYY')}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -120,14 +365,14 @@ export default function AddQuote(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'10:00 am'}
+                  {moment(isServiceDetails?.time, "HH:mm").format("hh:mm A")}
                 </Text>
               </View>
             </View>
             <View
               style={[
                 styles(theme).horizontalView,
-                {marginTop: getScaleSize(12)},
+                { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
                 <Image
@@ -142,7 +387,7 @@ export default function AddQuote(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'DIY Services'}
+                  {`${isServiceDetails?.category_info?.category_name?.name} Services`}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -158,7 +403,7 @@ export default function AddQuote(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'Paris, 75001'}
+                  {isServiceDetails?.about_client?.address}
                 </Text>
               </View>
             </View>
@@ -167,7 +412,7 @@ export default function AddQuote(props: any) {
         <View style={styles(theme).profileContainer}>
           <View style={styles(theme).horizontalView}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(18)}
               font={FONTS.Lato.SemiBold}
               color={theme._323232}>
@@ -177,18 +422,26 @@ export default function AddQuote(props: any) {
           <View
             style={[
               styles(theme).horizontalView,
-              {marginTop: getScaleSize(16)},
+              { marginTop: getScaleSize(16) },
             ]}>
-            <Image
-              style={styles(theme).profilePicView}
-              source={IMAGES.user_placeholder}
-            />
+            {isServiceDetails?.about_client?.profile_photo === null ?
+              <Image
+                style={styles(theme).profilePicView}
+                source={IMAGES.user_placeholder}
+              />
+              :
+              <Image
+                style={styles(theme).profilePicView}
+                resizeMode='contain'
+                source={{ uri: isServiceDetails?.about_client?.profile_photo }}
+              />
+            }
             <Text
-              style={{alignSelf: 'center', marginLeft: getScaleSize(16)}}
+              style={{ alignSelf: 'center', marginLeft: getScaleSize(16) }}
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={'#0F232F'}>
-              {'Bessie Cooper'}
+              {isServiceDetails?.about_client?.name}
             </Text>
             <Image
               style={{
@@ -201,23 +454,25 @@ export default function AddQuote(props: any) {
             />
           </View>
         </View>
-        <Input
-          placeholder={STRING.enter_email_or_mobile_number}
-          placeholderTextColor={theme._424242}
-          inputTitle={STRING.EnterQuoteAmount}
-          inputColor={true}
-          continerStyle={{marginTop: getScaleSize(16)}}
-          value={`${'€'}${amount}`}
-          keyboardType="numeric"
-          autoCapitalize="none"
-          onChangeText={text => {
-            const cleaned = text.replace(/[^0-9.]/g, '');
-            const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
-            setAmount(formatted);
-          }}
-        />
+        {profile?.service_provider_type === 'professional' &&
+          <Input
+            placeholder={STRING.enter_email_or_mobile_number}
+            placeholderTextColor={theme._424242}
+            inputTitle={STRING.EnterQuoteAmount}
+            inputColor={true}
+            continerStyle={{ marginTop: getScaleSize(16) }}
+            value={`${'€'}${amount}`}
+            keyboardType="numeric"
+            autoCapitalize="none"
+            onChangeText={text => {
+              const cleaned = text.replace(/[^0-9.]/g, '');
+              const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
+              setAmount(formatted);
+            }}
+          />
+        }
         <Text
-          style={{marginTop: getScaleSize(12)}}
+          style={{ marginTop: getScaleSize(12) }}
           size={getScaleSize(17)}
           font={FONTS.Lato.Medium}
           color={theme._424242}>
@@ -238,7 +493,7 @@ export default function AddQuote(props: any) {
           />
         </View>
         <Text
-          style={{marginTop: getScaleSize(20)}}
+          style={{ marginTop: getScaleSize(20) }}
           size={getScaleSize(17)}
           font={FONTS.Lato.Medium}
           color={theme._424242}>
@@ -246,40 +501,46 @@ export default function AddQuote(props: any) {
         </Text>
         <View style={styles(theme).imageUploadContent}>
           <TouchableOpacity
-            style={[styles(theme).uploadButton, {marginRight: getScaleSize(9)}]}
+            style={[styles(theme).uploadButton, { marginRight: getScaleSize(9) }]}
             activeOpacity={1}
-            onPress={() => {}}>
-            <Image
-              style={styles(theme).attachmentIcon}
-              source={IMAGES.upload_attachment}
-            />
-            <Text
-              style={{marginTop: getScaleSize(8)}}
-              size={getScaleSize(15)}
-              font={FONTS.Lato.Regular}
-              color={theme._818285}>
-              {STRING.upload_from_device}
-            </Text>
+            onPress={() => pickDocument(1)}>
+            {doc1 ? (
+              <Image source={{ uri: doc1.uri }} style={styles(theme).photosView} />
+            ) : (
+              <>
+                <Image source={IMAGES.upload_attachment} style={styles(theme).attachmentIcon} />
+                <Text
+                  style={{ marginTop: getScaleSize(8) }}
+                  size={getScaleSize(15)}
+                  font={FONTS.Lato.Regular}
+                  color={theme._818285}>
+                  {STRING.upload_from_device}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles(theme).uploadButton, {marginLeft: getScaleSize(9)}]}
+            style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9) }]}
             activeOpacity={1}
-            onPress={() => {}}>
-            <Image
-              style={styles(theme).attachmentIcon}
-              source={IMAGES.upload_attachment}
-            />
-            <Text
-              style={{marginTop: getScaleSize(8)}}
-              size={getScaleSize(15)}
-              font={FONTS.Lato.Regular}
-              color={theme._818285}>
-              {STRING.upload_from_device}
-            </Text>
+            onPress={() => pickDocument(2)}>
+            {doc2 ? (
+              <Image source={{ uri: doc2.uri }} style={styles(theme).photosView} />
+            ) : (
+              <>
+                <Image source={IMAGES.upload_attachment} style={styles(theme).attachmentIcon} />
+                <Text
+                  style={{ marginTop: getScaleSize(8) }}
+                  size={getScaleSize(15)}
+                  font={FONTS.Lato.Regular}
+                  color={theme._818285}>
+                  {STRING.upload_from_device}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
         <Text
-          style={{marginTop: getScaleSize(20)}}
+          style={{ marginTop: getScaleSize(20) }}
           size={getScaleSize(17)}
           font={FONTS.Lato.Medium}
           color={theme._424242}>
@@ -288,40 +549,47 @@ export default function AddQuote(props: any) {
         <TouchableOpacity
           style={[
             styles(theme).uploadButton,
-            {marginRight: getScaleSize(0), marginTop: getScaleSize(12)},
+            { marginRight: getScaleSize(0), marginTop: getScaleSize(12) },
           ]}
           activeOpacity={1}
-          onPress={() => {}}>
-          <Image
-            style={styles(theme).attachmentIcon}
-            source={IMAGES.upload_attachment}
-          />
-          <Text
-            style={{marginTop: getScaleSize(8)}}
-            size={getScaleSize(15)}
-            font={FONTS.Lato.Regular}
-            color={theme._818285}>
-            {STRING.upload_from_device}
-          </Text>
+          onPress={pickVideo}>
+          {videoThumbnail ? (
+            <Image
+              source={{ uri: videoThumbnail }}
+              style={styles(theme).photosView}
+            />
+          ) :
+            <>
+              <Image source={IMAGES.upload_attachment} style={styles(theme).attachmentIcon} />
+              <Text
+                style={{ marginTop: getScaleSize(8) }}
+                size={getScaleSize(15)}
+                font={FONTS.Lato.Regular}
+                color={theme._818285}>
+                {STRING.upload_from_device}
+              </Text>
+            </>
+          }
         </TouchableOpacity>
       </ScrollView>
       <Button
         title={STRING.SubmitQuote}
+        disabled={isLoading}
         style={{
           marginVertical: getScaleSize(24),
           marginHorizontal: getScaleSize(24),
+          opacity: isLoading ? 0.6 : 1,
         }}
-        onPress={() => {
-          props.navigation.navigate(SCREENS.Success.identifier)
-        }}
+        onPress={sendQuote}
       />
+      {isLoading && <ProgressView />}
     </View>
   );
 }
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     scrolledContainer: {
       marginTop: getScaleSize(19),
       marginHorizontal: getScaleSize(24),
@@ -418,6 +686,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       justifyContent: 'center',
       alignItems: 'center',
       height: getScaleSize(160),
+      overflow: 'hidden'
     },
     attachmentIcon: {
       height: getScaleSize(40),
@@ -429,7 +698,6 @@ const styles = (theme: ThemeContextType['theme']) =>
       width: getScaleSize(180),
       borderRadius: 8,
       resizeMode: 'cover',
-      marginTop: getScaleSize(18),
     },
     buttonContainer: {
       flexDirection: 'row',

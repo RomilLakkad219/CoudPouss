@@ -1,13 +1,33 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useContext} from 'react';
-import {ThemeContext, ThemeContextType} from '../context/ThemeProvider';
-import {getScaleSize, useString} from '../constant';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useContext } from 'react';
+
+//ASSET
+import { FONTS, IMAGES, LIGHT_THEME_COLOR } from '../assets';
+
+//CONTEXT
+import { ThemeContext, ThemeContextType } from '../context/ThemeProvider';
+
+//CONSTANT
+import { getScaleSize, useString } from '../constant';
+
+//COMPONENT
 import Text from './Text';
-import {FONTS, IMAGES} from '../assets';
+
+//CONTEXT
+import { AuthContext } from '../context';
+
+//PACKAGES
+import moment from 'moment';
 
 export default function ServiceRequest(props: any) {
-  const {theme} = useContext<any>(ThemeContext);
+
+  const { theme } = useContext<any>(ThemeContext);
+
+  const { profile } = useContext(AuthContext)
+
   const STRING = useString();
+
+  const data = props.data
 
   return (
     <TouchableOpacity
@@ -16,24 +36,32 @@ export default function ServiceRequest(props: any) {
       onPress={() => {
         props?.onPress()
       }}>
-      <Image
-        style={styles(theme).imageContainer}
-        source={{uri: 'https://picsum.photos/id/2/200/300'}}
-      />
+      {data?.subcategory_info?.sub_category_name?.service_photo === null ?
+        <View style={[styles(theme).imageContainer, {
+          backgroundColor: 'gray'
+        }]}>
+        </View>
+        :
+        <Image
+          style={styles(theme).imageContainer}
+          resizeMode='contain'
+          source={{ uri: data?.subcategory_info?.sub_category_name?.service_photo }}
+        />
+      }
       <View style={styles(theme).horizontalView}>
         <Text
-          style={{flex: 1.0}}
+          style={{ flex: 1.0 }}
           size={getScaleSize(24)}
           font={FONTS.Lato.Bold}
           color={theme._2C6587}>
-          {'Furniture Assembly'}
+          {data?.subcategory_info?.sub_category_name?.name}
         </Text>
         <Text
-          style={{alignSelf: 'center'}}
+          style={{ alignSelf: 'center' }}
           size={getScaleSize(14)}
           font={FONTS.Lato.Medium}
           color={theme._737373}>
-          {'2 hours ago'}
+          {data.createdTimeText}
         </Text>
       </View>
       <View style={styles(theme).verticalView}>
@@ -51,7 +79,7 @@ export default function ServiceRequest(props: any) {
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
               color={theme._424242}>
-              {'16 Aug, 2025'}
+              {moment(data?.date).format('DD MMM, YYYY')}
             </Text>
           </View>
           <View style={styles(theme).itemView}>
@@ -67,12 +95,12 @@ export default function ServiceRequest(props: any) {
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
               color={theme._424242}>
-              {'10:00 am'}
+              {moment(data?.time, "HH:mm").format("hh:mm A")}
             </Text>
           </View>
         </View>
         <View
-          style={[styles(theme).horizontalView, {marginTop: getScaleSize(12)}]}>
+          style={[styles(theme).horizontalView, { marginTop: getScaleSize(12) }]}>
           <View style={styles(theme).itemView}>
             <Image
               style={styles(theme).informationIcon}
@@ -86,7 +114,7 @@ export default function ServiceRequest(props: any) {
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
               color={theme._424242}>
-              {'DIY Services'}
+              {`${data?.category_info?.category_name?.name} Services`}
             </Text>
           </View>
           <View style={styles(theme).itemView}>
@@ -98,41 +126,64 @@ export default function ServiceRequest(props: any) {
               }}
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
+              numberOfLines={2}
               color={theme._424242}>
-              {'Paris, 75001'}
+              {data?.location}
             </Text>
           </View>
         </View>
       </View>
-      <View
-        style={[styles(theme).horizontalView, {marginTop: getScaleSize(24)}]}>
-        <View style={{flex: 1.0}}>
-          <Text
-            size={getScaleSize(14)}
-            font={FONTS.Lato.Medium}
-            color={'#424242'}>
-            {STRING.EstimatedCost}
-          </Text>
-          <Text
-            style={{marginTop: getScaleSize(2)}}
-            size={getScaleSize(27)}
-            font={FONTS.Lato.ExtraBold}
-            color={theme._2C6587}>
-            {'€499'}
-          </Text>
+      {profile?.service_provider_type === 'professional' ?
+        <View
+          style={[styles(theme).horizontalView, { marginTop: getScaleSize(24) }]}>
+          <View style={{ flex: 1.0 }}>
+            <Text
+              size={getScaleSize(14)}
+              font={FONTS.Lato.Medium}
+              color={'#424242'}>
+              {STRING.EstimatedCost}
+            </Text>
+            <Text
+              style={{ marginTop: getScaleSize(2) }}
+              size={getScaleSize(27)}
+              font={FONTS.Lato.ExtraBold}
+              color={theme._2C6587}>
+              {`€${data?.estimated_cost === null ? "" : data?.estimated_cost}`}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles(theme).quateContainer}
+            activeOpacity={1}
+            onPress={props?.onPressAccept}>
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.SemiBold}
+              color={theme.white}>
+              {STRING.Quote}
+            </Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles(theme).quateContainer}
-          activeOpacity={1}
-          onPress={() => {}}>
-          <Text
-            size={getScaleSize(16)}
-            font={FONTS.Lato.SemiBold}
-            color={theme.white}>
-            {STRING.Quote}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        :
+        <View style={styles(theme).buttonView}>
+          <TouchableOpacity style={styles(theme).viewButton}
+            onPress={() => {props.onPressView() }}>
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.SemiBold}
+              color={theme._214C65}>
+              {STRING.view}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles(theme).acceptButton}
+            onPress={() => {props.onPressAccept() }}>
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.SemiBold}
+              color={theme.white}>
+              {STRING.accept}
+            </Text>
+          </TouchableOpacity>
+        </View>}
     </TouchableOpacity>
   );
 }
@@ -173,4 +224,27 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(12),
       backgroundColor: theme._214C65,
     },
+    buttonView: {
+      flexDirection: 'row',
+      marginTop: getScaleSize(24),
+      alignItems: 'center',
+    },
+    viewButton: {
+      paddingVertical: getScaleSize(10),
+      paddingHorizontal: getScaleSize(66),
+      justifyContent: 'center',
+      alignItems: "center",
+      borderRadius: getScaleSize(12),
+      borderColor: LIGHT_THEME_COLOR._214C65,
+      borderWidth: 1,
+      marginRight: getScaleSize(12)
+    },
+    acceptButton: {
+      paddingVertical: getScaleSize(10),
+      paddingHorizontal: getScaleSize(66),
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: getScaleSize(12),
+      backgroundColor: LIGHT_THEME_COLOR._214C65,
+    }
   });
