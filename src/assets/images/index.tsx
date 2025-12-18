@@ -103,4 +103,6 @@ export const IMAGES = {
   quantity_remove: require('./quantity_remove.png'),
   quantity_add: require('./quantity_add.png'),
   serviceCancelledIcon: require('./serviceCancelledIcon.png'),
+  search_icon:require('./search_icon.png'),
+  arrow_left:require('./arrow_left.png')
 };

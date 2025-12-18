@@ -33,6 +33,10 @@ const API_ROUTES = {
     getFavoriteProfessionals: "service_confirmation/favorite-provider/fetch",
     onSendCategoryIds: "userService/auth/select-provider-services",
     fetchTransactions: "profile_module/user_profile",
+    getProfessionalAllServices: "quote_request/open-services",
+    getProfessionalServiceDetails: "quote_request/service-info",
+    sendQuoteRequest: "quote_request/quoterequest",
+    fileUploadProfessionalServices:"service_request/upload"
 }
 
 export { API_ROUTES, API_BASE_URL, DISABLE_API_LOGS }

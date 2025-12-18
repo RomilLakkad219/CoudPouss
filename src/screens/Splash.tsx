@@ -27,15 +27,13 @@ export default function Splash(props: any) {
     async function checkUserDetails() {
         const userDetails = await Storage.get(Storage.USER_DETAILS);
         const userData = JSON.parse(userDetails ?? '{}');
-        console.log('userData', userData)
+
         if (userData && userData?.user_data?.role) {
             setUser(userData);
             setUserType(userData?.user_data?.role);
-            const profileData = await getProfileData();
 
-            if (profileData) {
-                console.log("Profile data", profileData);
-            }
+            getProfileData();
+
             setTimeout(() => {
                 props?.navigation?.dispatch(
                     CommonActions.reset({
@@ -59,17 +57,39 @@ export default function Splash(props: any) {
     async function getProfileData() {
         try {
             const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
-            const userDetail = result?.data?.data?.user;
 
-            if (userDetail) {
-                setProfile(userDetail);
-                return userDetail;
+            if (result.status) {
+                setProfile(result?.data?.data?.user)
+                props.navigation.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{
+                            name: SCREENS.BottomBar.identifier, params: {
+                                isEmail: ""
+                            }
+                        }],
+                    }),
+                )
+            } else {
+                props.navigation.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{
+                            name: SCREENS.Login.identifier
+                        }],
+                    }),
+                )
             }
 
-            return null;
         } catch (error: any) {
-            SHOW_TOAST(error?.message ?? '', 'error');
-            return null;
+            props.navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{
+                        name: SCREENS.Login.identifier
+                    }],
+                }),
+            )
         }
     }
 

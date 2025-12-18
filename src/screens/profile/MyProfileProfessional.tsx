@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -15,13 +15,13 @@ import {
 } from 'react-native';
 
 //ASSETS
-import {FONTS, IMAGES} from '../../assets';
+import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import { getScaleSize, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -34,12 +34,15 @@ import {
 } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS} from '..';
+import { useFocusEffect } from '@react-navigation/native';
+import { SCREENS } from '..';
 
 export default function MyProfileProfessional(props: any) {
+
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+
+  const { theme } = useContext<any>(ThemeContext);
+  const { profile } = useContext(AuthContext)
 
   const [showMore, setShowMore] = useState(false);
   const [showMoreExperience, setShowMoreExperience] = useState(false);
@@ -68,8 +71,8 @@ export default function MyProfileProfessional(props: any) {
             size={getScaleSize(22)}
             font={FONTS.Lato.SemiBold}
             color={theme._2B2B2B}
-            style={{alignSelf: 'center'}}>
-            {'Bessie Cooper'}
+            style={{ alignSelf: 'center' }}>
+            {`${profile?.first_name + " " + profile?.last_name}`}
           </Text>
           <View style={styles(theme).horizontalContainer}>
             <View style={styles(theme).itemContainer}>
@@ -78,14 +81,14 @@ export default function MyProfileProfessional(props: any) {
                   size={getScaleSize(16)}
                   font={FONTS.Lato.Bold}
                   color={'#1D7885'}
-                  style={{alignSelf: 'center'}}>
+                  style={{ alignSelf: 'center' }}>
                   {'4.6'}
                 </Text>
                 <Text
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={'#214C65'}
-                  style={{alignSelf: 'center', marginTop: getScaleSize(4)}}>
+                  style={{ alignSelf: 'center', marginTop: getScaleSize(4) }}>
                   {STRING.Overallrating}
                 </Text>
               </View>
@@ -93,7 +96,7 @@ export default function MyProfileProfessional(props: any) {
             <View
               style={[
                 styles(theme).itemContainer,
-                {marginHorizontal: getScaleSize(16)},
+                { marginHorizontal: getScaleSize(16) },
               ]}>
               <View>
                 {/* <Text
@@ -115,7 +118,7 @@ export default function MyProfileProfessional(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={'#214C65'}
-                  style={{alignSelf: 'center', marginTop: getScaleSize(4)}}>
+                  style={{ alignSelf: 'center', marginTop: getScaleSize(4) }}>
                   {STRING.Certified}
                 </Text>
               </View>
@@ -126,14 +129,14 @@ export default function MyProfileProfessional(props: any) {
                   size={getScaleSize(16)}
                   font={FONTS.Lato.Bold}
                   color={'#1D7885'}
-                  style={{alignSelf: 'center'}}>
+                  style={{ alignSelf: 'center' }}>
                   {'4.6'}
                 </Text>
                 <Text
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={'#214C65'}
-                  style={{alignSelf: 'center', marginTop: getScaleSize(4)}}>
+                  style={{ alignSelf: 'center', marginTop: getScaleSize(4) }}>
                   {STRING.Clients}
                 </Text>
               </View>
@@ -150,7 +153,7 @@ export default function MyProfileProfessional(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
-            style={{marginTop: getScaleSize(8)}}
+            style={{ marginTop: getScaleSize(8) }}
             color={theme._323232}>
             {
               'With a passion for home improvement, I have dedicated over 8 years to perfecting my craft. My expertise spans from intricate plumbing tasks to seamless TV installations. I pride myself on delivering quality service with a personal touch, ensuring every client feels valued and satisfied.'
@@ -168,14 +171,14 @@ export default function MyProfileProfessional(props: any) {
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
             numberOfLines={showMoreExperience ? undefined : 3}
-            style={{marginTop: getScaleSize(8)}}
+            style={{ marginTop: getScaleSize(8) }}
             color={theme._323232}>
             {
               'Hi, I’m Bessie — with over 6 years of experience in expert TV mounting and reliable plumbing solutions. I specialize in mounting TVs, shelves, mirrors with precision and care Mounting Expert You Can Trust Over 6 of experience in securely mounting TVs, shelves, mirrors, artwork, and more Reliable & On-Time I value your time and ready to get the job done right the first time Clean Work, Solid Results Every project is done with attention to detail, safety, and durability Respect for Your Space I treat your home like it’s my own. Friendly, professional, and focused on delivering quality you’ll love. Client Satisfaction First I’m proud of my 5-star service and happy clients '
             }
           </Text>
-          <TouchableOpacity style={{marginTop: getScaleSize(8)}}
-           onPress={() => setShowMoreExperience(!showMoreExperience)}>
+          <TouchableOpacity style={{ marginTop: getScaleSize(8) }}
+            onPress={() => setShowMoreExperience(!showMoreExperience)}>
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.Medium}
@@ -194,7 +197,7 @@ export default function MyProfileProfessional(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
-            style={{marginTop: getScaleSize(8)}}
+            style={{ marginTop: getScaleSize(8) }}
             color={theme._323232}>
             {
               'Bessie Cooper has successfully completed over 150 projects, showcasing her expertise in TV mounting and plumbing. Her dedication to quality and customer satisfaction has earned her numerous accolades, including the "Best Service Provider" award in 2022. Clients consistently praise her attention to detail and professionalism, making her a top choice for home improvement services.'
@@ -213,11 +216,11 @@ export default function MyProfileProfessional(props: any) {
             horizontal
             keyExtractor={(item: any, index: number) => index.toString()}
             showsHorizontalScrollIndicator={false}
-            renderItem={({item, index}) => {
+            renderItem={({ item, index }) => {
               return (
                 <Image
                   style={[styles(theme).photosView]}
-                  source={{uri: 'https://picsum.photos/id/1/200/300'}}
+                  source={{ uri: 'https://picsum.photos/id/1/200/300' }}
                 />
               );
             }}
@@ -233,7 +236,7 @@ export default function MyProfileProfessional(props: any) {
           <View
             style={[
               styles(theme).horizontalContainer,
-              {marginTop: getScaleSize(20)},
+              { marginTop: getScaleSize(20) },
             ]}>
             <Text
               size={getScaleSize(24)}
@@ -257,14 +260,14 @@ export default function MyProfileProfessional(props: any) {
               </View>
               <Text
                 size={getScaleSize(12)}
-                style={{marginTop: getScaleSize(3)}}
+                style={{ marginTop: getScaleSize(3) }}
                 font={FONTS.Lato.Medium}
                 color={theme._323232}>
                 {'Based on 471 ratings'}
               </Text>
             </View>
           </View>
-          <View style={{marginTop: getScaleSize(15)}}>
+          <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Work quality'}
               value={'4.6'}
@@ -272,7 +275,7 @@ export default function MyProfileProfessional(props: any) {
               totalCount={5}
             />
           </View>
-          <View style={{marginTop: getScaleSize(15)}}>
+          <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Reliability'}
               value={'4.6'}
@@ -280,7 +283,7 @@ export default function MyProfileProfessional(props: any) {
               totalCount={5}
             />
           </View>
-          <View style={{marginTop: getScaleSize(15)}}>
+          <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Punctunality'}
               value={'4.6'}
@@ -288,7 +291,7 @@ export default function MyProfileProfessional(props: any) {
               totalCount={5}
             />
           </View>
-          <View style={{marginTop: getScaleSize(15)}}>
+          <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Soluction'}
               value={'4.6'}
@@ -296,7 +299,7 @@ export default function MyProfileProfessional(props: any) {
               totalCount={5}
             />
           </View>
-          <View style={{marginTop: getScaleSize(15)}}>
+          <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Payout'}
               value={'4.6'}
@@ -314,26 +317,26 @@ export default function MyProfileProfessional(props: any) {
           </Text>
           {['', ''].map((item: any, index: number) => {
             return (
-                <RatingsReviewsItem
+              <RatingsReviewsItem
                 key={index}
                 itemContainer={{ marginTop: index === 0 ? getScaleSize(20) : getScaleSize(16) }}
                 onPressShowMore={() => {
-                    setShowMore(!showMore);
+                  setShowMore(!showMore);
                 }}
                 showMore={showMore}
-                />
+              />
             );
           })}
         </View>
-        <View style={{height:getScaleSize(32)}}/>
-      </ScrollView>      
+        <View style={{ height: getScaleSize(32) }} />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     scrolledContainer: {
       marginHorizontal: getScaleSize(24),
     },

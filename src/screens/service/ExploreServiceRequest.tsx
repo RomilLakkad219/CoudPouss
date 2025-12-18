@@ -3,22 +3,19 @@ import {
   View,
   StatusBar,
   StyleSheet,
-  Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Alert,
   ScrollView,
-  FlatList,
-  TouchableOpacity,
   Image,
-  SafeAreaView,
+  TextInput,
+  FlexAlignType,
+  TouchableOpacity,
+  Modal,
 } from 'react-native';
-
-//ASSETS
-import { FONTS, IMAGES } from '../../assets';
 
 //API
 import { API } from '../../api';
+
+//ASSETS
+import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
 import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
@@ -30,20 +27,15 @@ import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 import {
   Header,
   ProgressView,
-  RequestItem,
-  SearchComponent,
   ServiceRequest,
   TaskItem,
   Text,
 } from '../../components';
 
-//PACKAGES
-import { useFocusEffect } from '@react-navigation/native';
-
 //SCREENS
 import { SCREENS } from '..';
 
-export default function ProfessionalHome(props: any) {
+export default function ExploreServiceRequest(props: any) {
 
   const STRING = useString();
 
@@ -52,14 +44,10 @@ export default function ProfessionalHome(props: any) {
   const { profile } = useContext(AuthContext)
 
   const [isLoading, setLoading] = useState(false);
-  const [serviceList, setServiceList] = useState([])
-
-  useFocusEffect(
-    React.useCallback(() => {
-      StatusBar.setBackgroundColor(theme.white);
-      StatusBar.setBarStyle('dark-content');
-    }, []),
-  );
+  const [serviceList, setServiceList] = useState([]);
+  const [filterModal, setFilterModal] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<string>('Filters');
+  const [filterPosition, setFilterPosition] = useState({ top: 0, right: 0 });
 
   useEffect(() => {
     getAllServices()
@@ -84,12 +72,9 @@ export default function ProfessionalHome(props: any) {
 
   async function getAllServices() {
     try {
-      const page = 2;
-      const limit = 2;
 
-      const result: any = await API.Instance.get(
-        `${API.API_ROUTES.getProfessionalAllServices}?page=${page}&limit=${limit}`
-      );
+      setLoading(true)
+      const result: any = await API.Instance.get(API.API_ROUTES.getProfessionalAllServices)
       setLoading(false)
 
       console.log('GET PROFESSIONAL SERVICES', JSON.stringify(result))
@@ -119,51 +104,87 @@ export default function ProfessionalHome(props: any) {
         backgroundColor={theme.white}
         translucent={false}
       />
-      <View style={styles(theme).headerContainer}>
-        <View style={styles(theme).verticalView}>
-          <Text
-            size={getScaleSize(16)}
-            font={FONTS.Lato.Medium}
-            color={theme._6D6D6D}
-            style={{}}>
-            {`Hello! ${profile?.first_name + " " + profile?.last_name}`}
-          </Text>
-          <Text
-            size={getScaleSize(24)}
-            font={FONTS.Lato.Bold}
-            color={theme._2C6587}
-            style={{}}>
-            {'Welcome to CoudPouss'}
-          </Text>
+      <Header
+        onBack={() => {
+          props.navigation.goBack();
+        }}
+        screenName={STRING.explore_all_service}
+      />
+      <View style={styles(theme).searchView}>
+        <View style={styles(theme).searchBox}>
+          <TextInput
+            style={styles(theme).searchInput}
+            placeholderTextColor={theme._555555}
+            placeholder={STRING.what_are_you_looking_for}
+            value={props.value}
+            onChangeText={(text) => props.onChangeText(text)}
+          />
+          <Image
+            style={styles(theme).searchImage}
+            source={IMAGES.search_icon}
+          />
         </View>
         <TouchableOpacity
-          style={[
-            styles(theme).notifiationIcon,
-            { marginRight: getScaleSize(8) },
-          ]}
-          activeOpacity={1}
-          onPress={() => {
-            props.navigation.navigate(SCREENS.Notification.identifier);
-          }}>
+          style={styles(theme).filterContainer}
+          onLayout={(event) => {
+            const { y, height } = event.nativeEvent.layout;
+            setFilterPosition({
+              top: y + height + getScaleSize(80),
+              right: getScaleSize(22),
+            });
+          }}
+          onPress={() => setFilterModal(true)}>
+          <Text
+            size={getScaleSize(14)}
+            font={FONTS.Lato.Medium}
+            color={theme._555555}>
+            {selectedFilter}
+          </Text>
           <Image
-            style={styles(theme).notifiationIcon}
-            source={IMAGES.notification_professional}
+            style={styles(theme).arrowImage}
+            source={IMAGES.arrow_left}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles(theme).profilePic}
-          activeOpacity={1}
-          onPress={() => {
-            props.navigation.navigate(SCREENS.MyProfileProfessional.identifier)
-          }}>
-          <Image
-            style={styles(theme).profilePic}
-            source={IMAGES.user_placeholder}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={styles(theme).searchView}>
-        <SearchComponent />
+        <Modal visible={filterModal} transparent animationType="fade">
+          <TouchableOpacity
+            style={styles(theme).modalOverlay}
+            activeOpacity={1}
+            onPress={() => setFilterModal(false)}
+          >
+            <View
+              style={[
+                styles(theme).dropdownModalBox,
+                {
+                  position: 'absolute',
+                  top: filterPosition.top,
+                  right: filterPosition.right,
+                },
+              ]}
+            >
+              {["Category", "Location"].map((type, index,arr) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles(theme).dropdownItem,
+                    index === arr.length - 1 && { borderBottomWidth: 0 }
+                  ]}
+                  onPress={() => {
+                    setSelectedFilter(type);
+                    setFilterModal(false);
+                  }}
+                >
+                  <Text
+                    size={getScaleSize(13)}
+                    font={FONTS.Lato.Medium}
+                    color={theme._555555}>
+                    {type}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
       </View>
       <ScrollView
         style={styles(theme).scrolledContainer}
@@ -172,32 +193,6 @@ export default function ProfessionalHome(props: any) {
           style={styles(theme).bannerView}
           source={{ uri: 'https://picsum.photos/id/1/200/300' }}
         />
-        <View style={styles(theme).directionView}>
-          <Text
-            size={getScaleSize(20)}
-            font={FONTS.Lato.SemiBold}
-            color={theme._323232}
-            style={{
-              marginTop: getScaleSize(28),
-            }}>
-            {STRING.ExploreServiceRequests}
-          </Text>
-          <View style={{ flex: 1 }}></View>
-          <TouchableOpacity onPress={() => {
-            props.navigation.navigate(SCREENS.ExploreServiceRequest.identifier)
-          }}>
-            <Text
-              size={getScaleSize(14)}
-              font={FONTS.Lato.Medium}
-              align='center'
-              color={theme._2C6587}
-              style={{
-                marginTop: getScaleSize(28),
-              }}>
-              {STRING.ViewAll}
-            </Text>
-          </TouchableOpacity>
-        </View>
         {serviceList?.map((item, index) => (
           <ServiceRequest
             key={index}
@@ -279,10 +274,6 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(17),
       alignSelf: 'center',
     },
-    searchView: {
-      marginTop: getScaleSize(23),
-      marginHorizontal: getScaleSize(22),
-    },
     scrolledContainer: {
       marginTop: getScaleSize(28),
       marginHorizontal: getScaleSize(22),
@@ -300,5 +291,77 @@ const styles = (theme: ThemeContextType['theme']) =>
     directionView: {
       flexDirection: 'row',
       alignItems: 'center'
-    }
+    },
+    searchView: {
+      flexDirection: 'row',
+      marginHorizontal: getScaleSize(22),
+      marginTop: getScaleSize(16)
+    },
+    searchBox: {
+      flexDirection: 'row',
+      flex: 1.0,
+      alignItems: 'center' as FlexAlignType,
+      backgroundColor: theme.white,
+      borderWidth: 1,
+      borderColor: '#BECFDA',
+      borderRadius: getScaleSize(12),
+      paddingHorizontal: getScaleSize(16),
+      // paddingVertical: getScaleSize(4),
+      height: getScaleSize(53),
+    },
+    searchImage: {
+      height: getScaleSize(32),
+      width: getScaleSize(32),
+      alignSelf: 'center' as FlexAlignType,
+    },
+    imgMicroPhone: {
+      height: getScaleSize(56),
+      width: getScaleSize(56),
+      alignSelf: 'center' as FlexAlignType,
+      marginLeft: getScaleSize(16),
+    },
+    searchInput: {
+      fontFamily: FONTS.Lato.Regular,
+      fontSize: getScaleSize(18),
+      color: theme.black,
+      marginLeft: getScaleSize(12),
+      flex: 1
+    },
+    filterContainer: {
+      backgroundColor: theme.white,
+      borderRadius: getScaleSize(12),
+      paddingHorizontal: getScaleSize(16),
+      marginLeft: getScaleSize(16),
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: '#BECFDA',
+      height: getScaleSize(53),
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    arrowImage: {
+      height: getScaleSize(24),
+      width: getScaleSize(24),
+      alignSelf: 'center',
+      marginLeft: getScaleSize(4)
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "transparent",
+    },
+    dropdownModalBox: {
+      width: getScaleSize(160),
+      backgroundColor: "#fff",
+      borderRadius: getScaleSize(12),
+      paddingVertical: getScaleSize(6),
+      elevation: 8,
+    },
+    dropdownItem: {
+      paddingVertical: getScaleSize(14),
+      paddingHorizontal: getScaleSize(16),
+      borderBottomWidth: 1,
+      borderBottomColor: "#E5E5E5",
+      backgroundColor: theme.white
+    },
   });
+
