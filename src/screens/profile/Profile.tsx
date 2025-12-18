@@ -24,7 +24,9 @@ export default function Profile(props: any) {
 
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
-  const { userType, setUser, setUserType, user } = useContext<any>(AuthContext);
+  const { userType, setUser, setUserType, user, profile } = useContext<any>(AuthContext);
+
+  console.log('user', profile)
 
   const profileItemsElder = [
     { id: 1, title: STRING.my_profile, icon: IMAGES.ic_my_profile, onPress: SCREENS.MyProfile.identifier },
@@ -76,8 +78,8 @@ export default function Profile(props: any) {
       />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles(theme).mainContainer}>
-          {user?.user_data?.profile_image ? (
-            <Image source={{ uri: user?.user_data?.profile_image }} style={styles(theme).profileContainer} />
+          {profile?.profile_photo_url ? (
+            <Image source={{ uri: profile?.profile_photo_url }} resizeMode='cover' style={styles(theme).profileContainer} />
           ) : (
             <View style={styles(theme).profileContainer} />
           )}

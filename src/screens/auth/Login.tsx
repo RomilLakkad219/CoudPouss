@@ -102,9 +102,7 @@ export default function Login(props: any) {
           CommonActions.reset({
             index: 0,
             routes: [{
-              name: SCREENS.BottomBar.identifier, params: {
-                isEmail: email
-              }
+              name: SCREENS.BottomBar.identifier, 
             }],
           }),
         )

@@ -356,7 +356,9 @@ export const useString = () => {
     accept: "Accept",
     exchange_product: "Exchange Product",
     what_are_you_looking_for: "What are you looking for?",
-    filters: 'Filters'
+    filters: 'Filters',
+    Choose_Date_Time: "Choose Date & Time",
+    product: "Product"
   };
 };
 

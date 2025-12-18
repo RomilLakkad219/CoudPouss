@@ -128,7 +128,6 @@ export default function CreateRequest(props: any) {
     }
   }
 
-
   const pickImage = async (type: string) => {
     launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (!response.didCancel && !response.errorCode && response.assets) {
@@ -241,6 +240,7 @@ export default function CreateRequest(props: any) {
       onCreateRequest();
     }
   }
+
   function onNextNonProfessional() {
     if (selectedProgress === 1) {
       setSelectedProgress(2);
@@ -269,10 +269,7 @@ export default function CreateRequest(props: any) {
         setSelectedProgress(5);
       }
     } else if (selectedProgress == 5) {
-      if (!valuation) {
-        SHOW_TOAST('Please enter a valuation', 'error');
-        return;
-      } else if (!selectedDate) {
+      if (!selectedDate) {
         SHOW_TOAST('Please select a date', 'error');
         return;
       } else if (!selectedTime) {
@@ -298,6 +295,7 @@ export default function CreateRequest(props: any) {
       onCreateRequest();
     }
   }
+
   function onBackProfessional() {
     if (selectedProgress === 1) {
       props.navigation.goBack();
@@ -310,11 +308,10 @@ export default function CreateRequest(props: any) {
     } else if (selectedProgress == 5) {
       setSelectedProgress(4);
     } else if (selectedProgress === 6) {
-      setSelectedProgress(5);
-    } else if (selectedProgress === 7) {
-      setSelectedProgress(6);
+      setSelectedProgress(4);
     }
   }
+
   function onBackNonProfessional() {
     if (selectedProgress === 1) {
       props.navigation.goBack();
@@ -329,10 +326,8 @@ export default function CreateRequest(props: any) {
     } else if (selectedProgress === 6) {
       setSelectedProgress(5);
     } else if (selectedProgress === 7) {
-      setSelectedProgress(6);
-    } else if (selectedProgress === 8) {
-      setSelectedProgress(7);
-    }
+      setSelectedProgress(4);
+    } 
   }
 
   async function onCreateRequest() {
@@ -386,8 +381,7 @@ export default function CreateRequest(props: any) {
         }
       }
       setLoading(true);
-      const result = await API.Instance.post(API.API_ROUTES.allRequests, params);
-      setLoading(false);
+      const result = await API.Instance.post(API.API_ROUTES.onServiceRequest, params);
       console.log('result', result.status, result)
       if (result.status) {
         SHOW_TOAST(result?.data?.message ?? '', 'success')
@@ -466,7 +460,7 @@ export default function CreateRequest(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {selectedCategoryItem?.name ?? 'No Category Selected'}
+            {selectedCategoryItem?.category_name ?? 'No Category Selected'}
           </Text>
           <View style={styles(theme).categoryView}>
             <Image
@@ -481,7 +475,7 @@ export default function CreateRequest(props: any) {
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={theme.primary}>
-              {selectSubCategoryItem?.title ?? 'No Service Selected'}
+              {selectSubCategoryItem?.subcategory_name ?? 'No Service Selected'}
             </Text>
           </View>
           <Text
@@ -497,17 +491,17 @@ export default function CreateRequest(props: any) {
                 size={getScaleSize(18)}
                 font={FONTS.Lato.SemiBold}
                 color={theme._989898}>
-                {STRING.Valuation}
+                {selectedCategory === 'professional' ? STRING.Valuation : STRING.product}
               </Text>
               <Text
                 style={{ marginTop: getScaleSize(6) }}
                 size={getScaleSize(20)}
                 font={FONTS.Lato.SemiBold}
                 color={theme.primary}>
-                {`€${valuation}`}
+                {selectedCategory === 'professional' ? `€${valuation}` : productName}
               </Text>
             </View>
-            <View style={styles(theme).deviderView} />
+            <View style={styles(theme).deviderVerticalView} />
             <View style={styles(theme).itemView}>
               <Text
                 size={getScaleSize(18)}
@@ -523,7 +517,7 @@ export default function CreateRequest(props: any) {
                 {moment(selectedDate).format('DD MMM')}
               </Text>
             </View>
-            <View style={styles(theme).deviderView} />
+            <View style={styles(theme).deviderVerticalView} />
             <View style={styles(theme).itemView}>
               <Text
                 size={getScaleSize(18)}
@@ -625,7 +619,7 @@ export default function CreateRequest(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {STRING.ValuationofJob}
+            {selectedCategory === 'professional' ? STRING.ValuationofJob : STRING.Choose_Date_Time}
           </Text>
           <Text
             style={{ marginTop: getScaleSize(12) }}
@@ -634,22 +628,24 @@ export default function CreateRequest(props: any) {
             color={theme._939393}>
             {STRING.valuation_message}
           </Text>
-          <View style={styles(theme).textInputContainer}>
-            <Input
-              placeholder={STRING.EnterValuation}
-              placeholderTextColor={theme._939393}
-              inputTitle={STRING.EnterValuation}
-              inputColor={theme._555555}
-              value={`${'€'}${valuation}`}
-              keyboardType="numeric"
-              autoCapitalize="none"
-              onChangeText={text => {
-                const cleaned = text.replace(/[^0-9.]/g, '');
-                const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
-                setValuation(formatted);
-              }}
-            />
-          </View>
+          {selectedCategory === 'professional' && (
+            <View style={styles(theme).textInputContainer}>
+              <Input
+                placeholder={STRING.EnterValuation}
+                placeholderTextColor={theme._939393}
+                inputTitle={STRING.EnterValuation}
+                inputColor={theme._555555}
+                value={`${'€'}${valuation}`}
+                keyboardType="numeric"
+                autoCapitalize="none"
+                onChangeText={text => {
+                  const cleaned = text.replace(/[^0-9.]/g, '');
+                  const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
+                  setValuation(formatted);
+                }}
+              />
+            </View>
+          )}
           <Text
             style={{ marginTop: getScaleSize(12) }}
             size={getScaleSize(16)}
@@ -663,8 +659,9 @@ export default function CreateRequest(props: any) {
               setSelectedDate(date);
             }}
           />
+          <View style={styles(theme).deviderView} />
           <Text
-            style={{ marginTop: getScaleSize(12) }}
+            style={{ marginTop: getScaleSize(4) }}
             size={getScaleSize(16)}
             font={FONTS.Lato.SemiBold}
             color={theme._555555}>
@@ -980,12 +977,14 @@ export default function CreateRequest(props: any) {
                       marginTop: type === 'large' && index % 2 == 0 ? getScaleSize(-25) : getScaleSize(20),
                     }
                   ]}>
-                  <Image
-                    style={styles(theme).imageViewc}
-                    // resizeMode='cover'
-                    source={{ uri: 'https://picsum.photos/id/1/200/300' }}
-                  />
-
+                  {item?.image ?
+                    <Image
+                      style={styles(theme).imageViewc}
+                      source={{ uri: item?.image }}
+                    />
+                    :
+                    <View style={[styles(theme).imageViewc, { backgroundColor: theme._D5D5D5 }]} />
+                  }
                   <Text
                     style={{
                       marginVertical: getScaleSize(14),
@@ -994,7 +993,7 @@ export default function CreateRequest(props: any) {
                     size={getScaleSize(16)}
                     font={FONTS.Lato.Bold}
                     color={theme.primary}>
-                    {item?.title}
+                    {item?.subcategory_name}
                   </Text>
                 </TouchableOpacity>
               )
@@ -1338,5 +1337,10 @@ const styles = (theme: ThemeContextType['theme']) =>
       alignItems: 'center',
       gap: getScaleSize(26),
       marginTop: getScaleSize(18),
-    }
+    },
+    deviderVerticalView: {
+      height: '100%',
+      backgroundColor: '#D6D6D6',
+      width: getScaleSize(1),
+    },
   });

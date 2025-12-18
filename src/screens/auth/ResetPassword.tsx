@@ -152,7 +152,6 @@ export default function ResetPassword(props: any) {
             />
             <Button
                 title={STRING.continue}
-                disabled={!email}
                 style={{ marginVertical: getScaleSize(24), marginHorizontal: getScaleSize(24) }}
                 onPress={() => {
                     onResetPassword();

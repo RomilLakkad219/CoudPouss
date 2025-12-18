@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -11,6 +11,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 
 //ASSETS
@@ -26,112 +27,146 @@ import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 import { Header, RequestItem, SearchComponent, Text } from '../../components';
 
 //PACKAGES
-import { useFocusEffect } from '@react-navigation/native';
 import { SCREENS } from '..';
 import { API } from '../../api';
+import { debounce } from 'lodash';
 
+const PAGE_SIZE = 10;
 export default function Request(props: any) {
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isLoading, setLoading] = useState(false);
-  const [allRequests, setAllRequests] = useState([]);
+  const [requestData, setRequestData] = useState<any>({
+    selectedFilter: { id: '1', title: 'All', filter: 'all' },
+    allRequests: [],
+    page: 1,
+    hasMore: true,
+    isLoading: true,
+    isMoreLoading: false,
+  });
+  const [searchDebouncedText, setSearchDebouncedText] = useState('');
+  const [searchValue, setSearchValue] = useState('');
 
   const data = [
-    { id: '1', title: 'All' },
-    { id: '2', title: 'Open Proposal' },
-    { id: '3', title: 'Responses' },
-    { id: '4', title: 'Validation' },
+    { id: '1', title: 'All', filter: 'all' },
+    { id: '2', title: 'Open Proposal', filter: 'open' },
+    { id: '3', title: 'Responses', filter: 'accepted' },
+    { id: '4', title: 'Validation', filter: 'completed' },
   ];
+
+  const abortControllerRef = useRef<AbortController | undefined>(undefined);
 
   useEffect(() => {
     getAllRequests();
-  }, []);
+  }, [requestData?.selectedFilter, requestData?.page]);
+
+  useEffect(() => {
+    getAllRequests();
+  }, [searchDebouncedText]);
+
+  const debouncedSearch = useCallback(debounce((text: string) => {
+    setSearchDebouncedText(text);
+  }, 500), []);
 
   async function getAllRequests() {
+    if (!requestData?.hasMore) return;
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const abortController = new AbortController();  
+    abortControllerRef.current = abortController;
+
     try {
-      setLoading(true);
-      const result = await API.Instance.get(API.API_ROUTES.allRequests + `?page=1&limit=5`);
-      setLoading(false);
-      console.log('result', result.status, result)
+      console.log('searchValue', searchValue);
+      const result: any = await API.Instance.get(API.API_ROUTES.getAllRequests + `?page=${requestData?.page}&limit=${PAGE_SIZE}&status=${requestData?.selectedFilter?.filter}&search=${searchValue}`, {
+        signal: abortController.signal
+      });
       if (result.status) {
-        console.log('allRequests==', result?.data?.data)
-        setAllRequests(result?.data?.data?.services ?? []);
+        const newData: any = result?.data?.data?.recent_requests?.items ?? []
+        if (newData.length < PAGE_SIZE) {
+          setRequestData((prev: any) => ({
+            ...prev,
+            hasMore: false,
+            allRequests: [...(prev?.allRequests ?? []), ...newData],
+            isLoading: false,
+          }));
+        }
+        else {
+          setRequestData((prev: any) => ({
+            ...prev,
+            allRequests: [...(prev?.allRequests ?? []), ...newData],
+            isLoading: false,
+          }));
+        }
       } else {
+        if (result?.message === 'Request canceled') return;
         SHOW_TOAST(result?.data?.message ?? '', 'error')
         console.log('error==>', result?.data?.message)
       }
     } catch (error: any) {
-      setLoading(false);
+      console.log('error', error);
+      if (error?.message === 'canceled') return;
       SHOW_TOAST(error?.message ?? '', 'error');
       console.log(error?.message)
     } finally {
-      setLoading(false);
+      setRequestData((prev: any) => ({
+        ...prev,
+        isLoading: false,
+        isMoreLoading: false,
+      }));
     }
   }
 
-  return (
-    <View style={styles(theme).container}>
-      <Header
-        type='profile'
-        screenName={STRING.Request} />
-      <View style={{ marginTop: getScaleSize(16), marginHorizontal: getScaleSize(22) }}>
-        <SearchComponent />
-      </View>
-      <View style={{ marginTop: getScaleSize(18) }}>
+  const loadMore = () => {
+    if (!requestData?.isLoading && requestData?.hasMore) {
+      setRequestData((prev: any) => ({
+        ...prev,
+        page: requestData?.page + 1,
+        hasMore: true,
+        isLoading: false,
+        isMoreLoading: true,
+      }));
+    }
+  };
+
+  function renderFlatList() {
+    console.log('requestData?.isLoading', requestData?.isLoading);
+    if (requestData?.allRequests?.length > 0) {
+      return (
         <FlatList
-          data={data}
-          keyExtractor={item => item.id}
-          ListHeaderComponent={() => {
-            return <View style={{ width: getScaleSize(22) }} />;
-          }}
-          ListFooterComponent={() => {
-            return <View style={{ width: getScaleSize(22) }} />;
-          }}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity
-              style={[
-                styles(theme).unselectedContainer,
-                {
-                  marginLeft: index === 0 ? 0 : getScaleSize(16),
-                  backgroundColor:
-                    selectedIndex === index ? theme.primary : '#F7F7F7',
-                },
-              ]}
-              activeOpacity={1}
-              onPress={() => {
-                setSelectedIndex(index);
-              }}>
-              <Text
-                size={getScaleSize(16)}
-                font={FONTS.Lato.Regular}
-                color={selectedIndex === index ? theme.white : theme._818285}>
-                {item?.title}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
-      {allRequests?.length > 0 ?
-        <ScrollView
-          style={styles(theme).scrolledContainer}
-          showsVerticalScrollIndicator={false}>
-          {allRequests?.length > 0 && allRequests?.map((item: any) => {
-            return (
-              <RequestItem key={item?.id} 
+          data={requestData?.allRequests}
+          contentContainerStyle={{ paddingBottom: getScaleSize(50) }}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item: any, index: number) => index.toString()}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={
+            requestData?.isMoreLoading ? <ActivityIndicator size="large" color={theme.primary} style={{ margin: 20 }} /> : null
+          }
+          renderItem={({ item }) => (
+            <RequestItem
+              selectedFilter={requestData?.selectedFilter}
               onPress={() => {
                 props.navigation.navigate(SCREENS.RequestDetails.identifier, {
                   item: item
                 })
-              }} 
+              }}
               item={item} />
-            )
-          })}
-        </ScrollView>
-        :
+          )}
+        />
+      )
+    }
+    else if (requestData?.isLoading) {
+      return (
+        <View style={styles(theme).emptyView}>
+          <ActivityIndicator size="large" color={theme.primary} style={{ margin: 20 }} />
+        </View>
+      )
+    }
+    else {
+      return (
         <View style={styles(theme).emptyView}>
           <Image style={styles(theme).emptyImage} source={IMAGES.empty} />
           <Text
@@ -160,8 +195,68 @@ export default function Request(props: any) {
             </Text>
           </TouchableOpacity>
         </View>
-      }
+      )
+    }
+  }
 
+  return (
+    <View style={styles(theme).container}>
+      <Header
+        type='profile'
+        screenName={STRING.Request} />
+      <View style={{ marginTop: getScaleSize(16), marginHorizontal: getScaleSize(22) }}>
+        <SearchComponent 
+        value={searchValue}
+        onChangeText={(text: string) => {
+          setSearchValue(text);
+          debouncedSearch(text);
+        }}
+        />
+      </View>
+      <View style={{ marginTop: getScaleSize(18) }}>
+        <FlatList
+          data={data}
+          keyExtractor={item => item.id}
+          ListHeaderComponent={() => {
+            return <View style={{ width: getScaleSize(22) }} />;
+          }}
+          ListFooterComponent={() => {
+            return <View style={{ width: getScaleSize(22) }} />;
+          }}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              style={[
+                styles(theme).unselectedContainer,
+                {
+                  marginLeft: index === 0 ? 0 : getScaleSize(16),
+                  backgroundColor:
+                    requestData?.selectedFilter?.id === item?.id ? theme.primary : '#F7F7F7',
+                },
+              ]}
+              activeOpacity={1}
+              onPress={() => {
+                setRequestData((prev: any) => ({
+                  ...prev,
+                  selectedFilter: item,
+                  page: 1,
+                  hasMore: true,
+                  allRequests: [],
+                  isLoading: true,
+                }));
+              }}>
+              <Text
+                size={getScaleSize(16)}
+                font={FONTS.Lato.Regular}
+                color={requestData?.selectedFilter?.id === item?.id ? theme.white : theme._818285}>
+                {item?.title}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+      {renderFlatList()}
     </View>
   );
 }
