@@ -7,7 +7,7 @@ import Text from './Text';
 
 export default function RatingsReviewsItem(props: any) {
 
-    const { onPressShowMore, showMore, itemContainer } = props;
+    const { onPressShowMore, showMore, itemContainer, item } = props;
 
     const { theme } = useContext<any>(ThemeContext);
     const STRING = useString();

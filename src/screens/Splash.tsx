@@ -31,17 +31,7 @@ export default function Splash(props: any) {
         if (userData && userData?.user_data?.role) {
             setUser(userData);
             setUserType(userData?.user_data?.role);
-
             getProfileData();
-
-            setTimeout(() => {
-                props?.navigation?.dispatch(
-                    CommonActions.reset({
-                        index: 0,
-                        routes: [{ name: SCREENS.BottomBar.identifier }],
-                    }),
-                );
-            }, 1000)
         } else {
             setTimeout(() => {
                 props?.navigation?.dispatch(
@@ -50,6 +40,9 @@ export default function Splash(props: any) {
                         routes: [{ name: SCREENS.Login.identifier }],
                     }),
                 );
+                setUser('');
+                setUserType('');
+                setProfile('');
             }, 2000)
         }
     };
@@ -57,16 +50,13 @@ export default function Splash(props: any) {
     async function getProfileData() {
         try {
             const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
-
             if (result.status) {
-                setProfile(result?.data?.data?.user)
+                setProfile(result?.data?.data)
                 props.navigation.dispatch(
                     CommonActions.reset({
                         index: 0,
                         routes: [{
-                            name: SCREENS.BottomBar.identifier, params: {
-                                isEmail: ""
-                            }
+                            name: SCREENS.BottomBar.identifier
                         }],
                     }),
                 )

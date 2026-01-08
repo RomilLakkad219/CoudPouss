@@ -54,7 +54,7 @@ export default function Thankyou(props: any) {
           routes: [{ name: SCREENS.BottomBar.identifier }],
         }),
       );
-    }, 4000);
+    }, 1800);
   },[])
 
   return (

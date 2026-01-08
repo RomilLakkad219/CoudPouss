@@ -90,28 +90,22 @@ export default function AddQuote(props: any) {
     const formData = new FormData();
 
     formData.append('file', {
-      uri:
-        Platform.OS === 'ios'
-          ? asset.uri.replace('file://', '')
-          : asset.uri,
+      uri: Platform.OS === 'ios'
+        ? asset.uri.replace('file://', '')
+        : asset.uri,
       name: asset.fileName || `file_${Date.now()}`,
       type: asset.type || 'image/jpeg',
     } as any);
 
-    const res: any = await API.Instance.post(
-      API.API_ROUTES.fileUploadProfessionalServices,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+    const res: any = await API.Instance.post(API.API_ROUTES.fileUploadProfessionalServices, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
     );
-
     if (!res?.status) {
       throw new Error(res?.message || 'File upload failed');
     }
-
     return res.data.storage_key;
   };
 
@@ -137,7 +131,7 @@ export default function AddQuote(props: any) {
 
           const id = await uploadFile(asset);
 
-          setPhotoIds(prev => [...prev, id]);
+            setPhotoIds(prev => [...prev, id]);
 
           if (index === 1) setDoc1(asset);
           if (index === 2) setDoc2(asset);
@@ -204,41 +198,11 @@ export default function AddQuote(props: any) {
     );
   };
 
-  // async function sendQuote() {
-  //   if (!amount) return SHOW_TOAST('Please enter amount', 'error');
-  //   if (!desctiption) return SHOW_TOAST('Please enter short description', 'error');
-
-  //   try {
-  //     setLoading(true);
-  //     const payload = {
-  //       servicesid: serviceDetails?.service_id,
-  //       provider_quote_amount: amount,
-  //       description: desctiption,
-  //       offer_photoids: photoIds,
-  //       offer_videoids: videoIds,
-  //     };
-
-  //     const result: any = await API.Instance.post(
-  //       API.API_ROUTES.sendQuoteRequest,
-  //       payload
-  //     );
-  //     setLoading(false);
-
-  //     if (result?.status) {
-  //       props.navigation.navigate(SCREENS.Success.identifier);
-  //     } else {
-  //       SHOW_TOAST(result?.message, 'error');
-  //     }
-  //   } catch (e: any) {
-  //     setLoading(false);
-  //     SHOW_TOAST(e?.message || 'Something went wrong', 'error');
-  //   }
-  // }
-
+  
   async function sendQuote() {
 
     // amount validation only for professional
-    if (profile?.service_provider_type === 'professional' && !amount) {
+    if (profile?.user?.service_provider_type === 'professional' && !amount) {
       return SHOW_TOAST('Please enter amount', 'error');
     }
 
@@ -255,7 +219,7 @@ export default function AddQuote(props: any) {
       };
 
       // PROFESSIONAL PAYLOAD
-      if (profile?.service_provider_type === 'professional') {
+      if (profile?.user?.service_provider_type === 'professional') {
         payload = {
           ...payload,
           provider_quote_amount: amount,
@@ -265,7 +229,7 @@ export default function AddQuote(props: any) {
       }
 
       // NON-PROFESSIONAL PAYLOAD
-      if (profile?.service_provider_type === 'non_professional') {
+      if (profile?.user?.service_provider_type === 'non_professional') {
         payload = {
           ...payload,
           offer_photos: photoIds.map(key => ({
@@ -285,7 +249,9 @@ export default function AddQuote(props: any) {
       setLoading(false);
 
       if (result?.status) {
-        props.navigation.navigate(SCREENS.Success.identifier);
+        props.navigation.navigate(SCREENS.Success.identifier,{
+          isFromHome: true,
+        });
       } else {
         SHOW_TOAST(result?.message || 'Failed to send quote', 'error');
       }
@@ -312,7 +278,7 @@ export default function AddQuote(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          {isServiceDetails?.subcategory_info?.sub_category_name?.service_photo === null ?
+          {isServiceDetails?.subcategory_info?.sub_category_img_url === null ?
             <View style={[styles(theme).imageView, {
               backgroundColor: 'gray'
             }]}>
@@ -320,8 +286,8 @@ export default function AddQuote(props: any) {
             :
             <Image
               style={styles(theme).imageView}
-              resizeMode='contain'
-              source={{ uri: isServiceDetails?.subcategory_info?.sub_category_name?.service_photo }}
+              resizeMode='cover'
+              source={{ uri: isServiceDetails?.subcategory_info?.sub_category_img_url }}
             />
           }
           <Text
@@ -332,7 +298,7 @@ export default function AddQuote(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {isServiceDetails?.subcategory_info?.sub_category_name?.name}
+            {isServiceDetails?.subcategory_info?.sub_category_name ?? ''}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -387,7 +353,7 @@ export default function AddQuote(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {`${isServiceDetails?.category_info?.category_name?.name} Services`}
+                  {`${isServiceDetails?.category_info?.category_name ?? ''} Services`}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -454,7 +420,7 @@ export default function AddQuote(props: any) {
             />
           </View>
         </View>
-        {profile?.service_provider_type === 'professional' &&
+        {profile?.user?.service_provider_type === 'professional' &&
           <Input
             placeholder={STRING.enter_email_or_mobile_number}
             placeholderTextColor={theme._424242}

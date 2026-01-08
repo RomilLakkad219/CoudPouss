@@ -1,16 +1,18 @@
 import { FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 import { FONTS, IMAGES } from '../../assets';
 
 //COMPONENTS
-import { BottomSheet, Button, Header, ServiceItem, Text } from '../../components';
+import { BottomSheet, Button, Header, ProgressView, ServiceItem, Text } from '../../components';
 import { SCREENS } from '..';
+import { API } from '../../api';
+import { useIsFocused } from '@react-navigation/native';
 
 
 export default function ManageServices(props: any) {
@@ -18,8 +20,37 @@ export default function ManageServices(props: any) {
     const { theme } = useContext<any>(ThemeContext);
     const STRING = useString();
     const bottomSheetRef = useRef<any>(null);
+    const { profile } = useContext<any>(AuthContext);
 
-    const [selectedService, setSelectedService] = useState<any>('DIY');
+    const [selectedService, setSelectedService] = useState<any>(null);
+    const [isLoading, setLoading] = useState(false);
+    const [services, setServices] = useState<any>([]);
+
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if (isFocused) {
+            getServices();
+        }
+    }, [isFocused]);
+
+    async function getServices() {
+        try {
+            setLoading(true);
+            const result = await API.Instance.get(API.API_ROUTES.getAllService);
+            if (result.status) {
+                console.log('result==>', result?.data?.data)
+                setServices(result?.data?.data ?? []);
+                setSelectedService(result?.data?.data?.services?.[0] ?? null);
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -40,8 +71,9 @@ export default function ManageServices(props: any) {
                 <View style={styles(theme).divider} />
                 <View style={styles(theme).serviceContainer}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {['DIY', 'Gardening', 'Moving', 'Housekeeping'].map((item: any, index: number) => {
-                            const isLast = index === ['DIY', 'Gardening', 'Moving', 'Housekeeping'].length - 1;
+                        {(services?.services ?? []).map((item: any, index: number) => {
+                            const isSelected = selectedService.category_id === item.category_id;
+                            const isLast = index === (services.length - 1);
                             return (
                                 <TouchableOpacity
                                     key={index}
@@ -51,19 +83,19 @@ export default function ManageServices(props: any) {
                                     style={[styles(theme).serviceItemContainer, {
                                         marginLeft: index == 0 ? getScaleSize(24) : getScaleSize(16),
                                         marginRight: isLast ? getScaleSize(24) : 0,
-                                        backgroundColor: selectedService === item ? theme._2C6587 : theme._F7F7F7,
+                                        backgroundColor: isSelected ? theme._2C6587 : theme._F7F7F7,
                                     }
                                     ]}>
                                     <Image
                                         source={IMAGES.ic_hammer_wrench}
                                         style={[styles(theme).itemIcon, {
-                                            tintColor: selectedService === item ? theme.white : theme._C1C1C1
+                                            tintColor: isSelected ? theme.white : theme._C1C1C1
                                         }]} />
                                     <Text
                                         size={getScaleSize(16)}
                                         font={FONTS.Lato.SemiBold}
-                                        color={selectedService === item ? theme.white : theme._818285}>
-                                        {item}
+                                        color={isSelected ? theme.white : theme._818285}>
+                                        {item?.category_name ?? ''}
                                     </Text>
                                 </TouchableOpacity>
                             )
@@ -71,30 +103,36 @@ export default function ManageServices(props: any) {
                     </ScrollView>
                 </View>
                 <View style={{ marginVertical: getScaleSize(24), flex: 1 }}>
-                <FlatList
-                    data={[{ id: 1, name: 'Furniture Assembly' }, { id: 2, name: 'Interior Painting' }]}
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item, index }) => {
-                        return (
-                            <ServiceItem
-                                item={item}
-                                itemContainer={ styles(theme).itemContainerStyle}
-                                isManage={true}
-                                onPress={() => {
-                                    setSelectedService(item);
-                                }}
-                            />
-                        )
-                    }}
-                />
+                    <FlatList
+                        data={selectedService?.subcategories ?? []}
+                        showsVerticalScrollIndicator={false}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item, index }) => {
+                            return (
+                                <ServiceItem
+                                    item={item}
+                                    itemContainer={styles(theme).itemContainerStyle}
+                                    isManage={true}
+                                    onPress={() => {
+                                        setSelectedService(item);
+                                    }}
+                                />
+                            )
+                        }}
+                    />
                 </View>
             </View>
             <Button
                 title={STRING.add_more_services}
                 style={{ marginHorizontal: getScaleSize(24), marginBottom: getScaleSize(24) }}
                 onPress={() => {
-                    bottomSheetRef.current.open();
+                    if (profile?.user?.service_provider_type === 'professional') {
+                        props.navigation.navigate(SCREENS.AddServices.identifier, {
+                            isFromManageServices: true,
+                        });
+                    } else {
+                        bottomSheetRef.current.open();
+                    }
                 }}
             />
             <BottomSheet
@@ -106,9 +144,11 @@ export default function ManageServices(props: any) {
                 buttonTitle={STRING.proceed}
                 secondButtonTitle={STRING.cancel}
                 onPressButton={() => {
-                    bottomSheetRef.current.close();
+                    bottomSheetRef.current.clo
+                
                 }}
             />
+            {isLoading && <ProgressView />}
         </View>
     )
 }
@@ -142,7 +182,7 @@ const styles = (theme: ThemeContextType['theme']) =>
             height: getScaleSize(24),
             marginRight: getScaleSize(14),
         },
-        itemContainerStyle:{
+        itemContainerStyle: {
             marginBottom: getScaleSize(18),
             marginHorizontal: getScaleSize(24),
         }

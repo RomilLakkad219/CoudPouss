@@ -1,5 +1,5 @@
 import { Image, ScrollView, SectionList, StyleSheet, View } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 //CONTEXT
 import { ThemeContext, ThemeContextType } from '../../context'
@@ -11,13 +11,21 @@ import { Header, TransactionItem } from '../../components';
 import { Text } from '../../components';
 
 //CONSTANT
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 import { FONTS, IMAGES } from '../../assets';
+import { API } from '../../api';
 
 export default function Transactions(props: any) {
 
     const { theme } = useContext<any>(ThemeContext);
     const STRING = useString();
+
+    const [isLoading, setLoading] = useState(false);
+    const [transactions, setTransactions] = useState<any>([]);
+
+    useEffect(() => {
+        fetchTransactions();
+    }, []);
 
     const DATA = [
         {
@@ -76,6 +84,24 @@ export default function Transactions(props: any) {
         }
     ]
 
+    async function fetchTransactions() {
+        try {
+            setLoading(true);
+            const result: any = await API.Instance.get(API.API_ROUTES.fetchTransactions + `?section=transactions`);
+            if (result?.status) {
+                setTransactions(result?.data?.data?.Transactions ?? []);
+            }
+            else {
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <View style={styles(theme).container}>
             <Header
@@ -122,9 +148,9 @@ export default function Transactions(props: any) {
                     }}
                     renderItem={({ item }) => {
                         return (
-                            <TransactionItem 
-                            item={item} 
-                            itemContainer={styles(theme).itemContainer} />
+                            <TransactionItem
+                                item={item}
+                                itemContainer={styles(theme).itemContainer} />
                         )
                     }}
                 />
@@ -175,7 +201,7 @@ const styles = (theme: ThemeContextType['theme']) => StyleSheet.create({
     dateContainer: {
         flex: 1.0
     },
-    itemContainer:{
+    itemContainer: {
         marginHorizontal: getScaleSize(22),
         marginVertical: getScaleSize(12),
     }

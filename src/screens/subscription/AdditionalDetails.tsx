@@ -25,6 +25,8 @@ export default function AdditionalDetails(props: any) {
     const STRING = useString();
     const { theme } = useContext<any>(ThemeContext);
 
+    const planDetails: any = props?.route?.params?.planDetails ?? {};
+
     const [copyOfId, setCopyOfId] = useState<any>([]);
     const [kbisExtract, setKbisExtract] = useState<any>([]);
     const [proofOfResidence, setProofOfResidence] = useState<any>([]);
@@ -88,7 +90,9 @@ export default function AdditionalDetails(props: any) {
             setLoading(false);
             console.log('result', result.status, result)
             if (result.status) {
-                props.navigation.navigate(SCREENS.YearsOfExperience.identifier);
+                props.navigation.navigate(SCREENS.YearsOfExperience.identifier,{
+                    planDetails: planDetails,
+                });
             } else {
                 SHOW_TOAST(result?.data?.message ?? '', 'error')
             }

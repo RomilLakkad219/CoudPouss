@@ -21,7 +21,7 @@ export default function Signup(props: any) {
     const STRING = useString();
 
     const { theme } = useContext<any>(ThemeContext);
-    const { userType, setProfile } = useContext<any>(AuthContext);
+    const { userType } = useContext<any>(AuthContext);
 
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
@@ -65,8 +65,6 @@ export default function Signup(props: any) {
                 console.log('result', result.status, result)
                 if (result.status) {
                     SHOW_TOAST(result?.data?.message ?? '', 'success')
-                    getProfileData();
-
                     props.navigation.navigate(SCREENS.Otp.identifier, {
                         isFromSignup: true,
                         email: email,
@@ -82,35 +80,6 @@ export default function Signup(props: any) {
                 SHOW_TOAST(error?.message ?? '', 'error');
                 console.log(error?.message)
             }
-        }
-    }
-
-    async function getProfileData() {
-        try {
-            setLoading(true);
-            const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
-            setLoading(false);
-
-            if (result.status) {
-                setProfile(result?.data?.data?.user)
-                props.navigation.dispatch(
-                    CommonActions.reset({
-                        index: 0,
-                        routes: [{
-                            name: SCREENS.BottomBar.identifier, params: {
-                                isEmail: email
-                            }
-                        }],
-                    }),
-                )
-            } else {
-                setLoading(false);
-                SHOW_TOAST(result?.data?.message, 'error')
-            }
-        } catch (error: any) {
-            setLoading(false);
-            SHOW_TOAST(error?.message ?? '', 'error');
-            return null;
         }
     }
 

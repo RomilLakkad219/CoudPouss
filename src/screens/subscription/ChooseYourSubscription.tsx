@@ -87,7 +87,7 @@ export default function ChooseYourSubscription(props: any) {
                                         setSelectedPlan(item);
                                     }}
                                     style={styles(theme).subscriptionItem}>
-                                    <View style={[styles(theme).flexView, { marginBottom: getScaleSize(18) }]}>
+                                    <View style={[styles(theme).flexView, { marginBottom: getScaleSize(16) }]}>
                                         <Text
                                             size={getScaleSize(19)}
                                             font={FONTS.Lato.Bold}

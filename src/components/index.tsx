@@ -26,6 +26,7 @@ import TransactionItem from './TransactionItem'
 import SelectCountrySheet from './SelectCountrySheet'
 import BottomSheet from './BottomSheet'
 import ProgressView from './ProgressView'
+import CancelScheduledServicePopup from './CancelScheduledServicePopup'
 
 export {
     Header,
@@ -55,5 +56,6 @@ export {
     TransactionItem,
     BottomSheet,
     SelectCountrySheet,
-    ProgressView
+    ProgressView,
+    CancelScheduledServicePopup
 }

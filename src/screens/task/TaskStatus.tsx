@@ -86,7 +86,8 @@ export default function TaskStatus(props: any) {
       title: 'Service Started',
       date: "Scheduled on Fri, 20 Jan' 2025 - 3:15pm",
       completed: false,
-      serviceRunning : true
+      serviceRunning : true,
+      securityCode: true
     },
     {
       id: 8,

@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -15,55 +15,37 @@ import {
 } from 'react-native';
 
 //ASSETS
-import {FONTS, IMAGES} from '../../assets';
+import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import { getScaleSize, useString } from '../../constant';
 
 //COMPONENT
-import {Header, SearchComponent, Text} from '../../components';
+import { Header, SearchComponent, Text } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS} from '..';
+import { useFocusEffect } from '@react-navigation/native';
+import { SCREENS } from '..';
 
 export default function Chat(props: any) {
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(theme.white);
-        StatusBar.setBarStyle('dark-content');
-      }
-    }, []),
-  );
+  const { theme } = useContext<any>(ThemeContext);
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
-      <Text
-        size={getScaleSize(24)}
-        font={FONTS.Lato.Bold}
-        color={theme.primary}
-        style={{
-          marginTop: getScaleSize(8),
-          marginHorizontal: getScaleSize(22),
-        }}>
-        {STRING.Chat}
-      </Text>
+      <Header
+        type='profile'
+        screenName={STRING.Chat} />
+      <View style={styles(theme).searchContainer}>
+        <SearchComponent />
+      </View>
       <ScrollView
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
-        <SearchComponent />
+
         {['', '', '', '', ''].map((item: any, index: number) => {
           return (
             <TouchableOpacity
@@ -76,14 +58,14 @@ export default function Chat(props: any) {
                 style={styles(theme).userImage}
                 source={IMAGES.user_placeholder}
               />
-              <View style={{alignSelf:'center', marginLeft:getScaleSize(12), flex:1.0}}>
+              <View style={{ alignSelf: 'center', marginLeft: getScaleSize(12), flex: 1.0 }}>
                 <Text
                   size={getScaleSize(16)}
                   font={FONTS.Lato.Medium}
                   color={theme._2B2B2B}>
                   {'Emily Johnson'}
                 </Text>
-                 <Text
+                <Text
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Regular}
                   color={theme._ACADAD}>
@@ -108,11 +90,14 @@ export default function Chat(props: any) {
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     scrolledContainer: {
       marginHorizontal: getScaleSize(22),
-      marginTop: getScaleSize(24),
       flex: 1.0,
+    },
+    searchContainer: {
+      marginHorizontal: getScaleSize(22),
+      marginVertical: getScaleSize(24),
     },
     userImage: {
       height: getScaleSize(60),
@@ -120,17 +105,17 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(30),
     },
     itemContainer: {
-      marginTop: getScaleSize(24),
+      marginBottom: getScaleSize(24),
       flexDirection: 'row',
     },
-    messageContainer:{
-      height:getScaleSize(24),
-      width:getScaleSize(24),
-      borderRadius:getScaleSize(12),
-      alignSelf:'center',
-      backgroundColor:theme._F0B52C,
-      justifyContent:'center',
-      alignItems:'center',
-      marginRight:getScaleSize(2)
+    messageContainer: {
+      height: getScaleSize(24),
+      width: getScaleSize(24),
+      borderRadius: getScaleSize(12),
+      alignSelf: 'center',
+      backgroundColor: theme._F0B52C,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: getScaleSize(2)
     }
   });

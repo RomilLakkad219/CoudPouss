@@ -51,74 +51,41 @@ export default function ProfessionalHome(props: any) {
 
   const { profile } = useContext(AuthContext)
 
+  console.log('profile==', profile)
+
   const [isLoading, setLoading] = useState(false);
   const [serviceList, setServiceList] = useState([])
-
-  useFocusEffect(
-    React.useCallback(() => {
-      StatusBar.setBackgroundColor(theme.white);
-      StatusBar.setBarStyle('dark-content');
-    }, []),
-  );
 
   useEffect(() => {
     getAllServices()
   }, [])
 
-  const getCreatedTimeText = (date: string, time: string) => {
-    const createdDateTime = new Date(`${date}T${time}:00`);
-    const now = new Date();
-
-    const diffMs = now.getTime() - createdDateTime.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffMinutes < 1) return 'Just now';
-    if (diffMinutes < 60) return `${diffMinutes} min ago`;
-    if (diffHours < 24) return `${diffHours} hrs ago`;
-    if (diffDays === 1) return 'Yesterday';
-
-    return `${diffDays} days ago`;
-  };
-
   async function getAllServices() {
     try {
-      const page = 2;
+      const page = 1;
       const limit = 2;
-
-      const result: any = await API.Instance.get(
-        `${API.API_ROUTES.getProfessionalAllServices}?page=${page}&limit=${limit}`
-      );
-      setLoading(false)
-
-      console.log('GET PROFESSIONAL SERVICES', JSON.stringify(result))
-
+      setLoading(true);
+      const result: any = await API.Instance.get(`${API.API_ROUTES.getProfessionalAllServices}?page=${page}&limit=${limit}`);
       if (result?.status) {
-        const updatedList = result.data.data.map((item: any) => ({
-          ...item,
-          createdTimeText: getCreatedTimeText(item.date, item.time),
-        }));
-        setServiceList(updatedList)
-        console.log(JSON.stringify(updatedList))
+        setServiceList(result.data.data ?? [])
       }
       else {
         SHOW_TOAST(result?.data?.message, 'error')
       }
     }
     catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <View style={styles(theme).container}>
       <StatusBar
-        barStyle="dark-content"
+        translucent={true}
         backgroundColor={theme.white}
-        translucent={false}
-      />
+        barStyle={'dark-content'} />
       <View style={styles(theme).headerContainer}>
         <View style={styles(theme).verticalView}>
           <Text
@@ -126,7 +93,7 @@ export default function ProfessionalHome(props: any) {
             font={FONTS.Lato.Medium}
             color={theme._6D6D6D}
             style={{}}>
-            {`Hello! ${profile?.first_name + " " + profile?.last_name}`}
+            {`Hello! ${profile?.user?.first_name + " " + profile?.user?.last_name}`}
           </Text>
           <Text
             size={getScaleSize(24)}
@@ -156,10 +123,17 @@ export default function ProfessionalHome(props: any) {
           onPress={() => {
             props.navigation.navigate(SCREENS.MyProfileProfessional.identifier)
           }}>
-          <Image
-            style={styles(theme).profilePic}
-            source={IMAGES.user_placeholder}
-          />
+          {profile?.user?.profile_photo_url ?
+            <Image
+              style={styles(theme).profilePic}
+              source={{ uri: profile?.user?.profile_photo_url }}
+            />
+            :
+            <Image
+              style={styles(theme).profilePic}
+              source={IMAGES.user_placeholder}
+            />
+          }
         </TouchableOpacity>
       </View>
       <View style={styles(theme).searchView}>
@@ -170,9 +144,9 @@ export default function ProfessionalHome(props: any) {
         showsVerticalScrollIndicator={false}>
         <Image
           style={styles(theme).bannerView}
-          source={{ uri: 'https://picsum.photos/id/1/200/300' }}
+          source={IMAGES.homeBanner}
         />
-        <View style={styles(theme).directionView}>
+        <View style={[styles(theme).directionView,{marginBottom: getScaleSize(24)}]}>
           <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
@@ -203,14 +177,15 @@ export default function ProfessionalHome(props: any) {
             key={index}
             data={item}
             onPress={() => {
-              props.navigation.navigate(SCREENS.ServicePreview.identifier, { serviceData: item });
-            }}
-            onPressView={() => {
-              props.navigation.navigate(SCREENS.ServicePreview.identifier, { serviceData: item });
+              props.navigation.navigate(SCREENS.ServicePreview.identifier, { 
+                serviceData: item,
+                isFromHome: true,
+              });
             }}
             onPressAccept={() => {
               props.navigation.navigate(SCREENS.AddQuote.identifier, {
                 isItem: item,
+                isFromHome: true,
               });
             }}
           />
@@ -294,7 +269,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       width: '100%',
     },
     horizontalContainer: {
-      marginTop: getScaleSize(27),
+      marginTop: getScaleSize(3),
       flexDirection: 'row',
     },
     directionView: {

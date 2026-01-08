@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -15,13 +15,13 @@ import {
 } from 'react-native';
 
 //ASSETS
-import {FONTS, IMAGES} from '../../assets';
+import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
-import {ThemeContext, ThemeContextType} from '../../context';
+import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -37,15 +37,58 @@ import {
 } from '../../components';
 
 //PACKAGES
-import {useFocusEffect} from '@react-navigation/native';
-import {SCREENS} from '..';
+import { useFocusEffect } from '@react-navigation/native';
+import { SCREENS } from '..';
+import { API } from '../../api';
+import moment from 'moment';
 
 export default function ProfessionalTaskDetails(props: any) {
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
   const [isStatus, setIsStatus] = useState(false);
   const [visibleTaskDetails, setVisibleTaskDetails] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [serviceDetails, setServiceDetails] = useState<any>({});
+
+  const item = props?.route?.params?.item ?? {};
+
+  useEffect(() => {
+    if (item) {
+      getServiceDetails();
+    }
+  }, []);
+
+  async function getServiceDetails() {
+    try {
+      const params = {
+        service_id: item?.id
+      }
+      setLoading(true);
+      const result = await API.Instance.post(API.API_ROUTES.getServiceDetails, params);
+      setLoading(false);
+      if (result.status) {
+        setServiceDetails(result?.data?.data ?? {});
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      setLoading(false);
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (Platform.OS === 'android') {
+        StatusBar.setBackgroundColor(theme.white);
+        StatusBar.setBarStyle('dark-content');
+      }
+    }, []),
+  );
 
   const statusData = [
     {
@@ -98,14 +141,6 @@ export default function ProfessionalTaskDetails(props: any) {
     },
   ];
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(theme.white);
-        StatusBar.setBarStyle('dark-content');
-      }
-    }, []),
-  );
 
   return (
     <View style={styles(theme).container}>
@@ -124,10 +159,14 @@ export default function ProfessionalTaskDetails(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          <Image
-            style={styles(theme).imageView}
-            source={{uri: 'https://picsum.photos/id/1/200/300'}}
-          />
+          {serviceDetails?.service_image_url ?
+            <Image
+              style={styles(theme).imageView}
+              source={{ uri: serviceDetails?.service_image_url }}
+            />
+            :
+            <View style={[styles(theme).imageView, { backgroundColor: theme._D5D5D5 }]} />
+          }
           <Text
             style={{
               marginVertical: getScaleSize(12),
@@ -136,7 +175,7 @@ export default function ProfessionalTaskDetails(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {'Furniture Assembly'}
+            {serviceDetails?.sub_category_name ?? ''}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -153,7 +192,7 @@ export default function ProfessionalTaskDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'16 Aug, 2025'}
+                  {serviceDetails?.chosen_datetime ? moment(serviceDetails?.chosen_datetime).format('DD MMM, YYYY') : '-'}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -169,20 +208,25 @@ export default function ProfessionalTaskDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'10:00 am'}
+                  {serviceDetails?.chosen_datetime ? moment(serviceDetails?.chosen_datetime).format('hh:mm A') : '-'}
                 </Text>
               </View>
             </View>
             <View
               style={[
                 styles(theme).horizontalView,
-                {marginTop: getScaleSize(12)},
+                { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
-                <Image
-                  style={styles(theme).informationIcon}
-                  source={IMAGES.service}
-                />
+                {serviceDetails?.category_logo ?
+                  <Image
+                    style={styles(theme).informationIcon}
+                    source={{ uri: serviceDetails?.category_logo }}
+                    resizeMode='cover'
+                  />
+                  :
+                  <View style={[styles(theme).informationIcon]} />
+                }
                 <Text
                   style={{
                     marginHorizontal: getScaleSize(8),
@@ -191,7 +235,7 @@ export default function ProfessionalTaskDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'DIY Services'}
+                  {serviceDetails?.category_name ?? ''}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -207,7 +251,7 @@ export default function ProfessionalTaskDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'Paris, 75001'}
+                  {serviceDetails?.elder_address ?? '-'}
                 </Text>
               </View>
             </View>
@@ -215,23 +259,23 @@ export default function ProfessionalTaskDetails(props: any) {
         </View>
         <View style={styles(theme).amountContainer}>
           <Text
-            style={{flex: 1.0}}
+            style={{ flex: 1.0 }}
             size={getScaleSize(18)}
             font={FONTS.Lato.Medium}
             color={theme._323232}>
             {STRING.FinalizedQuoteAmount}
           </Text>
           <Text
-            style={{flex: 1.0, marginTop: getScaleSize(8)}}
+            style={{ flex: 1.0, marginTop: getScaleSize(8) }}
             size={getScaleSize(27)}
             font={FONTS.Lato.Bold}
             color={theme._323232}>
-            {'€499'}
+            {`€${serviceDetails?.finalize_quote_amount ?? 0}`}
           </Text>
         </View>
         <View style={styles(theme).amountContainer}>
           <Text
-            style={{flex: 1.0}}
+            style={{ flex: 1.0 }}
             size={getScaleSize(18)}
             font={FONTS.Lato.Medium}
             color={theme._323232}>
@@ -240,15 +284,15 @@ export default function ProfessionalTaskDetails(props: any) {
           <FlatList
             data={['1', '2', '3', '4', '5', '6', '.', '.', '.']}
             horizontal
-            renderItem={({item, index}) => {
+            renderItem={({ item, index }) => {
               return (
                 <View
                   style={[
                     styles(theme).securityItemContainer,
-                    {marginLeft: index === 0 ? 0 : 6},
+                    { marginLeft: index === 0 ? 0 : 6 },
                   ]}>
                   <Text
-                    style={{flex: 1.0}}
+                    style={{ flex: 1.0 }}
                     size={getScaleSize(18)}
                     font={FONTS.Lato.Medium}
                     color={theme._323232}>
@@ -259,7 +303,7 @@ export default function ProfessionalTaskDetails(props: any) {
             }}
           />
           <Text
-            style={{flex: 1.0, marginTop: getScaleSize(12)}}
+            style={{ flex: 1.0, marginTop: getScaleSize(12) }}
             size={getScaleSize(11)}
             font={FONTS.Lato.Regular}
             color={'#424242'}>
@@ -269,7 +313,7 @@ export default function ProfessionalTaskDetails(props: any) {
         <View style={styles(theme).profileContainer}>
           <View style={styles(theme).horizontalView}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(18)}
               font={FONTS.Lato.SemiBold}
               color={theme._323232}>
@@ -279,7 +323,7 @@ export default function ProfessionalTaskDetails(props: any) {
           <View
             style={[
               styles(theme).horizontalView,
-              {marginTop: getScaleSize(16)},
+              { marginTop: getScaleSize(16) },
             ]}>
             <Image
               style={styles(theme).profilePicView}
@@ -287,14 +331,14 @@ export default function ProfessionalTaskDetails(props: any) {
             />
             <View>
               <Text
-                style={{alignSelf: 'center', marginLeft: getScaleSize(16)}}
+                style={{ alignSelf: 'center', marginLeft: getScaleSize(16) }}
                 size={getScaleSize(20)}
                 font={FONTS.Lato.SemiBold}
                 color={'#0F232F'}>
                 {'Bessie Cooper'}
               </Text>
               <Text
-                style={{marginLeft: getScaleSize(16)}}
+                style={{ marginLeft: getScaleSize(16) }}
                 size={getScaleSize(12)}
                 font={FONTS.Lato.Medium}
                 color={'#595959'}>
@@ -310,12 +354,12 @@ export default function ProfessionalTaskDetails(props: any) {
               }}
               source={IMAGES.verify}
             /> */}
-            <View style={{flex: 1.0}} />
+            <View style={{ flex: 1.0 }} />
             <TouchableOpacity
               activeOpacity={1}
               style={[
                 styles(theme).newButton,
-                {marginRight: getScaleSize(6), width: getScaleSize(86)},
+                { marginRight: getScaleSize(6), width: getScaleSize(86) },
               ]}
               onPress={() => {
                 props.navigation.navigate(SCREENS.ChatDetails.identifier);
@@ -331,19 +375,19 @@ export default function ProfessionalTaskDetails(props: any) {
         </View>
         <View style={styles(theme).profileContainer}>
           <Text
-            style={{flex: 1.0}}
+            style={{ flex: 1.0 }}
             size={getScaleSize(18)}
             font={FONTS.Lato.Medium}
             color={theme._323232}>
             {'Address'}
           </Text>
-          <View style={{flexDirection: 'row', marginTop: getScaleSize(12)}}>
+          <View style={{ flexDirection: 'row', marginTop: getScaleSize(12) }}>
             <Image
-              style={{height: getScaleSize(24), width: getScaleSize(24)}}
+              style={{ height: getScaleSize(24), width: getScaleSize(24) }}
               source={IMAGES.map_pin}
             />
             <Text
-              style={{flex: 1.0, marginLeft:getScaleSize(4)}}
+              style={{ flex: 1.0, marginLeft: getScaleSize(4) }}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
@@ -354,29 +398,29 @@ export default function ProfessionalTaskDetails(props: any) {
         <View
           style={[
             styles(theme).profileContainer,
-            {paddingVertical: getScaleSize(26)},
+            { paddingVertical: getScaleSize(26) },
           ]}>
           <TouchableOpacity
-            style={{flexDirection: 'row'}}
+            style={{ flexDirection: 'row' }}
             activeOpacity={1}
             onPress={() => {
               setIsStatus(!isStatus);
             }}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(18)}
               font={FONTS.Lato.Medium}
               color={theme._323232}>
               {STRING.CheckStatus}
             </Text>
             <TouchableOpacity
-              style={{height: getScaleSize(25), width: getScaleSize(24)}}
+              style={{ height: getScaleSize(25), width: getScaleSize(24) }}
               activeOpacity={1}
               onPress={() => {
                 setIsStatus(!isStatus);
               }}>
               <Image
-                style={{height: getScaleSize(25), width: getScaleSize(24)}}
+                style={{ height: getScaleSize(25), width: getScaleSize(24) }}
                 source={isStatus ? IMAGES.up : IMAGES.down}
               />
             </TouchableOpacity>
@@ -384,7 +428,7 @@ export default function ProfessionalTaskDetails(props: any) {
           {isStatus && (
             <>
               <View style={styles(theme).devider}></View>
-              <View style={{marginTop: getScaleSize(32)}}>
+              <View style={{ marginTop: getScaleSize(32) }}>
                 {statusData.map((item, index) => (
                   <StatusItem
                     key={item.id}
@@ -400,29 +444,29 @@ export default function ProfessionalTaskDetails(props: any) {
         <View
           style={[
             styles(theme).profileContainer,
-            {paddingVertical: getScaleSize(26)},
+            { paddingVertical: getScaleSize(26) },
           ]}>
           <TouchableOpacity
-            style={{flexDirection: 'row'}}
+            style={{ flexDirection: 'row' }}
             activeOpacity={1}
             onPress={() => {
               setVisibleTaskDetails(!visibleTaskDetails);
             }}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(18)}
               font={FONTS.Lato.SemiBold}
               color={theme._323232}>
               {STRING.TaskDetails}
             </Text>
             <TouchableOpacity
-              style={{height: getScaleSize(25), width: getScaleSize(24)}}
+              style={{ height: getScaleSize(25), width: getScaleSize(24) }}
               activeOpacity={1}
               onPress={() => {
                 setVisibleTaskDetails(!visibleTaskDetails);
               }}>
               <Image
-                style={{height: getScaleSize(25), width: getScaleSize(24)}}
+                style={{ height: getScaleSize(25), width: getScaleSize(24) }}
                 source={isStatus ? IMAGES.up : IMAGES.down}
               />
             </TouchableOpacity>
@@ -431,14 +475,14 @@ export default function ProfessionalTaskDetails(props: any) {
             <>
               <View style={styles(theme).devider}></View>
               <Text
-                style={{flex: 1.0, marginTop: getScaleSize(20)}}
+                style={{ flex: 1.0, marginTop: getScaleSize(20) }}
                 size={getScaleSize(18)}
                 font={FONTS.Lato.SemiBold}
                 color={'#424242'}>
                 {STRING.Servicedescription}
               </Text>
               <Text
-                style={{flex: 1.0, marginTop: getScaleSize(16)}}
+                style={{ flex: 1.0, marginTop: getScaleSize(16) }}
                 size={getScaleSize(14)}
                 font={FONTS.Lato.Medium}
                 color={theme._939393}>
@@ -447,7 +491,7 @@ export default function ProfessionalTaskDetails(props: any) {
                 }
               </Text>
               <Text
-                style={{flex: 1.0, marginTop: getScaleSize(20)}}
+                style={{ flex: 1.0, marginTop: getScaleSize(20) }}
                 size={getScaleSize(18)}
                 font={FONTS.Lato.SemiBold}
                 color={'#424242'}>
@@ -458,11 +502,11 @@ export default function ProfessionalTaskDetails(props: any) {
                 horizontal
                 keyExtractor={(item: any, index: number) => index.toString()}
                 showsHorizontalScrollIndicator={false}
-                renderItem={({item, index}) => {
+                renderItem={({ item, index }) => {
                   return (
                     <Image
                       style={[styles(theme).photosView]}
-                      source={{uri: 'https://picsum.photos/id/1/200/300'}}
+                      source={{ uri: 'https://picsum.photos/id/1/200/300' }}
                     />
                   );
                 }}
@@ -479,7 +523,7 @@ export default function ProfessionalTaskDetails(props: any) {
           </Text>
           <View style={styles(theme).newHorizontalView}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
@@ -494,7 +538,7 @@ export default function ProfessionalTaskDetails(props: any) {
           </View>
           <View style={styles(theme).newHorizontalView}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
@@ -509,7 +553,7 @@ export default function ProfessionalTaskDetails(props: any) {
           </View>
           <View style={styles(theme).newHorizontalView}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(14)}
               font={FONTS.Lato.SemiBold}
               color={'#595959'}>
@@ -525,7 +569,7 @@ export default function ProfessionalTaskDetails(props: any) {
           <View style={styles(theme).dotView} />
           <View style={styles(theme).newHorizontalView}>
             <Text
-              style={{flex: 1.0}}
+              style={{ flex: 1.0 }}
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={'#0F232F'}>
@@ -540,23 +584,13 @@ export default function ProfessionalTaskDetails(props: any) {
           </View>
         </View>
       </ScrollView>
-      {/* <Button
-        title={STRING.WriteaReview}
-        style={{
-          marginHorizontal: getScaleSize(22),
-          marginBottom: getScaleSize(16),
-        }}
-        onPress={() => {
-          props.navigation.navigate(SCREENS.WriteReview.identifier);
-        }}
-      /> */}
     </View>
   );
 }
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
-    container: {flex: 1, backgroundColor: theme.white},
+    container: { flex: 1, backgroundColor: theme.white },
     scrolledContainer: {
       marginTop: getScaleSize(19),
       marginHorizontal: getScaleSize(24),

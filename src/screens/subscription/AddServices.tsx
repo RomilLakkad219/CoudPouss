@@ -20,6 +20,11 @@ export default function AddServices(props: any) {
 
     const STRING = useString();
 
+    const planDetails: any = props?.route?.params?.planDetails ?? {};
+    const isFromManageServices: boolean = props?.route?.params?.isFromManageServices ?? false;
+
+    console.log('planDetails==>', planDetails)
+
     const { setSelectedServices, selectedServices, myPlan } = useContext<any>(AuthContext);
     const { theme } = useContext<any>(ThemeContext);
 
@@ -79,11 +84,6 @@ export default function AddServices(props: any) {
             setLoading(false);
         }
     }
-
-
-    useEffect(() => {
-        console.log('selectedServices==>', selectedServices)
-    }, [selectedServices])
 
 
     const isServiceSelected = (item: any) => {
@@ -159,6 +159,31 @@ export default function AddServices(props: any) {
         }
     }
 
+    async function onSelectedCategories() {
+        const output = selectedServices.map((item: any) => ({
+            category_id: item.category.id,
+            sub_category_ids: item.service.map((e: any) => e.id),
+        }));
+        const params = {
+            services: output
+        }
+        try {
+            setLoading(true);
+            const result = await API.Instance.post(API.API_ROUTES.onSendCategoryIds, params);
+            if (result.status) {
+                props.navigation.goBack();
+                SHOW_TOAST(result?.data?.message, 'success')
+            } else {
+                SHOW_TOAST(result?.data?.message, 'error')
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <View style={styles(theme).container}>
             <Header
@@ -186,18 +211,21 @@ export default function AddServices(props: any) {
                 </Text>
                 <CategoryDropdown
                     onChange={(item) => {
-                        if (selectedServices.length > 0) {
-                            const categoryItem = selectedServices.find((e: any) => e?.category?.id === selectedCategory?.id);
-                            if (categoryItem) {
-                                bottomSheetRef.current.open();
-                            } else {
-                                setSelectedCategory(item);
-                                getSubCategoryData(item?.id);
-                            }
-                        } else {
-                            setSelectedCategory(item);
-                            getSubCategoryData(item?.id);
-                        }
+                        // if (selectedServices.length > 0) {
+                        //     const categoryItem = selectedServices.find((e: any) => e?.category?.id === selectedCategory?.id);
+                        //     if (categoryItem) {
+                        //         bottomSheetRef.current.open();
+                        //     } else {
+                        //         setSelectedCategory(item);
+                        //         getSubCategoryData(item?.id);
+                        //     }
+                        // } else {
+                        //     setSelectedCategory(item);
+                        //     getSubCategoryData(item?.id);
+                        // }
+
+                        setSelectedCategory(item);
+                        getSubCategoryData(item?.id);
 
                     }}
                     selectedItem={selectedCategory}
@@ -250,7 +278,11 @@ export default function AddServices(props: any) {
                     title={STRING.next}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        props.navigation.navigate(SCREENS.ReviewServices.identifier);
+                        if(isFromManageServices){
+                            onSelectedCategories();
+                        }else{
+                            props.navigation.navigate(SCREENS.ReviewServices.identifier);
+                        }
                     }}
                 />
             </View>

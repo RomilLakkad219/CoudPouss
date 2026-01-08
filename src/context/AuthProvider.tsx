@@ -19,15 +19,13 @@ export function AuthProvider(props: Readonly<AuthProviderProps>): any {
     const [myPlan, setMyPlan] = useState<any>(null)
     //professional, non_professional   
     const [profile, setProfile] = useState<any>(null)
-     const [selectedServices, setSelectedServices] = useState<any>([])
+    const [selectedServices, setSelectedServices] = useState<any>([])
 
     async function fetchProfile() {
         try {
             const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
-
-            console.log('PROFILE', JSON.stringify(result))
             if (result.status) {
-                const userDetail = result?.data?.data?.user;
+                const userDetail = result?.data?.data;
                 setProfile(userDetail)
                 return userDetail
             }

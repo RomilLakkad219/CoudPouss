@@ -18,7 +18,6 @@ const TimePicker = (props: any) => {
   const [selectedMinute, setSelectedMinute] = useState(moment().minute());
   const [isAM, setIsAM] = useState(isCurrentAM);
 
-  console.log('selectedHour', selectedHour, selectedMinute, isAM)
 
   const updateParent = (hour: number, minute: number, am: boolean) => {
     onTimeChange && onTimeChange(hour, minute, am);
@@ -157,100 +156,6 @@ const TimePicker = (props: any) => {
           {'PM'}
         </Text>
       </View>
-      {/* <View style={styles.timeSelector}>        
-        <View style={styles.timeSection}>
-          <TouchableOpacity 
-            style={styles.arrowButton} 
-            onPress={incrementHour}
-          >
-            <Text style={styles.arrowText}>▲</Text>
-          </TouchableOpacity>
-          
-          <View style={styles.timeDisplay}>
-            <Text style={styles.timeNumber}>
-              {selectedHour}
-            </Text>
-          </View>
-          
-          <TouchableOpacity 
-            style={styles.arrowButton} 
-            onPress={decrementHour}
-          >
-            <Text style={styles.arrowText}>▼</Text>
-          </TouchableOpacity>
-          
-          <Text style={styles.timeLabel}>HOURS</Text>
-        </View>
-
-        <Text style={styles.separator}>:</Text>
-
-        <View style={styles.timeSection}>
-          <TouchableOpacity 
-            style={styles.arrowButton} 
-            onPress={incrementMinute}
-          >
-            <Text style={styles.arrowText}>▲</Text>
-          </TouchableOpacity>
-          
-          <View style={styles.timeDisplay}>
-            <Text style={styles.timeNumber}>
-              {selectedMinute.toString().padStart(2, '0')}
-            </Text>
-          </View>
-          
-          <TouchableOpacity 
-            style={styles.arrowButton} 
-            onPress={decrementMinute}
-          >
-            <Text style={styles.arrowText}>▼</Text>
-          </TouchableOpacity>
-          
-          <Text style={styles.timeLabel}>MINUTES</Text>
-        </View>
-
-        <View style={styles.ampmSection}>
-          <TouchableOpacity 
-            style={styles.arrowButton} 
-            onPress={toggleAmPm}
-          >
-            <Text style={styles.arrowText}>▲</Text>
-          </TouchableOpacity>
-          
-          <View style={styles.ampmDisplay}>
-            <Text style={[
-              styles.ampmText,
-              isAM && styles.activeAmPm
-            ]}>
-              AM
-            </Text>
-            <Text style={[
-              styles.ampmText,
-              !isAM && styles.activeAmPm
-            ]}>
-              PM
-            </Text>
-          </View>
-          
-          <TouchableOpacity 
-            style={styles.arrowButton} 
-            onPress={toggleAmPm}
-          >
-            <Text style={styles.arrowText}>▼</Text>
-          </TouchableOpacity>
-          
-          <Text style={styles.timeLabel}>AM/PM</Text>
-        </View>
-      </View> */}
-
-      {/* <View style={styles.selectedTimeContainer}>
-        <Text style={styles.selectedTimeText}>
-          {selectedHour}:{selectedMinute.toString().padStart(2, '0')} {isAM ? 'AM' : 'PM'}
-        </Text>
-      </View> */}
-
-      {/* <TouchableOpacity style={styles.confirmButton} onPress={confirmTime}>
-        <Text style={styles.confirmButtonText}>CONFIRM TIME</Text>
-      </TouchableOpacity> */}
     </View>
   );
 };

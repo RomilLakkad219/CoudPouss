@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     View,
     StyleSheet,
@@ -12,10 +12,10 @@ import {
 import { FONTS, IMAGES } from '../../assets';
 
 //CONTEXT
-import { ThemeContext, ThemeContextType } from '../../context';
+import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { getScaleSize, useString } from '../../constant';
+import { getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -26,16 +26,21 @@ import {
 } from '../../components';
 
 //PACKAGES
+import { launchImageLibrary } from 'react-native-image-picker';
+import { API } from '../../api';
 
 export default function EditProfile(props: any) {
+
     const STRING = useString();
     const { theme } = useContext<any>(ThemeContext);
+    const { profile, fetchProfile } = useContext(AuthContext)
 
-    const [bio, setBio] = useState('With a passion for home improvement, I have dedicated over 8 years to perfecting my craft. My expertise spans from intricate plumbing tasks to seamless TV installations. I pride myself on delivering quality service with a personal touch, ensuring every client feels valued and satisfied.');
+    const [isLoading, setLoading] = useState(false);
+    const [bio, setBio] = useState('')
     const [bioError, setBioError] = useState('');
-    const [experienceSpecialities, setExperienceSpecialities] = useState('Hi, I’m Bessie — with over 6 years of experience in expert TV mounting and reliable plumbing solutions. I specialize in mounting TVs, shelves, mirrors with precision and care Mounting Expert You Can Trust Over 6 of experience in securely mounting TVs, shelves, mirrors, artwork, and more Reliable & On-Time I value your time and ready to get the job done right the first time Clean Work, Solid Results Every project is done with attention to detail, safety, and durability Respect for Your Space I treat your home like it’s my own. Friendly, professional, and focused on delivering quality you’ll love. Client Satisfaction First I’m proud of my 5-star service and happy clients ');
+    const [experienceSpecialities, setExperienceSpecialities] = useState('');
     const [experienceSpecialitiesError, setExperienceSpecialitiesError] = useState('');
-    const [achievements, setAchievements] = useState('Bessie Cooper has successfully completed over 150 projects, showcasing her expertise in TV mounting and plumbing. Her dedication to quality and customer satisfaction has earned her numerous accolades, including the "Best Service Provider" award in 2022. Clients consistently praise her attention to detail and professionalism, making her a top choice for home improvement services.')
+    const [achievements, setAchievements] = useState('')
     const [achievementsError, setAchievementsError] = useState('');
     const [name, setName] = useState('');
     const [nameError, setNameError] = useState('');
@@ -46,6 +51,102 @@ export default function EditProfile(props: any) {
     const [address, setAddress] = useState('');
     const [addressError, setAddressError] = useState('');
     const [showCountryCode, setShowCountryCode] = useState(false);
+    const [profileImage, setProfileImage] = useState<any>(null);
+    const [yearsOfExperience, setYearsOfExperience] = useState<number>(0);
+
+    console.log('profile==>', profile)
+
+    useEffect(() => {
+        setName((profile?.user?.first_name ?? "") + " " + (profile?.user?.last_name ?? ""));
+        setEmail(profile?.user?.email ?? '');
+        setMobileNumber(profile?.user?.phone_number ?? '');
+        setAddress(profile?.user?.address ?? '');
+        setYearsOfExperience(profile?.provider_info?.years_of_experience ?? '');
+    }, [profile]);
+
+    const pickImage = async () => {
+        launchImageLibrary({ mediaType: 'photo' }, (response) => {
+            if (!response.didCancel && !response.errorCode && response.assets) {
+                const asset: any = response.assets[0];
+                console.log('asset', asset)
+                setProfileImage(asset);
+                uploadProfileImage(asset);
+            } else {
+                console.log('response', response)
+            }
+        });
+    }
+
+    async function uploadProfileImage(asset: any) {
+        try {
+            const formData = new FormData();
+            formData.append(profile?.user?.phone_number ? 'email' : 'email', profile?.user?.email);
+            formData.append('file', {
+                uri: asset?.uri,
+                name: asset?.fileName || 'profile_image.jpg',
+                type: asset?.type || 'image/jpeg',
+            });
+
+            console.log('FORM DATA', formData)
+            setLoading(true);
+            const result = await API.Instance.post(API.API_ROUTES.uploadProfileImage, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            setLoading(false);
+            if (result.status) {
+                SHOW_TOAST(result?.data?.message ?? '', 'success')
+                await fetchProfile()
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+                setProfileImage(null);
+            }
+        }
+        catch (error: any) {
+            setProfileImage(null);
+            setLoading(false);
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function onEditUserProfile() {
+
+        try {
+            const params = {
+                "user_data": {
+                    "name": name,
+                    "address": address
+                },
+                "provider_data": {
+                    "bio": bio,
+                    "speciality": experienceSpecialities,
+                    "achievements": achievements,
+                    "years_of_experience": Number(yearsOfExperience) || 0
+                }
+            }
+            setLoading(true);
+            const result = await API.Instance.patch(API.API_ROUTES.editProfile, params);
+            setLoading(false);
+
+            console.log('EDIT PROFILE RES', JSON.stringify(result))
+
+            if (result?.status) {
+                SHOW_TOAST(STRING.profile_updated_successfully, 'success')
+                props.navigation.goBack();
+                await fetchProfile()
+            }
+            else {
+                SHOW_TOAST(result?.data?.message, 'error')
+                console.log('ERR', result?.data?.message)
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+        }
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -58,15 +159,26 @@ export default function EditProfile(props: any) {
             <ScrollView
                 style={styles(theme).scrolledContainer}
                 showsVerticalScrollIndicator={false}>
-                <View style={styles(theme).profileContainer} />
-                <Text
-                    size={getScaleSize(16)}
-                    font={FONTS.Lato.SemiBold}
-                    align="center"
-                    color={theme._2C6587}
-                    style={{ marginBottom: getScaleSize(24) }}>
-                    {STRING.edit_picture_or_avatar}
-                </Text>
+                {profile?.user?.profile_photo_url ?
+                    <Image source={{ uri: profile?.user?.profile_photo_url }}
+                        resizeMode='cover' style={styles(theme).profileContainer} />
+                    :
+                    <View style={[styles(theme).profileContainer, {
+                        backgroundColor: theme._F0EFF0,
+                    }]} />
+                }
+                <TouchableOpacity onPress={() => {
+                    pickImage()
+                }}>
+                    <Text
+                        size={getScaleSize(16)}
+                        font={FONTS.Lato.SemiBold}
+                        align="center"
+                        color={theme._2C6587}
+                        style={{ marginBottom: getScaleSize(24) }}>
+                        {STRING.edit_picture_or_avatar}
+                    </Text>
+                </TouchableOpacity>
                 <Text
                     size={getScaleSize(18)}
                     font={FONTS.Lato.Medium}
@@ -127,13 +239,23 @@ export default function EditProfile(props: any) {
                         inputColor={true}
                         value={address}
                         multiline={true}
-                        inputContainer={{ height: getScaleSize(90), textAlignVertical: 'top' }}
-                        continerStyle={{}}
+                        inputContainer={styles(theme).inputContainerHeight90}
+                        continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
                             setAddress(text);
                             setAddressError('');
                         }}
                         isError={addressError}
+                    />
+                    <Input
+                        placeholder={STRING.experience}
+                        inputTitle={STRING.years_of_experience}
+                        inputColor={true}
+                        keyboardType='number-pad'
+                        value={yearsOfExperience.toString()}
+                        onChangeText={(text: any) => {
+                            setYearsOfExperience(text);
+                        }}
                     />
                 </View>
                 <Text
@@ -145,12 +267,10 @@ export default function EditProfile(props: any) {
                 </Text>
                 <View style={styles(theme).mainContainer}>
                     <Input
-                        placeholder={STRING.enter_name}
-                        placeholderTextColor={theme._939393}
                         inputTitle={STRING.Bio}
                         inputColor={true}
                         value={bio}
-                        inputContainer={{ height: getScaleSize(200), textAlignVertical: 'top' }}
+                        inputContainer={styles(theme).inputContainerHeight}
                         multiline={true}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
@@ -163,7 +283,7 @@ export default function EditProfile(props: any) {
                         inputTitle={STRING.ExperienceSpecialities}
                         inputColor={true}
                         value={experienceSpecialities}
-                        inputContainer={{ height: getScaleSize(200), textAlignVertical: 'top' }}
+                        inputContainer={styles(theme).inputContainerHeight}
                         multiline={true}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
@@ -176,7 +296,7 @@ export default function EditProfile(props: any) {
                         inputTitle={STRING.Achievements}
                         inputColor={true}
                         value={achievements}
-                        inputContainer={{ height: getScaleSize(200), textAlignVertical: 'top' }}
+                        inputContainer={styles(theme).inputContainerHeight}
                         multiline={true}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
@@ -231,8 +351,8 @@ export default function EditProfile(props: any) {
                 title={STRING.update}
                 style={styles(theme).updateButton}
                 onPress={() => {
-                    props.navigation.goBack();
-                 }}
+                    onEditUserProfile()
+                }}
             />
             <SafeAreaView />
         </View>
@@ -282,5 +402,13 @@ const styles = (theme: ThemeContextType['theme']) =>
         updateButton: {
             marginHorizontal: getScaleSize(24),
             marginVertical: getScaleSize(24),
+        },
+        inputContainerHeight: {
+            height: getScaleSize(200),
+            textAlignVertical: 'top'
+        },
+        inputContainerHeight90: {
+            height: getScaleSize(90),
+            textAlignVertical: 'top'
         }
     });

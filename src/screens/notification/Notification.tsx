@@ -178,7 +178,7 @@ export default function Notification(props: any) {
                     style={styles(theme).nextButtonContainer}
                     activeOpacity={1}
                     onPress={() => {
-                      props.navigation.navigate(SCREENS.TaskDetails.identifier);
+                      props.navigation.navigate(SCREENS.CompletedTaskDetails.identifier);
                     }}>
                     <Text
                       size={getScaleSize(14)}

@@ -29,7 +29,7 @@ export default function AddPersonalDetails(props: any) {
   const STRING = useString();
 
   const { theme } = useContext<any>(ThemeContext);
-  const { userType, setUser, setUserType } = useContext<any>(AuthContext);
+  const { userType, setUser, setUserType, setProfile } = useContext<any>(AuthContext);
 
   const isEmail = props?.route?.params?.email || '';
   const isPhoneNumber = props?.route?.params?.isPhoneNumber || false;
@@ -61,7 +61,6 @@ export default function AddPersonalDetails(props: any) {
     launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (!response.didCancel && !response.errorCode && response.assets) {
         const asset: any = response.assets[0];
-        console.log('asset', asset)
         setProfileImage(asset);
         uploadProfileImage(asset);
       } else {
@@ -86,7 +85,6 @@ export default function AddPersonalDetails(props: any) {
         },
       });
       setLoading(false);
-      console.log('result', result.status, result)
       if (result.status) {
         SHOW_TOAST(result?.data?.message ?? '', 'success')
       } else {
@@ -131,25 +129,41 @@ export default function AddPersonalDetails(props: any) {
       try {
         setLoading(true);
         const result = await API.Instance.post(API.API_ROUTES.addPersonalDetails, params);
-        setLoading(false);
-        console.log('result', result.status, result)
         if (result.status) {
           SHOW_TOAST(result?.data?.message ?? '', 'success')
           Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
           setUser(result?.data?.data);
           setUserType(result?.data?.data?.user_data?.role);
-          onNext();
+          getProfileData()
         } else {
           SHOW_TOAST(result?.data?.message ?? '', 'error')
           console.log('error==>', result?.data?.message)
         }
       } catch (error: any) {
-        setLoading(false);
         SHOW_TOAST(error?.message ?? '', 'error');
         console.log(error?.message)
       } finally {
         setLoading(false);
       }
+    }
+  }
+
+  async function getProfileData() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
+      if (result.status) {
+        setProfile(result?.data?.data)
+        onNext();
+      } else {
+        SHOW_TOAST(result?.data?.message, 'error')
+        console.log('ERR', result?.data?.message)
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+      return null;
+    } finally {
+      setLoading(false);
     }
   }
 
