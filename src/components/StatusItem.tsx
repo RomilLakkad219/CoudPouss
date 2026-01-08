@@ -12,10 +12,13 @@ import { FONTS, IMAGES } from '../assets';
 import { constant } from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Text from './Text';
+import moment from 'moment';
 
 const StatusItem = (props: any) => {
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
+
+  const { item } = props;
 
   function getImage() {
     if (props?.item?.serviceRunning) {
@@ -45,14 +48,14 @@ const StatusItem = (props: any) => {
           }}
           source={getImage()}
         />
-        {!props?.item?.completed && props?.item?.number && (
+        {!item?.completed && item?.id && (
           <Text
             style={{ position: 'absolute', top: getScaleSize(4) }}
             size={getScaleSize(12)}
             font={FONTS.Lato.Medium}
             color={theme.white}
           >
-            {props?.item?.number}
+            {item?.id ?? ''}
           </Text>
         )}
         {!props?.isLast && (
@@ -72,15 +75,15 @@ const StatusItem = (props: any) => {
         <Text
           style={[
             styles(theme).title,
-            props?.item?.completed
+            item?.completed
               ? styles(theme).completedTitle
               : styles(theme).pendingTitle,
           ]}>
-          {props?.item?.title}
+          {item?.name ?? ''}
         </Text>
         <Text
           style={styles(theme).date}>
-          {props?.item?.date}
+          {item?.time ? moment(item?.time).format('ddd, DD MMM’ YYYY  -  h:mma') : '-'}
         </Text>
         {props?.item?.securityCode && (
           <>

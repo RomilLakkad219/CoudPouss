@@ -63,16 +63,22 @@ export default function MyProfileProfessional(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).informationContainer}>
-          <Image
-            style={styles(theme).profilePic}
-            source={IMAGES.user_placeholder}
-          />
+          {profile?.user?.profile_photo_url ?
+            <Image
+              style={styles(theme).profilePic}
+              source={{ uri: profile?.user?.profile_photo_url }}
+            />
+            :
+            <View style={[styles(theme).profilePic, {
+              backgroundColor: theme._F0EFF0,
+            }]} />
+          }
           <Text
             size={getScaleSize(22)}
             font={FONTS.Lato.SemiBold}
             color={theme._2B2B2B}
             style={{ alignSelf: 'center' }}>
-            {`${profile?.first_name + " " + profile?.last_name}`}
+            {`${profile?.user?.first_name + " " + profile?.user?.last_name}`}
           </Text>
           <View style={styles(theme).horizontalContainer}>
             <View style={styles(theme).itemContainer}>
@@ -155,9 +161,7 @@ export default function MyProfileProfessional(props: any) {
             font={FONTS.Lato.Medium}
             style={{ marginTop: getScaleSize(8) }}
             color={theme._323232}>
-            {
-              'With a passion for home improvement, I have dedicated over 8 years to perfecting my craft. My expertise spans from intricate plumbing tasks to seamless TV installations. I pride myself on delivering quality service with a personal touch, ensuring every client feels valued and satisfied.'
-            }
+            {profile?.provider_info?.bio ?? '-'}
           </Text>
         </View>
         <View style={styles(theme).informationContainer}>

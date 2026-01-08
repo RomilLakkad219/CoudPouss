@@ -50,31 +50,10 @@ export default function OpenRequestDetails(props: any) {
     const item = props?.route?.params?.item;
 
     const [isStatus, setIsStatus] = useState(true);
+
     const [visibleTaskDetails, setVisibleTaskDetails] = useState(false);
     const [isLoading, setLoading] = useState(false);
     const [serviceDetails, setServiceDetails] = useState<any>({});
-
-    const statusData = [
-        {
-            id: 1,
-            title: 'Serice request placed',
-            date: "Fri, 20 Jan' 2025 - 3:15pm",
-            completed: true,
-        },
-        {
-            id: 2,
-            title: 'Waiting for quotes from experts',
-            date: "Fri, 20 Jan' 2025 - 3:15pm",
-            serviceRunning: true,
-        },
-        {
-            id: 3,
-            title: 'Service Scheduled',
-            date: "Fri, 20 Jan' 2025 - 3:15pm",
-            completed: false,
-            number: 1
-        },
-    ];
 
     useEffect(() => {
         if (item) {
@@ -90,13 +69,10 @@ export default function OpenRequestDetails(props: any) {
             setLoading(true);
             const result = await API.Instance.post(API.API_ROUTES.getServiceDetails, params);
             setLoading(false);
-            console.log('result', result.status, result)
             if (result.status) {
-                console.log('serviceDetails==', result?.data?.data)
                 setServiceDetails(result?.data?.data ?? {});
             } else {
                 SHOW_TOAST(result?.data?.message ?? '', 'error')
-                console.log('error==>', result?.data?.message)
             }
         } catch (error: any) {
             setLoading(false);
@@ -120,10 +96,10 @@ export default function OpenRequestDetails(props: any) {
                 style={styles(theme).scrolledContainer}
                 showsVerticalScrollIndicator={false}>
                 <View style={styles(theme).imageContainer}>
-                    {serviceDetails?.subcategory_photo_url ?
+                    {serviceDetails?.sub_category_logo ?
                         <Image
                             style={styles(theme).imageView}
-                            source={{ uri: serviceDetails?.subcategory_photo_url }}
+                            source={{ uri: serviceDetails?.sub_category_logo }}
                         />
                         :
                         <View style={[styles(theme).imageView, { backgroundColor: theme._D5D5D5 }]} />
@@ -136,7 +112,7 @@ export default function OpenRequestDetails(props: any) {
                         size={getScaleSize(24)}
                         font={FONTS.Lato.Bold}
                         color={theme.primary}>
-                        {serviceDetails?.subcategory_name ?? ''}
+                        {serviceDetails?.sub_category_name ?? ''}
                     </Text>
                     <View style={styles(theme).informationView}>
                         <View style={styles(theme).horizontalView}>
@@ -179,10 +155,15 @@ export default function OpenRequestDetails(props: any) {
                                 { marginTop: getScaleSize(12) },
                             ]}>
                             <View style={styles(theme).itemView}>
-                                <Image
-                                    style={styles(theme).informationIcon}
-                                    source={IMAGES.service}
-                                />
+                                {serviceDetails?.category_logo ?
+                                    <Image
+                                        style={styles(theme).informationIcon}
+                                        source={{ uri: serviceDetails?.category_logo }}
+                                        resizeMode='cover'
+                                    />
+                                    :
+                                    <View style={[styles(theme).informationIcon]} />
+                                }
                                 <Text
                                     style={{
                                         marginHorizontal: getScaleSize(8),
@@ -247,12 +228,12 @@ export default function OpenRequestDetails(props: any) {
                         <>
                             <View style={styles(theme).devider}></View>
                             <View style={{ marginTop: getScaleSize(32) }}>
-                                {statusData.map((item, index) => (
+                                {serviceDetails?.lifecycle?.map((item: any, index: number) => (
                                     <StatusItem
-                                        key={item.id}
+                                        key={index}
                                         item={item}
                                         index={index}
-                                        isLast={index === statusData.length - 1}
+                                        isLast={index === serviceDetails?.lifecycle?.length - 1}
                                     />
                                 ))}
                             </View>
@@ -285,7 +266,7 @@ export default function OpenRequestDetails(props: any) {
                             }}>
                             <Image
                                 style={{ height: getScaleSize(25), width: getScaleSize(24) }}
-                                source={isStatus ? IMAGES.up : IMAGES.down}
+                                source={visibleTaskDetails ? IMAGES.up : IMAGES.down}
                             />
                         </TouchableOpacity>
                     </TouchableOpacity>
@@ -304,9 +285,7 @@ export default function OpenRequestDetails(props: any) {
                                 size={getScaleSize(14)}
                                 font={FONTS.Lato.Medium}
                                 color={theme._939393}>
-                                {
-                                    'Transform your space with our expert furniture assembly services. Our skilled team will handle everything from unpacking to setup, ensuring your new pieces are perfectly assembled and ready for use. We specialize in a wide range of furniture types, including flat-pack items, complex modular systems, and custom installations. Enjoy a hassle-free experience as we take care of the details, allowing you to focus on enjoying your newly furnished area. Schedule your assembly today and let us help you create the perfect environment!'
-                                }
+                                {serviceDetails?.service_description ?? '-'}
                             </Text>
                             <Text
                                 style={{ flex: 1.0, marginTop: getScaleSize(20) }}
@@ -316,14 +295,17 @@ export default function OpenRequestDetails(props: any) {
                                 {STRING.Jobphotos}
                             </Text>
                             <FlatList
-                                data={['']}
+                                data={serviceDetails?.media?.photos ?? []}
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
+                                keyExtractor={(item, index) => index.toString()}
+                                contentContainerStyle={{ gap: getScaleSize(16) }}
                                 renderItem={({ item, index }) => {
                                     return (
                                         <Image
                                             style={[styles(theme).photosView]}
-                                            source={{ uri: 'https://picsum.photos/id/1/200/300' }}
+                                            resizeMode='cover'
+                                            source={{ uri: item }}
                                         />
                                     );
                                 }}
@@ -445,10 +427,10 @@ const styles = (theme: ThemeContextType['theme']) =>
         },
         photosView: {
             height: getScaleSize(144),
-            width: getScaleSize(180),
+            width: (Dimensions.get('window').width - getScaleSize(108)) / 2,
             borderRadius: 8,
-            resizeMode: 'cover',
             marginTop: getScaleSize(18),
+            backgroundColor: theme._EAF0F3,
         },
         buttonContainer: {
             flexDirection: 'row',

@@ -55,6 +55,7 @@ export default function ServicePreview(props: any) {
   const { profile } = useContext(AuthContext)
 
   const serviceData = props?.route?.params?.serviceData
+  const isFromHome = props?.route?.params?.isFromHome ?? false;
 
   const [isStatus, setIsStatus] = useState(false);
   const [visibleTaskDetails, setVisibleTaskDetails] = useState(false);
@@ -110,7 +111,7 @@ export default function ServicePreview(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          {serviceDetails?.subcategory_info?.sub_category_name?.service_photo === null ?
+          {serviceDetails?.subcategory_info?.sub_category_img_url === null ?
             <View style={[styles(theme).imageView, {
               backgroundColor: 'gray'
             }]}>
@@ -118,8 +119,8 @@ export default function ServicePreview(props: any) {
             :
             <Image
               style={styles(theme).imageView}
-              resizeMode='contain'
-              source={{ uri: serviceDetails?.subcategory_info?.sub_category_name?.service_photo }}
+              resizeMode='cover'
+              source={{ uri: serviceDetails?.subcategory_info?.sub_category_img_url }}
             />
           }
           <Text
@@ -130,7 +131,7 @@ export default function ServicePreview(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {serviceDetails?.subcategory_info?.sub_category_name?.name}
+            {serviceDetails?.subcategory_info?.sub_category_name ?? ''}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -185,7 +186,7 @@ export default function ServicePreview(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {`${serviceDetails?.category_info?.category_name?.name} Services`}
+                  {`${serviceDetails?.category_info?.category_name ?? ''}`}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -202,7 +203,7 @@ export default function ServicePreview(props: any) {
                   font={FONTS.Lato.Medium}
                   numberOfLines={2}
                   color={theme.primary}>
-                  {serviceDetails?.about_client?.address}
+                  {serviceDetails?.about_client?.address ?? '-'}
                 </Text>
               </View>
             </View>
@@ -223,16 +224,16 @@ export default function ServicePreview(props: any) {
               styles(theme).horizontalView,
               { marginTop: getScaleSize(16) },
             ]}>
-            {serviceDetails?.about_client?.profile_photo === null ?
-              <Image
-                style={styles(theme).profilePicView}
-                source={IMAGES.user_placeholder}
-              />
-              :
+            {serviceDetails?.about_client?.profile_photo ?
               <Image
                 style={styles(theme).profilePicView}
                 resizeMode='contain'
                 source={{ uri: serviceDetails?.about_client?.profile_photo }}
+              />
+              :
+              <Image
+                style={styles(theme).profilePicView}
+                source={IMAGES.user_placeholder}
               />
             }
             <Text
@@ -253,7 +254,7 @@ export default function ServicePreview(props: any) {
             />
           </View>
         </View>
-        {profile?.service_provider_type === 'non_professional' &&
+        {profile?.user?.service_provider_type === 'non_professional' &&
           <View style={styles(theme).profileContainer}>
             <View>
               <Text
@@ -273,7 +274,7 @@ export default function ServicePreview(props: any) {
             </View>
           </View>
         }
-        {profile?.service_provider_type === 'non_professional' &&
+        {profile?.user?.service_provider_type === 'non_professional' &&
           <View style={styles(theme).profileContainer}>
             <View>
               <Text
@@ -293,7 +294,7 @@ export default function ServicePreview(props: any) {
             </View>
           </View>
         }
-        {profile?.service_provider_type === 'non_professional' &&
+        {profile?.user?.service_provider_type === 'non_professional' &&
           <View style={styles(theme).profileContainer}>
             <View>
               <Text
@@ -353,6 +354,7 @@ export default function ServicePreview(props: any) {
           data={serviceDetails?.job_photos}
           horizontal
           showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: getScaleSize(16), marginBottom: getScaleSize(24) }}
           renderItem={({ item, index }) => {
             return (
               <Image
@@ -389,7 +391,8 @@ export default function ServicePreview(props: any) {
           activeOpacity={1}
           onPress={() => {
             props.navigation.navigate(SCREENS.AddQuote.identifier, {
-              item: serviceDetails
+              item: serviceDetails,
+              isFromHome: isFromHome,
             })
           }}>
           <Text
@@ -512,10 +515,11 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     photosView: {
       height: getScaleSize(144),
-      width: getScaleSize(180),
+      width: (Dimensions.get('window').width - getScaleSize(66)) / 2,
       borderRadius: 8,
       resizeMode: 'cover',
       marginTop: getScaleSize(18),
+      backgroundColor: theme._EAF0F3,
     },
     buttonContainer: {
       flexDirection: 'row',

@@ -94,7 +94,8 @@ export default function Login(props: any) {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
       if (result.status) {
-        setProfile(result?.data?.data?.user)
+        console.log('profile result==>', JSON.stringify(result?.data?.data))
+        setProfile(result?.data?.data)
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,

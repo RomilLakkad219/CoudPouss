@@ -1,11 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import {
-  Alert,
   Image,
-  ImageBackground,
-  ImageSourcePropType,
-  Platform,
-  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -21,6 +16,7 @@ import { head } from 'lodash';
 import { EventRegister } from 'react-native-event-listeners';
 import { CommonActions } from '@react-navigation/native';
 import { SCREENS } from '../screens';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function Tabbar(props: any) {
   const { theme } = useContext<any>(ThemeContext);
@@ -101,7 +97,7 @@ function Tabbar(props: any) {
           );
         })}
       </View>
-      <SafeAreaView />
+      <SafeAreaView edges={['bottom']} />
     </View>
   );
 }

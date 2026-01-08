@@ -27,7 +27,7 @@ function FavouritesItem(props: any) {
 
   return (
     <View style={[styles(theme).container, itemContainer]}>
-      <Image style={styles(theme).userImage} source={{ uri: item?.profile_picture_url }} />
+      <Image style={styles(theme).userImage} source={{ uri: item?.provider?.profile_picture_url }} />
       <TouchableOpacity
         style={styles(theme).likeImageContainer}
         onPress={() => {
@@ -39,7 +39,7 @@ function FavouritesItem(props: any) {
         size={getScaleSize(18)}
         font={FONTS.Lato.SemiBold}
         color={theme._323232}>
-        {item?.full_name ?? '-'}
+        {item?.provider?.full_name ?? '-'}
       </Text>
       <View style={{ flexDirection: 'row' }}>
         <Text

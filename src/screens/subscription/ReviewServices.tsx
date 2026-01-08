@@ -36,8 +36,6 @@ export default function ReviewServices(props: any) {
         setSelectedServices(updated);
     };
 
-    console.log('selectedServices==>', selectedServices)
-
     async function onSelectedCategories() {
         const output = selectedServices.map((item: any) => ({
             category_id: item.category.id,
@@ -46,14 +44,10 @@ export default function ReviewServices(props: any) {
         const params = {
             services: output
         }
-
-        console.log('params==>', params)
         try {
             setLoading(true);
             const result = await API.Instance.post(API.API_ROUTES.onSendCategoryIds, params);
-            console.log('result', result.status, result)
             if (result.status) {
-                console.log('result?.data?.data?', result?.data?.data)
                 setSelectedServices([]);
                 if (myPlan === 'professional') {
                     props.navigation.navigate(SCREENS.AddBankDetails.identifier);
@@ -62,7 +56,6 @@ export default function ReviewServices(props: any) {
                 }
             } else {
                 SHOW_TOAST(result?.data?.message, 'error')
-                console.log('ERR', result?.data?.message)
             }
         } catch (error: any) {
             SHOW_TOAST(error?.message ?? '', 'error');

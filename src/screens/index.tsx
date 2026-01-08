@@ -63,6 +63,7 @@ import Favourites from './home/Favourites';
 import Task from './task/Task';
 import ServiceCancelled from './request/ServiceCancelled';
 import Search from './home/Search';
+import WebViewScreen from './WebViewScreen';
 
 export const SCREENS = {
   Splash: {
@@ -286,6 +287,10 @@ export const SCREENS = {
     identifier: 'ExploreServiceRequest',
     component: ExploreServiceRequest,
   },
+  WebViewScreen: {
+    identifier: 'WebViewScreen',
+    component: WebViewScreen,
+  }
 };
 
 export const TABS = {

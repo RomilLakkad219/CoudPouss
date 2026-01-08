@@ -9,6 +9,8 @@ import {
   FlexAlignType,
   TouchableOpacity,
   Modal,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 
 //API
@@ -37,6 +39,7 @@ import { SCREENS } from '..';
 
 export default function ExploreServiceRequest(props: any) {
 
+  const PAGE_SIZE = 10;
   const STRING = useString();
 
   const { theme } = useContext<any>(ThemeContext);
@@ -44,58 +47,53 @@ export default function ExploreServiceRequest(props: any) {
   const { profile } = useContext(AuthContext)
 
   const [isLoading, setLoading] = useState(false);
-  const [serviceList, setServiceList] = useState([]);
+  const [serviceList, setServiceList] = useState<any[]>([]);
   const [filterModal, setFilterModal] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>('Filters');
   const [filterPosition, setFilterPosition] = useState({ top: 0, right: 0 });
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     getAllServices()
-  }, [])
-
-  const getCreatedTimeText = (date: string, time: string) => {
-    const createdDateTime = new Date(`${date}T${time}:00`);
-    const now = new Date();
-
-    const diffMs = now.getTime() - createdDateTime.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffMinutes < 1) return 'Just now';
-    if (diffMinutes < 60) return `${diffMinutes} min ago`;
-    if (diffHours < 24) return `${diffHours} hrs ago`;
-    if (diffDays === 1) return 'Yesterday';
-
-    return `${diffDays} days ago`;
-  };
+  }, [page])
 
   async function getAllServices() {
+    if (!hasMore) return;
     try {
 
       setLoading(true)
-      const result: any = await API.Instance.get(API.API_ROUTES.getProfessionalAllServices)
-      setLoading(false)
-
-      console.log('GET PROFESSIONAL SERVICES', JSON.stringify(result))
-
+      const result: any = await API.Instance.get(API.API_ROUTES.getProfessionalAllServices + `?page=${page}&limit=${PAGE_SIZE}`)
       if (result?.status) {
-        const updatedList = result.data.data.map((item: any) => ({
-          ...item,
-          createdTimeText: getCreatedTimeText(item.date, item.time),
-        }));
-        setServiceList(updatedList)
-        console.log(JSON.stringify(updatedList))
+        console.log('result==>', result?.data?.data);
+        const newData = result?.data?.data ?? []
+        console.log('newData==>', newData);
+        if (newData.length < PAGE_SIZE) {
+          setHasMore(false);
+          setServiceList((prev: any) => [...prev, ...newData]);
+        } else {
+          setServiceList((prev: any) => [...prev, ...newData]);
+        }
       }
       else {
         SHOW_TOAST(result?.data?.message, 'error')
       }
     }
     catch (error: any) {
-      setLoading(false);
+      if (error?.message === 'canceled') return;
       SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
     }
   }
+
+  const loadMore = () => {
+    if (!isLoading && hasMore) {
+      setPage(page + 1);
+      getAllServices();
+    }
+  };
 
   return (
     <View style={styles(theme).container}>
@@ -116,8 +114,11 @@ export default function ExploreServiceRequest(props: any) {
             style={styles(theme).searchInput}
             placeholderTextColor={theme._555555}
             placeholder={STRING.what_are_you_looking_for}
-            value={props.value}
-            onChangeText={(text) => props.onChangeText(text)}
+            numberOfLines={1}
+            value={searchText}
+            onChangeText={(text) => {
+              setSearchText(text)
+            }}
           />
           <Image
             style={styles(theme).searchImage}
@@ -161,7 +162,7 @@ export default function ExploreServiceRequest(props: any) {
                 },
               ]}
             >
-              {["Category", "Location"].map((type, index,arr) => (
+              {["Category", "Location"].map((type, index, arr) => (
                 <TouchableOpacity
                   key={index}
                   style={[
@@ -184,68 +185,35 @@ export default function ExploreServiceRequest(props: any) {
             </View>
           </TouchableOpacity>
         </Modal>
-
       </View>
-      <ScrollView
-        style={styles(theme).scrolledContainer}
-        showsVerticalScrollIndicator={false}>
-        <Image
-          style={styles(theme).bannerView}
-          source={{ uri: 'https://picsum.photos/id/1/200/300' }}
-        />
-        {serviceList?.map((item, index) => (
-          <ServiceRequest
-            key={index}
-            data={item}
-            onPress={() => {
-              props.navigation.navigate(SCREENS.ServicePreview.identifier, { serviceData: item });
-            }}
-            onPressView={() => {
-              props.navigation.navigate(SCREENS.ServicePreview.identifier, { serviceData: item });
-            }}
-            onPressAccept={() => {
-              props.navigation.navigate(SCREENS.AddQuote.identifier, {
-                isItem: item,
-              });
-            }}
-          />
-        ))}
-        <View style={styles(theme).horizontalContainer}>
-          <Text
-            size={getScaleSize(20)}
-            font={FONTS.Lato.SemiBold}
-            color={theme._323232}
-            style={{
-              flex: 1.0,
-            }}>
-            {STRING.RecentTasks}
-          </Text>
-          <Text
-            size={getScaleSize(16)}
-            font={FONTS.Lato.Regular}
-            onPress={() => { }}
-            style={{ alignSelf: 'center' }}
-            color={theme._999999}>
-            {STRING.ViewAll}
-          </Text>
-        </View>
-        {['', ''].map(item => {
+      <FlatList
+        data={serviceList}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item: any, index: number) => index.toString()}
+        contentContainerStyle={{marginHorizontal: getScaleSize(22), paddingBottom: getScaleSize(50) }}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="large" color={theme.primary} style={{ margin: 20 }} /> : null
+        }
+        renderItem={({ item, index }) => {
           return (
-            <TaskItem
-              onPressItem={() => {
-                props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier);
+            <ServiceRequest
+              key={index}
+              data={item}
+              onPress={() => {
+                props.navigation.navigate(SCREENS.ServicePreview.identifier, { serviceData: item });
               }}
-              onPressStatus={() => {
-                props.navigation.navigate(SCREENS.TaskStatus.identifier);
-              }}
-              onPressChat={() => {
-                props.navigation.navigate(SCREENS.ChatDetails.identifier);
+              onPressAccept={() => {
+                props.navigation.navigate(SCREENS.AddQuote.identifier, {
+                  isItem: item,
+                  isFromHome: false,
+                });
               }}
             />
-          );
-        })}
-      </ScrollView>
-      {isLoading && <ProgressView />}
+          )
+        }}
+      />
     </View>
   );
 }
@@ -295,17 +263,18 @@ const styles = (theme: ThemeContextType['theme']) =>
     searchView: {
       flexDirection: 'row',
       marginHorizontal: getScaleSize(22),
-      marginTop: getScaleSize(16)
+      marginTop: getScaleSize(16),
+      marginBottom: getScaleSize(24)
     },
     searchBox: {
       flexDirection: 'row',
       flex: 1.0,
-      alignItems: 'center' as FlexAlignType,
+      alignItems: 'center',
       backgroundColor: theme.white,
       borderWidth: 1,
       borderColor: '#BECFDA',
       borderRadius: getScaleSize(12),
-      paddingHorizontal: getScaleSize(16),
+      paddingHorizontal: getScaleSize(12),
       // paddingVertical: getScaleSize(4),
       height: getScaleSize(53),
     },
@@ -314,18 +283,13 @@ const styles = (theme: ThemeContextType['theme']) =>
       width: getScaleSize(32),
       alignSelf: 'center' as FlexAlignType,
     },
-    imgMicroPhone: {
-      height: getScaleSize(56),
-      width: getScaleSize(56),
-      alignSelf: 'center' as FlexAlignType,
-      marginLeft: getScaleSize(16),
-    },
+   
     searchInput: {
       fontFamily: FONTS.Lato.Regular,
       fontSize: getScaleSize(18),
       color: theme.black,
-      marginLeft: getScaleSize(12),
-      flex: 1
+      // marginLeft: getScaleSize(12),
+      flex: 1.0,
     },
     filterContainer: {
       backgroundColor: theme.white,

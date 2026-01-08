@@ -48,7 +48,8 @@ export const LIGHT_THEME_COLOR = {
   _0E1B2780: "#0E1B2780",
   _FEF8EA: "#FEF8EA",
   _BECFDA: "#BECFDA",
-  _C62828: "#C62828"
+  _C62828: "#C62828",
+  _F5F5F5: "#F5F5F5",
 };
 
 export const DARK_THEME_COLOR = {

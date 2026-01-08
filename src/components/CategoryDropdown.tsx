@@ -24,15 +24,17 @@ const CategoryDropdown = (props: DropdownProps) => {
     
     const [isFocus, setIsFocus] = useState(false);
 
+    console.log('selectedItem==>', selectedItem)
+
     const renderItem = (item: any) => {
-        console.log('item==>', item?.category_logo);
         const isSelected = item?.id === selectedItem?.id;
         return (
             <View style={styles(theme).item}>
                 <View style={styles(theme).iconLabelContainer}>
                     <Image
-                        source={item.category_logo}
-                        style={[styles(theme).icon, { tintColor: isSelected ? theme._2C6587 : theme._C1C1C1 }]}
+                        source={{uri: item.category_logo}}
+                        style={[styles(theme).icon]}
+                        resizeMode='cover'
                     />
                     <Text
                         size={getScaleSize(16)}
@@ -49,6 +51,7 @@ const CategoryDropdown = (props: DropdownProps) => {
             </View>
         );
     };
+
 
     return (
         <View style={container}>
@@ -74,10 +77,10 @@ const CategoryDropdown = (props: DropdownProps) => {
                 renderLeftIcon={() => {
                     return (
                         <>
-                            {selectedItem?.icon &&
-                                <Image source={selectedItem?.icon} style={[styles(theme).icon, { tintColor: theme._2C6587 }]} />
+                            {selectedItem?.category_logo &&
+                                <Image source={{uri: selectedItem?.category_logo}} style={[styles(theme).icon]} resizeMode='cover' />
                             }
-                        </>
+                        </> 
                     )
                 }}
             />

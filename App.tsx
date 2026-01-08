@@ -18,6 +18,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import _ from 'lodash'
 import KeyboardManager from 'react-native-keyboard-manager';
 import Toast, { BaseToast, ErrorToast, InfoToast } from 'react-native-toast-message';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 LogBox.ignoreAllLogs(true);
 

@@ -35,13 +35,10 @@ export default function SelectedPlanDetails(props: any) {
             setLoading(true);
             const result = await API.Instance.get(API.API_ROUTES.getPlanDetails + `?provider_type=${plan?.type}`);
             setLoading(false);
-            console.log('result', result.status, result)
             if (result.status) {
-                console.log('planDetails==', result?.data?.data)
                 setPlanDetails(result?.data?.data?.plan);
             } else {
                 SHOW_TOAST(result?.data?.message ?? '', 'error')
-                console.log('error==>', result?.data?.message)
             }
         } catch (error: any) {
             setLoading(false);

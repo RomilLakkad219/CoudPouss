@@ -16,93 +16,60 @@ import Text from './Text';
 import { constant } from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-const CancelScheduledServicePopup = (props: any) => {
-    const STRING = useString();
+
+interface CancelScheduledServicePopupProps {
+    cancelServiceDetails?: any;
+    onClose: () => void;
+    onCancel: (item: any) => void;
+    onRef: any;
+    height?: number;
+}
+
+export default function CancelScheduledServicePopup(props: CancelScheduledServicePopupProps) {
     const { theme } = useContext<any>(ThemeContext);
 
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const slideAnim = useRef(new Animated.Value(50)).current;
-    const scaleAnim = useRef(new Animated.Value(0.8)).current;
+    const STRING = useString();
+    const { onRef, cancelServiceDetails, onClose, onCancel, height } = props;
+    console.log('cancelServiceDetails==>', cancelServiceDetails)
 
-    const [selectedCategory, setSelectedCategory] = useState(1);
-
-    const startOpenAnimations = () => {
-        fadeAnim.setValue(0);
-        slideAnim.setValue(100); // Start from further down for slower feel
-        scaleAnim.setValue(0.7); // Start smaller for more dramatic scale
-
-        // Ultra slow and smooth animation
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 1200, // 1.2 seconds
-                easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }),
-            Animated.timing(slideAnim, {
-                toValue: 0,
-                duration: 1200,
-                easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: 1200,
-                easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }),
-        ]).start();
-    };
-
-    const startCloseAnimations = () => {
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 300,
-                easing: Easing.in(Easing.cubic),
-                useNativeDriver: true,
-            }),
-            Animated.timing(slideAnim, {
-                toValue: 50,
-                duration: 300,
-                easing: Easing.in(Easing.cubic),
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 0.8,
-                duration: 300,
-                easing: Easing.in(Easing.cubic),
-                useNativeDriver: true,
-            }),
-        ]).start();
-    };
+    function getTitle() {
+        if (cancelServiceDetails?.hours_before_service) {
+            return STRING.cancel_scheduled_service;
+        } else {
+            return STRING.cancellation_not_possible;
+        }
+    }
 
     return (
-        <View style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
-            <RBSheet
-                ref={props.onRef}
-                closeOnDragDown={true}
-                closeOnPressMask={true}
-                animationType="slide"
-                onOpen={startOpenAnimations}
-                onClose={startCloseAnimations}
-                customStyles={{
-                    container: {
-                        backgroundColor: '#FFF',
-                        height: getScaleSize(550),
-                        borderTopLeftRadius: getScaleSize(20),
-                        borderTopRightRadius: getScaleSize(20),
-                    },
-                }}>
-                <View style={styles(theme).content}>
-                    <Image style={styles(theme).icon} source={IMAGES.serviceCancelledIcon} />
-                    <Text
-                        size={getScaleSize(22)}
-                        font={FONTS.Lato.Bold}
-                        color={theme.primary}
-                        style={{ alignSelf: 'center', marginTop: getScaleSize(16) }}>
-                        {STRING.cancel_scheduled_service}
-                    </Text>
+        <RBSheet
+            ref={onRef}
+            customModalProps={{
+                animationType: 'fade',
+                statusBarTranslucent: true,
+            }}
+            customStyles={{
+                wrapper: {
+                    backgroundColor: theme._77777733,
+                },
+                container: {
+                    height: getScaleSize(550),
+                    borderTopLeftRadius: getScaleSize(24),
+                    borderTopRightRadius: getScaleSize(24),
+                    backgroundColor: theme.white,
+                },
+            }}
+            draggable={false}
+            closeOnPressMask={true}>
+            <View style={styles(theme).content}>
+                <Image style={styles(theme).icon} source={IMAGES.serviceCancelledIcon} />
+                <Text
+                    size={getScaleSize(22)}
+                    font={FONTS.Lato.Bold}
+                    color={theme.primary}
+                    style={{ alignSelf: 'center', marginTop: getScaleSize(16) }}>
+                    {getTitle()}
+                </Text>
+                {cancelServiceDetails?.hours_before_service && (
                     <Text
                         size={getScaleSize(19)}
                         font={FONTS.Lato.Medium}
@@ -115,6 +82,8 @@ const CancelScheduledServicePopup = (props: any) => {
                         }}>
                         {STRING.are_you_sure_you_want_to_cancel_your_scheduled_service_with_the_expert}
                     </Text>
+                )}
+                {cancelServiceDetails?.hours_before_service && !cancelServiceDetails?.is_within_48_hours && (
                     <View style={styles(theme).informationContainer}>
                         <Text
                             size={getScaleSize(18)}
@@ -135,7 +104,7 @@ const CancelScheduledServicePopup = (props: any) => {
                                 size={getScaleSize(14)}
                                 font={FONTS.Lato.SemiBold}
                                 color={'#595959'}>
-                                {'€499'}
+                                {`€${cancelServiceDetails?.total_amount ?? '0'}`}
                             </Text>
                         </View>
                         <View style={styles(theme).horizontalView}>
@@ -151,7 +120,7 @@ const CancelScheduledServicePopup = (props: any) => {
                                 size={getScaleSize(14)}
                                 font={FONTS.Lato.SemiBold}
                                 color={'#595959'}>
-                                {'€49.00'}
+                                {`€${cancelServiceDetails?.service_fee ?? '0'}`}
                             </Text>
                         </View>
                         <View style={styles(theme).dotView} />
@@ -173,55 +142,52 @@ const CancelScheduledServicePopup = (props: any) => {
                                 size={getScaleSize(20)}
                                 font={FONTS.Lato.SemiBold}
                                 color={theme.primary}>
-                                {'€450.00'}
+                                {`€${cancelServiceDetails?.total_refund ?? '0'}`}
                             </Text>
                         </View>
                     </View>
-                    {/* <View style={{flex:1.0}}/> */}
-                    <View style={styles(theme).buttonContainer}>
-                        <TouchableOpacity
-                            style={styles(theme).nextButtonContainer}
-                            activeOpacity={1}
-                            onPress={() => {
-                                props?.proceedToPay()
-                            }}>
-                            <Text
-                                size={getScaleSize(19)}
-                                font={FONTS.Lato.Bold}
-                                color={theme.white}
-                                style={{ alignSelf: 'center' }}>
-                                {STRING.keep_booking}
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles(theme).backButtonContainer}
-                            activeOpacity={1}
-                            onPress={() => {
-                                props?.onClose()
-                            }}>
-                            <Text
-                                size={getScaleSize(19)}
-                                font={FONTS.Lato.Bold}
-                                color={theme._C62828}
-                                style={{ alignSelf: 'center' }}>
-                                {STRING.confirm_cancellation}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
+                )}
+                {/* <View style={{flex:1.0}}/> */}
+                <View style={styles(theme).buttonContainer}>
+                    <TouchableOpacity
+                        style={styles(theme).nextButtonContainer}
+                        activeOpacity={1}
+                        onPress={() => {
+                            onClose()
+                        }}>
+                        <Text
+                            size={getScaleSize(19)}
+                            font={FONTS.Lato.Bold}
+                            color={theme.white}
+                            style={{ alignSelf: 'center' }}>
+                            {STRING.keep_booking}
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles(theme).backButtonContainer}
+                        activeOpacity={1}
+                        onPress={()=>{
+                            onCancel(cancelServiceDetails?.service_id ?? null)
+                        }}>
+                        <Text
+                            size={getScaleSize(19)}
+                            font={FONTS.Lato.Bold}
+                            color={theme._C62828}
+                            style={{ alignSelf: 'center' }}>
+                            {STRING.confirm_cancellation}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
-            </RBSheet>
-        </View>
-    );
-};
+            </View>
+        </RBSheet>
+    )
+}
 
 const styles = (theme: ThemeContextType['theme']) =>
     StyleSheet.create({
-        container: {
-            flexDirection: 'column',
-            marginTop: getScaleSize(24),
-        },
         content: {
             paddingVertical: getScaleSize(24),
+            flex: 1.0,
         },
         icon: {
             height: getScaleSize(60),
@@ -290,5 +256,3 @@ const styles = (theme: ThemeContextType['theme']) =>
             marginBottom: getScaleSize(8),
         }
     });
-
-export default CancelScheduledServicePopup;

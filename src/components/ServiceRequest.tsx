@@ -27,15 +27,17 @@ export default function ServiceRequest(props: any) {
 
   const STRING = useString();
 
-  const data = props.data
+  const { data, onPress, onPressAccept } = props
+
+  const getTimeAgo = (date: string, time: string) => {
+    return moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm').fromNow();
+  };
 
   return (
     <TouchableOpacity
       style={styles(theme).container}
       activeOpacity={1}
-      onPress={() => {
-        props?.onPress()
-      }}>
+      onPress={onPress}>
       {data?.subcategory_info?.sub_category_name?.service_photo === null ?
         <View style={[styles(theme).imageContainer, {
           backgroundColor: 'gray'
@@ -44,8 +46,8 @@ export default function ServiceRequest(props: any) {
         :
         <Image
           style={styles(theme).imageContainer}
-          resizeMode='contain'
-          source={{ uri: data?.subcategory_info?.sub_category_name?.service_photo }}
+          resizeMode='cover'
+          source={{ uri: data?.subcategory_info?.sub_category_name?.img_url }}
         />
       }
       <View style={styles(theme).horizontalView}>
@@ -61,7 +63,7 @@ export default function ServiceRequest(props: any) {
           size={getScaleSize(14)}
           font={FONTS.Lato.Medium}
           color={theme._737373}>
-          {data.createdTimeText}
+          {getTimeAgo(data?.date, data?.time)}
         </Text>
       </View>
       <View style={styles(theme).verticalView}>
@@ -79,7 +81,7 @@ export default function ServiceRequest(props: any) {
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
               color={theme._424242}>
-              {moment(data?.date).format('DD MMM, YYYY')}
+              {data?.date ? moment(data?.date).format('DD MMM, YYYY') : ''}
             </Text>
           </View>
           <View style={styles(theme).itemView}>
@@ -133,7 +135,7 @@ export default function ServiceRequest(props: any) {
           </View>
         </View>
       </View>
-      {profile?.service_provider_type === 'professional' ?
+      {profile?.user?.service_provider_type === 'professional' ?
         <View
           style={[styles(theme).horizontalView, { marginTop: getScaleSize(24) }]}>
           <View style={{ flex: 1.0 }}>
@@ -154,7 +156,7 @@ export default function ServiceRequest(props: any) {
           <TouchableOpacity
             style={styles(theme).quateContainer}
             activeOpacity={1}
-            onPress={props?.onPressAccept}>
+            onPress={onPressAccept}>
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.SemiBold}
@@ -166,7 +168,7 @@ export default function ServiceRequest(props: any) {
         :
         <View style={styles(theme).buttonView}>
           <TouchableOpacity style={styles(theme).viewButton}
-            onPress={() => {props.onPressView() }}>
+            onPress={onPress}>
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.SemiBold}
@@ -175,7 +177,7 @@ export default function ServiceRequest(props: any) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles(theme).acceptButton}
-            onPress={() => {props.onPressAccept() }}>
+            onPress={onPressAccept}>
             <Text
               size={getScaleSize(16)}
               font={FONTS.Lato.SemiBold}
@@ -191,7 +193,7 @@ export default function ServiceRequest(props: any) {
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
     container: {
-      marginTop: getScaleSize(24),
+      marginBottom: getScaleSize(24),
       paddingHorizontal: getScaleSize(16),
       paddingVertical: getScaleSize(16),
       backgroundColor: '#EAF0F3',

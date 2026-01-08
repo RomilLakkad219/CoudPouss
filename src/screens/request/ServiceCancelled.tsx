@@ -1,17 +1,9 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import {
     View,
-    StatusBar,
     StyleSheet,
-    Dimensions,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
-    Alert,
     ScrollView,
-    FlatList,
-    TouchableOpacity,
     Image,
-    Platform,
 } from 'react-native';
 
 //ASSETS
@@ -25,25 +17,22 @@ import { getScaleSize, useString } from '../../constant';
 
 //COMPONENT
 import {
-    AcceptBottomPopup,
     Button,
-    CancelScheduledServicePopup,
     Header,
-    PaymentBottomPopup,
-    RejectBottomPopup,
-    RequestItem,
-    SearchComponent,
     Text,
 } from '../../components';
-
-//PACKAGES
-import { useFocusEffect } from '@react-navigation/native';
-import { SCREENS } from '..';
 
 export default function ServiceCancelled(props: any) {
     const STRING = useString();
     const { theme } = useContext<any>(ThemeContext);
-    const cancelScheduledServicePopupRef = useRef<any>(null);
+
+    const item = props?.route?.params?.item ?? {};
+
+    useEffect(() => {
+        if (item) {
+            console.log('item==>', item)
+        }
+    }, [item]);
 
     return (
         <View style={styles(theme).container}>
@@ -220,19 +209,9 @@ export default function ServiceCancelled(props: any) {
                     title={STRING.ProceedtoPay}
                     style={{ marginHorizontal: getScaleSize(22), marginBottom: getScaleSize(16) }}
                     onPress={() => {
-                        cancelScheduledServicePopupRef.current.open();
                     }}
                 />
             </ScrollView>
-            <CancelScheduledServicePopup
-                onRef={cancelScheduledServicePopupRef}
-                onClose={() => {
-                    cancelScheduledServicePopupRef.current.close();
-                }}
-                proceedToPay={() => {
-                    cancelScheduledServicePopupRef.current.close();
-                }}
-            />
         </View>
     );
 }

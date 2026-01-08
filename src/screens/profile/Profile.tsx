@@ -24,7 +24,7 @@ export default function Profile(props: any) {
 
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
-  const { userType, setUser, setUserType, user, profile } = useContext<any>(AuthContext);
+  const { userType, profile } = useContext<any>(AuthContext);
 
   console.log('user', profile)
 
@@ -52,19 +52,18 @@ export default function Profile(props: any) {
     }
   }
 
-  
 
 
-  function logout() {
+
+  async function logout() {
+    await Storage.clear()
+   
     props.navigation.dispatch(
       CommonActions.reset({
         index: 0,
         routes: [{ name: SCREENS.Splash.identifier }],
       }),
     );
-    Storage.clear()
-    setUser('');
-    setUserType('');
   }
 
 
@@ -80,18 +79,17 @@ export default function Profile(props: any) {
       />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles(theme).mainContainer}>
-          {profile?.profile_photo_url ? (
-            <Image source={{ uri: profile?.profile_photo_url }} resizeMode='cover' style={styles(theme).profileContainer} />
+          {profile?.user?.profile_photo_url ? (
+            <Image source={{ uri: profile?.user?.profile_photo_url }} resizeMode='cover' style={styles(theme).profileContainer} />
           ) : (
             <View style={styles(theme).profileContainer} />
           )}
-
           <Text
             size={getScaleSize(22)}
             font={FONTS.Lato.SemiBold}
             align="center"
             color={theme._2B2B2B}>
-            {(profile?.first_name ?? "") + " " + (profile?.last_name ?? "")}
+            {(profile?.user?.first_name ?? "") + " " + (profile?.user?.last_name ?? "")}
           </Text>
           {userType === 'service_provider' && (
             <View style={styles(theme).checkStatusContainer}>

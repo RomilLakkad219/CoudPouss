@@ -37,17 +37,15 @@ export default function MyProfile(props: any) {
 
     const { profile, fetchProfile } = useContext(AuthContext)
 
-    console.log('profile==', profile)
-
     const bottomSheetRef = useRef<any>(null);
 
-    const [name, setName] = useState((profile?.first_name ?? "") + " " + (profile?.last_name ?? ""));
+    const [name, setName] = useState((profile?.user?.first_name ?? "") + " " + (profile?.user?.last_name ?? ""));
     const [nameError, setNameError] = useState('');
-    const [email, setEmail] = useState(profile?.email ?? "");
+    const [email, setEmail] = useState(profile?.user?.email ?? "");
     const [emailError, setEmailError] = useState('');
-    const [mobileNumber, setMobileNumber] = useState(profile?.phone_number ?? "");
+    const [mobileNumber, setMobileNumber] = useState(profile?.user?.phone_number ?? "");
     const [mobileNumberError, setMobileNumberError] = useState('');
-    const [address, setAddress] = useState(profile?.address ?? "");
+    const [address, setAddress] = useState(profile?.user?.address ?? "");
     const [addressError, setAddressError] = useState('');
     const [showCountryCode, setShowCountryCode] = useState(false);
     const [isLoading, setLoading] = useState(false);
@@ -76,7 +74,7 @@ export default function MyProfile(props: any) {
     async function uploadProfileImage(asset: any) {
         try {
             const formData = new FormData();
-            formData.append(profile?.phone_number ? 'email' : 'email', profile?.email);
+            formData.append(profile?.user?.phone_number ? 'email' : 'email', profile?.user?.email);
             formData.append('file', {
                 uri: asset?.uri,
                 name: asset?.fileName || 'profile_image.jpg',
@@ -95,6 +93,7 @@ export default function MyProfile(props: any) {
 
             if (result.status) {
                 SHOW_TOAST(result?.data?.message ?? '', 'success')
+                await fetchProfile()
             } else {
                 SHOW_TOAST(result?.data?.message ?? '', 'error')
                 setProfileImage(null);
@@ -113,12 +112,10 @@ export default function MyProfile(props: any) {
 
     async function onEditUserProfile() {
 
-        const { firstName, lastName } = splitName(name);
-
         try {
             const params = {
                 user_data: {
-                    first_name: firstName,
+                    name: name,
                     // phone_country_code: countryCode,
                     // phone_number: mobileNumber,
                     address: address
@@ -188,16 +185,15 @@ export default function MyProfile(props: any) {
             />
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles(theme).mainContainer}>
-                    {profile?.profile_photo_url ?
-                        <Image source={{ uri: profile?.profile_photo_url }}
+                    {profile?.user?.profile_photo_url ?
+                        <Image source={{ uri: profile?.user?.profile_photo_url }}
                             resizeMode='cover' style={styles(theme).profileContainer} />
                         :
                         <View style={[styles(theme).profileContainer, {
                             backgroundColor: theme._F0EFF0,
                         }]} />
-
                     }
-                    < TouchableOpacity onPress={() => {
+                    <TouchableOpacity onPress={() => {
                         pickImage()
                     }}>
                         <Text
@@ -235,6 +231,7 @@ export default function MyProfile(props: any) {
                         inputColor={true}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         value={email}
+                        editable={false}
                         onChangeText={text => {
                             setEmail(text);
                             setEmailError('');
@@ -246,6 +243,7 @@ export default function MyProfile(props: any) {
                         placeholderTextColor={theme._939393}
                         inputTitle={STRING.mobile_number}
                         inputColor={true}
+                        editable={false}
                         keyboardType="numeric"
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         value={mobileNumber}
@@ -276,7 +274,7 @@ export default function MyProfile(props: any) {
                         isError={addressError}
                     />
                 </View>
-            </ScrollView >
+            </ScrollView>
             <Button
                 title={STRING.update}
                 style={{ marginVertical: getScaleSize(24), marginHorizontal: getScaleSize(24) }}

@@ -224,8 +224,6 @@ export const useString = () => {
     Rejectedforanotherreason: 'Rejected for another reason',
     Cancel: 'Cancel',
     ConfirmServicerequest: 'Confirm Service request ?',
-    popup_message:
-      'You are about to confirm a service at the rate of 499€ with the Provider Wade Warren, Are you sure you want to continue? ',
     No: 'No',
     Yes: 'Yes',
     Proceedtopayment: 'Proceed to payment',
@@ -367,7 +365,10 @@ export const useString = () => {
     are_you_sure_you_want_to_cancel_your_scheduled_service_with_the_expert: "Are you sure you want to cancel your scheduled service with the expert?",
     payment_breakdown: "Payment Breakdown",
     confirm_cancellation: "Confirm Cancellation",
-    keep_booking: "Keep Booking"
+    keep_booking: "Keep Booking",
+    you_have_not_sent_any_quote_please_sent_a_quotes_to_the_service_request: "You have not sent any quote, please sent\na quotes to the service request",
+    you_can_also_upload_a_video: "(You can also upload a video)",
+    cancellation_not_possible: "Cancellation not possible",
   };
 };
 

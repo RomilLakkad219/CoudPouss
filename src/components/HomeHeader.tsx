@@ -30,7 +30,7 @@ const HEADER_HEIGHT = 260;
 const HomeHeader = (props: any) => {
   const STRING = useString();
   const { theme } = useContext(ThemeContext);
-  const { user } = useContext<any>(AuthContext);
+  const { user, profile } = useContext<any>(AuthContext);
 
   return (
     <View style={styles(theme).container}>
@@ -42,7 +42,7 @@ const HomeHeader = (props: any) => {
             size={getScaleSize(16)}
             font={FONTS.Lato.Medium}
             color={theme.white}>
-            {`Hello! ${user?.user_data?.name}\n`}
+            {`Hello! ${(profile?.user?.first_name ?? "") + " " + (profile?.user?.last_name ?? "")}\n`}
 
           </Text>
           <Text
@@ -70,19 +70,25 @@ const HomeHeader = (props: any) => {
           ]}
           activeOpacity={1}
           onPress={() => { props?.onPressUserProfile() }}>
-
-          <Image
-            style={styles(theme).placeholderImage}
-            source={IMAGES.user_placeholder}
-          />
+          {profile?.user?.profile_photo_url ?
+            <Image
+              style={styles(theme).placeholderImage}
+              source={{ uri: profile?.user?.profile_photo_url }}
+            />
+            :
+            <Image
+              style={styles(theme).placeholderImage}
+              source={IMAGES.user_placeholder}
+            />
+          }
         </TouchableOpacity>
       </View>
       <View style={styles(theme).searchView}>
         <View style={styles(theme).searchBox}>
           <Image style={styles(theme).searchImage} source={IMAGES.search} />
           <Pressable
-          onPress={props?.onSearchPress}
-           style={{ flex: 1.0 }}>
+            onPress={props?.onSearchPress}
+            style={{ flex: 1.0 }}>
             <TextInput
               style={styles(theme).searchInput}
               placeholderTextColor={'#939393'}
@@ -137,7 +143,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     container: {
       flex: 1.0,
       backgroundColor: theme.primary,
-      paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + getScaleSize(10) : getScaleSize(20),
+      paddingTop: StatusBar.currentHeight,
       // paddingHorizontal: getScaleSize(20),
       borderBottomLeftRadius: getScaleSize(60),
       borderBottomRightRadius: getScaleSize(60),

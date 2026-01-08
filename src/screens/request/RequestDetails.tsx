@@ -1,27 +1,20 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
-  StatusBar,
   StyleSheet,
   Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Alert,
   ScrollView,
   FlatList,
   TouchableOpacity,
   Image,
-  Platform,
 } from 'react-native';
 
-//ASSETS
+//ASSETS & CONSTANT
 import { FONTS, IMAGES } from '../../assets';
+import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //CONTEXT
 import { ThemeContext, ThemeContextType } from '../../context';
-
-//CONSTANT
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -35,10 +28,13 @@ import {
   Text,
 } from '../../components';
 
-//PACKAGES
-import { useFocusEffect } from '@react-navigation/native';
+//SCREENS
 import { SCREENS } from '..';
+
+//API
 import { API } from '../../api';
+
+//PACKAGES
 import moment from 'moment';
 
 export default function RequestDetails(props: any) {
@@ -52,6 +48,10 @@ export default function RequestDetails(props: any) {
 
   const [isLoading, setLoading] = useState(false);
   const [serviceDetails, setServiceDetails] = useState<any>({});
+  const [selectedCategory, setSelectedCategory] = useState(0);
+  const [reason, setReason] = useState('');
+  const [serviceAmount, setServiceAmount] = useState<any>({});
+
 
   useEffect(() => {
     if (item) {
@@ -84,6 +84,135 @@ export default function RequestDetails(props: any) {
     }
   }
 
+  async function addFavoriteProfessional() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.post(API.API_ROUTES.addFavoriteProfessional + `/${serviceDetails?.provider?.id}`);
+      if (result.status) {
+        SHOW_TOAST(result?.data?.message ?? '', 'success')
+        getServiceDetails()
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function removeFavoriteProfessional() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.post(API.API_ROUTES.removeFavoriteProfessional + `/${serviceDetails?.provider?.id}`);
+      if (result.status) {
+        SHOW_TOAST(result?.data?.message ?? '', 'success')
+        getServiceDetails()
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onRejectReason() {
+    if (selectedCategory == 0) {
+      SHOW_TOAST('Please select a reason', 'error')
+      return;
+    }
+    if (selectedCategory == 3) {
+      if (reason == '') {
+        SHOW_TOAST('Please enter a reason', 'error')
+        return;
+      }
+    }
+
+    try {
+      const params = {
+        failure_reason: reason,
+        service_id: serviceDetails?.service_id,
+        quote_id: serviceDetails?.quote_id,
+      }
+      setLoading(true);
+      const result = await API.Instance.put(API.API_ROUTES.onServiceReject, params);
+      if (result.status) {
+        SHOW_TOAST(result?.data?.message ?? '', 'success')
+        rejectRef.current.close();
+        props.navigation.goBack();
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  async function onAcceptService() {
+    try {
+      const params = {
+        service_id: serviceDetails?.service_id,
+        quote_id: serviceDetails?.quote_id,
+      }
+      setLoading(true);
+      const result = await API.Instance.put(API.API_ROUTES.onAcceptService, params);
+      if (result.status) {
+        onConfirmPayment();
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onConfirmPayment() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.post(API.API_ROUTES.confirmPayment + `/${serviceDetails?.service_id}`);
+      if (result.status) {
+        paymentRef.current.close();
+        setTimeout(() => {
+          props.navigation.navigate(SCREENS.ServiceConfirmed.identifier, { item: serviceDetails })
+        }, 1000);
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  async function getServiceAmount() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getServiceAmount + `/${serviceDetails?.service_id}`);
+      if (result.status) {
+        console.log('serviceAmount==>', result?.data?.data)
+        setServiceAmount(result?.data?.data ?? {});
+        acceptRef.current.close();
+        setTimeout(() => {
+          paymentRef.current.open();
+        }, 500);
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <View style={styles(theme).container}>
       <Header
@@ -96,10 +225,11 @@ export default function RequestDetails(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          {serviceDetails?.subcategory_photo_url ?
+          {serviceDetails?.sub_category_logo ?
             <Image
               style={styles(theme).imageView}
-              source={{ uri: serviceDetails?.subcategory_photo_url }}
+              resizeMode='cover'
+              source={{ uri: serviceDetails?.sub_category_logo }}
             />
             :
             <View style={[styles(theme).imageView, { backgroundColor: theme._D5D5D5 }]} />
@@ -112,7 +242,7 @@ export default function RequestDetails(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {serviceDetails?.subcategory_name}
+            {serviceDetails?.sub_category_name}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -155,10 +285,15 @@ export default function RequestDetails(props: any) {
                 { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
-                <Image
-                  style={styles(theme).informationIcon}
-                  source={IMAGES.service}
-                />
+                {serviceDetails?.category_logo ?
+                  <Image
+                    style={styles(theme).informationIcon}
+                    source={{ uri: serviceDetails?.category_logo }}
+                    resizeMode='cover'
+                  />
+                  :
+                  <View style={[styles(theme).informationIcon]} />
+                }
                 <Text
                   style={{
                     marginHorizontal: getScaleSize(8),
@@ -183,7 +318,7 @@ export default function RequestDetails(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {'-'}
+                  {serviceDetails?.elder_address ?? '-'}
                 </Text>
               </View>
             </View>
@@ -227,23 +362,42 @@ export default function RequestDetails(props: any) {
               color={theme._323232}>
               {STRING.Aboutprofessional}
             </Text>
-            <Image style={styles(theme).likeIcon} source={IMAGES.like_unfill} />
+            <TouchableOpacity
+              activeOpacity={1}
+              style={styles(theme).likeIconContainer}
+              onPress={() => {
+                if (serviceDetails?.provider?.is_favorite) {
+                  removeFavoriteProfessional();
+                } else {
+                  addFavoriteProfessional();
+                }
+              }}>
+              <Image style={styles(theme).likeIcon} source={serviceDetails?.provider?.is_favorite ? IMAGES.like : IMAGES.like_unfill} />
+            </TouchableOpacity>
           </View>
           <View
             style={[
               styles(theme).horizontalView,
               { marginTop: getScaleSize(16) },
             ]}>
-            <Image
-              style={styles(theme).profilePicView}
-              source={IMAGES.user_placeholder}
-            />
+            {serviceDetails?.provider?.profile_photo_url ?
+              <Image
+                style={styles(theme).profilePicView}
+                resizeMode='cover'
+                source={{ uri: serviceDetails?.provider?.profile_photo_url }}
+              />
+              :
+              <Image
+                style={styles(theme).profilePicView}
+                source={IMAGES.user_placeholder}
+              />
+            }
             <Text
               style={{ alignSelf: 'center', marginLeft: getScaleSize(16) }}
               size={getScaleSize(20)}
               font={FONTS.Lato.SemiBold}
               color={'#0F232F'}>
-              {'Bessie Cooper'}
+              {serviceDetails?.provider?.full_name ?? ''}
             </Text>
             <Image
               style={{
@@ -277,7 +431,7 @@ export default function RequestDetails(props: any) {
               activeOpacity={1}
               style={[styles(theme).newButton, { marginLeft: getScaleSize(6) }]}
               onPress={() => {
-                props.navigation.navigate(SCREENS.OtherUserProfile.identifier);
+                props.navigation.navigate(SCREENS.OtherUserProfile.identifier, { item: serviceDetails?.provider });
               }}>
               <Text
                 size={getScaleSize(14)}
@@ -310,40 +464,34 @@ export default function RequestDetails(props: any) {
           color={theme._323232}>
           {STRING.Supportingdocuments}
         </Text>
-        <View style={styles(theme).imageUploadContent}>
-          <TouchableOpacity
-            style={[styles(theme).uploadButton, { marginRight: getScaleSize(9) }]}
-            activeOpacity={1}
-            onPress={() => { }}>
-            <Image
-              style={styles(theme).attachmentIcon}
-              source={IMAGES.pdf_icon}
-            />
-            <Text
-              style={{ marginTop: getScaleSize(8) }}
-              size={getScaleSize(15)}
-              font={FONTS.Lato.Regular}
-              color={theme._818285}>
-              {STRING.ViewDocument}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9) }]}
-            activeOpacity={1}
-            onPress={() => { }}>
-            <Image
-              style={styles(theme).attachmentIcon}
-              source={IMAGES.pdf_icon}
-            />
-            <Text
-              style={{ marginTop: getScaleSize(8) }}
-              size={getScaleSize(15)}
-              font={FONTS.Lato.Regular}
-              color={theme._818285}>
-              {STRING.ViewDocument}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <FlatList
+          data={serviceDetails?.Supporting_docs ?? []}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: getScaleSize(16), marginTop: getScaleSize(12) }}
+          renderItem={({ item, index }) => {
+            return (
+              <TouchableOpacity
+                style={[styles(theme).uploadButton]}
+                activeOpacity={1}
+                onPress={() => {
+                  props.navigation.navigate(SCREENS.WebViewScreen.identifier, { url: item });
+                }}>
+                <Image
+                  style={styles(theme).attachmentIcon}
+                  source={IMAGES.pdf_icon}
+                />
+                <Text
+                  style={{ marginTop: getScaleSize(8) }}
+                  size={getScaleSize(15)}
+                  font={FONTS.Lato.Regular}
+                  color={theme._818285}>
+                  {STRING.ViewDocument}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
         <Text
           style={{ marginTop: getScaleSize(24) }}
           size={getScaleSize(18)}
@@ -399,35 +547,36 @@ export default function RequestDetails(props: any) {
       </View>
       <RejectBottomPopup
         rejectRef={rejectRef}
+        selectedCategory={selectedCategory}
+        reason={reason}
+        setSelectedCategory={setSelectedCategory}
+        setReason={setReason}
         onClose={() => {
           rejectRef.current.close();
         }}
         onReject={() => {
-          rejectRef.current.close();
+          onRejectReason();
         }}
       />
       <AcceptBottomPopup
         onRef={acceptRef}
+        title={`You are about to confirm a service at the rate of $${serviceDetails?.total_renegotiated ?? 0}€ with the Provider Wade Warren, Are you sure you want to continue? `}
         onClose={() => {
           acceptRef.current.close();
         }}
         onNavigate={() => {
-          acceptRef.current.close();
-          setTimeout(() => {
-            paymentRef.current.open();
-          }, 1000);
+          getServiceAmount();
         }}
       />
       <PaymentBottomPopup
         onRef={paymentRef}
+        serviceAmount={serviceAmount}
         onClose={() => {
           paymentRef.current.close();
         }}
         proceedToPay={() => {
-          paymentRef.current.close();
-          setTimeout(() => {
-            props.navigation.navigate(SCREENS.ServiceConfirmed.identifier)
-          }, 1000);
+          onAcceptService()
+          // props.navigation.navigate(SCREENS.ServiceConfirmed.identifier, { item: serviceDetails })
         }}
       />
       {isLoading && <ProgressView />}
@@ -498,9 +647,17 @@ const styles = (theme: ThemeContextType['theme']) =>
       marginTop: getScaleSize(16),
     },
     likeIcon: {
+      height: getScaleSize(16),
+      width: getScaleSize(16),
+      alignSelf: 'center',
+    },
+    likeIconContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
       height: getScaleSize(28),
       width: getScaleSize(28),
-      alignSelf: 'center',
+      backgroundColor: theme._F5F5F5,
+      borderRadius: getScaleSize(14),
     },
     profilePicView: {
       height: getScaleSize(56),
@@ -524,11 +681,11 @@ const styles = (theme: ThemeContextType['theme']) =>
       paddingHorizontal: 16,
     },
     imageUploadContent: {
-      marginTop: getScaleSize(12),
+
       flexDirection: 'row',
     },
     uploadButton: {
-      flex: 1.0,
+      width: (Dimensions.get('window').width - getScaleSize(66)) / 2,
       borderWidth: 1,
       borderColor: theme._818285,
       borderStyle: 'dashed',

@@ -29,10 +29,14 @@ function RequestItem(props: any) {
   function getStatus(status: any) {
     if (status === 'open') {
       return 'Open Proposal';
-    } else if (status === 'accepted') {
+    } else if (status === 'pending') {
       return 'Responsed';
-    } else if (status === 'completed') {
+    } else if (status === 'accepted') {
       return 'Validation';
+    } else if (status === 'completed') {
+      return 'Completed';
+    } else if (status === 'cancelled') {
+      return 'Cancelled';
     }
   }
 
@@ -41,11 +45,17 @@ function RequestItem(props: any) {
       props.onPress()
     }}>
       <View style={styles(theme).horizontalContainer}>
-        <Image
-          source={IMAGES.service_icon}
-          style={styles(theme).imageIcon}
-          resizeMode="contain"
-        />
+        <View style={styles(theme).imageContainer}>
+          {item?.category_logo ?
+            <Image
+              source={{ uri: item?.category_logo }}
+              style={styles(theme).imageIcon}
+              resizeMode="contain"
+            />
+            :
+            <View style={styles(theme).imageIcon} />
+          }
+        </View>
         <Text
           style={{ marginLeft: getScaleSize(16), alignSelf: 'center' }}
           size={getScaleSize(24)}
@@ -136,9 +146,17 @@ const styles = (theme: ThemeContextType['theme']) =>
     horizontalContainer: {
       flexDirection: 'row',
     },
-    imageIcon: {
-      width: getScaleSize(48),
+    imageContainer: {
       height: getScaleSize(44),
+      width: getScaleSize(44),
+      borderRadius: getScaleSize(10),
+      backgroundColor: theme._2C6587,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    imageIcon: {
+      width: getScaleSize(24),
+      height: getScaleSize(24),
     },
     detailsView: {
       backgroundColor: theme.white,

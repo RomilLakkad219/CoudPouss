@@ -70,7 +70,6 @@ export default function Search(props: any) {
             console.log('result', result.status, result)
             if (result.status) {
                 console.log('searchData==', result?.data?.data)
-
                 setSearchData(result?.data?.data);
             } else {
                 SHOW_TOAST(result?.data?.message ?? '', 'error')
@@ -105,18 +104,24 @@ export default function Search(props: any) {
                     contentContainerStyle={{ paddingBottom: getScaleSize(50) }}
                     showsVerticalScrollIndicator={false}
                     keyExtractor={(item: any, index: number) => index.toString()}
-                    renderItem={({ item }) => (
+                    renderItem={({ item, index }) => (
                         <RequestItem
+                            selectedFilter={typeof searchText === 'string' ? { id: '1', title: 'All', filter: 'all' } : null}
+                            key={index}
                             onPress={() => {
                                 if (item?.status === 'open') {
                                     props.navigation.navigate(SCREENS.OpenRequestDetails.identifier, {
                                         item: item
                                     })
-                                } else if (item?.status === 'accepted') {
+                                } else if (item?.status === 'pending') {
                                     props.navigation.navigate(SCREENS.RequestDetails.identifier, {
                                         item: item
                                     })
                                 } else if (item?.status === 'completed') {
+                                    props.navigation.navigate(SCREENS.CompletedTaskDetails.identifier, {
+                                        item: item
+                                    })
+                                } else if (item?.status === 'accepted') {
                                     props.navigation.navigate(SCREENS.CompletedTaskDetails.identifier, {
                                         item: item
                                     })

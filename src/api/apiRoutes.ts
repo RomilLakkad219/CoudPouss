@@ -21,7 +21,7 @@ const API_ROUTES = {
     addYearsOfExperience: 'userService/auth/experience',
     onSelectPlan: "userService/auth/select-plan",
     allCategories: "home_module/all_categories",
-    uploadServiceRequestImage: "service_request/upload",
+    uploadServiceRequestImage: "service_request/upload-job-file",
     editProfile: "profile_module/profile",
     onServiceRequest: "service_request/service-requests",
     ratingAndReviews: "elderly_profile/profile?section=ratings_reviews",
@@ -36,7 +36,24 @@ const API_ROUTES = {
     getProfessionalAllServices: "quote_request/open-services",
     getProfessionalServiceDetails: "quote_request/service-info",
     sendQuoteRequest: "quote_request/quoterequest",
-    fileUploadProfessionalServices:"service_request/upload"
+    fileUploadProfessionalServices:"quote_request/upload-job-file",
+    uploadProviderJobFiles: "profile_module/upload-files",
+    getProviderUserDetails: "service_confirmation/service_accept/provider_user",
+    getQuateList: "quote_accept/service-provider/quotes",
+    addFavoriteProfessional: "service_confirmation/favorite-provider/add",
+    removeFavoriteProfessional: "service_confirmation/favorite-provider/remove",
+    onServiceReject: "service_confirmation/service_accept/reject_quote",
+    getServiceAmount: "service_confirmation/service_accept/amounts",
+    onAcceptService: "service_confirmation/service_accept/accept_quote",
+    getServicePaymentDetails: "service_confirmation/service_accept/payment-details",
+    otherUserProfile: "service_confirmation/service_accept/user",
+    confirmPayment: "service_confirmation/service_accept/confirm-payment",
+    onWriteReview: "service_confirmation/ratings/submit?type=both",
+    getCancelServiceDetails: "service_request/get-payment",
+    onCancelService: "service_request/cancel",
+    getAllService: "userService/auth/get-selected-services",
+    getTsakDetails: "quote_accept/service-provider",
 }
+
 
 export { API_ROUTES, API_BASE_URL, DISABLE_API_LOGS }
