@@ -44,7 +44,7 @@ const StatusItem = (props: any) => {
           style={{
             height: getScaleSize(24),
             width: getScaleSize(24),
-            resizeMode: 'contain',
+            resizeMode: 'cover',
           }}
           source={getImage()}
         />

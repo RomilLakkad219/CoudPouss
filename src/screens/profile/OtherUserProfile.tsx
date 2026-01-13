@@ -445,7 +445,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       marginTop: getScaleSize(18),
     },
     ratingimage: {
-      resizeMode: 'contain',
+      resizeMode: 'cover',
       width: getScaleSize(20),
       height: getScaleSize(20),
       marginLeft: getScaleSize(2),

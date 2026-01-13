@@ -366,13 +366,13 @@ export default function RequestDetails(props: any) {
               activeOpacity={1}
               style={styles(theme).likeIconContainer}
               onPress={() => {
-                if (serviceDetails?.provider?.is_favorite) {
+                if (serviceDetails?.provider?.is_favorate) {
                   removeFavoriteProfessional();
                 } else {
                   addFavoriteProfessional();
                 }
               }}>
-              <Image style={styles(theme).likeIcon} source={serviceDetails?.provider?.is_favorite ? IMAGES.like : IMAGES.like_unfill} />
+              <Image style={styles(theme).likeIcon} source={serviceDetails?.provider?.is_favorate ? IMAGES.like : IMAGES.like_unfill} />
             </TouchableOpacity>
           </View>
           <View
@@ -399,15 +399,17 @@ export default function RequestDetails(props: any) {
               color={'#0F232F'}>
               {serviceDetails?.provider?.full_name ?? ''}
             </Text>
-            <Image
-              style={{
-                height: getScaleSize(25),
-                width: getScaleSize(25),
-                alignSelf: 'center',
-                marginLeft: getScaleSize(6),
-              }}
-              source={IMAGES.verify}
-            />
+            {serviceDetails?.provider?.is_verified &&
+              <Image
+                style={{
+                  height: getScaleSize(25),
+                  width: getScaleSize(25),
+                  alignSelf: 'center',
+                  marginLeft: getScaleSize(6),
+                }}
+                source={IMAGES.verify}
+              />
+            }
           </View>
           <View
             style={[
@@ -560,7 +562,7 @@ export default function RequestDetails(props: any) {
       />
       <AcceptBottomPopup
         onRef={acceptRef}
-        title={`You are about to confirm a service at the rate of $${serviceDetails?.total_renegotiated ?? 0}€ with the Provider Wade Warren, Are you sure you want to continue? `}
+        title={`You are about to confirm a service at the rate of €${serviceDetails?.total_renegotiated ?? 0} with the Provider Wade Warren, Are you sure you want to continue? `}
         onClose={() => {
           acceptRef.current.close();
         }}

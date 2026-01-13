@@ -174,10 +174,15 @@ export default function ServicePreview(props: any) {
                 { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
-                <Image
-                  style={styles(theme).informationIcon}
-                  source={IMAGES.service}
-                />
+                {serviceDetails?.category_info?.category_logo_url ?
+                  <Image
+                    style={styles(theme).informationIcon}
+                    source={{ uri: serviceDetails?.category_info?.category_logo_url }}
+                    resizeMode='cover'
+                  />
+                  :
+                  <View style={[styles(theme).informationIcon]} />
+                }
                 <Text
                   style={{
                     marginHorizontal: getScaleSize(8),
@@ -186,7 +191,7 @@ export default function ServicePreview(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {`${serviceDetails?.category_info?.category_name ?? ''}`}
+                  {`${serviceDetails?.category_info?.category_name ?? 'No'} Service`}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -227,7 +232,7 @@ export default function ServicePreview(props: any) {
             {serviceDetails?.about_client?.profile_photo ?
               <Image
                 style={styles(theme).profilePicView}
-                resizeMode='contain'
+                resizeMode='cover'
                 source={{ uri: serviceDetails?.about_client?.profile_photo }}
               />
               :
@@ -243,15 +248,6 @@ export default function ServicePreview(props: any) {
               color={'#0F232F'}>
               {serviceDetails?.about_client?.name}
             </Text>
-            <Image
-              style={{
-                height: getScaleSize(25),
-                width: getScaleSize(25),
-                alignSelf: 'center',
-                marginLeft: getScaleSize(6),
-              }}
-              source={IMAGES.verify}
-            />
           </View>
         </View>
         {profile?.user?.service_provider_type === 'non_professional' &&
@@ -314,7 +310,7 @@ export default function ServicePreview(props: any) {
                       {item ?
                         <Image
                           style={styles(theme).photosView}
-                          resizeMode='contain'
+                          resizeMode='cover'
                           source={{ uri: item }}
                         />
                         :
@@ -359,7 +355,7 @@ export default function ServicePreview(props: any) {
             return (
               <Image
                 style={styles(theme).photosView}
-                resizeMode='contain'
+                resizeMode='cover'
                 source={{ uri: item }}
               />
             );
@@ -375,7 +371,7 @@ export default function ServicePreview(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
-            color={'#424242'}>
+            color={theme._2C6587}>
             {STRING.EstimatedCost}
           </Text>
           <Text

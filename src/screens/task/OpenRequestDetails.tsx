@@ -25,21 +25,13 @@ import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
-    AcceptBottomPopup,
-    Button,
     Header,
-    PaymentBottomPopup,
     ProgressView,
-    RejectBottomPopup,
-    RequestItem,
-    SearchComponent,
     StatusItem,
     Text,
 } from '../../components';
 
 //PACKAGES
-import { useFocusEffect } from '@react-navigation/native';
-import { SCREENS } from '..';
 import { API } from '../../api';
 import moment from 'moment';
 

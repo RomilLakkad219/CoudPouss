@@ -105,5 +105,5 @@ export const IMAGES = {
   serviceCancelledIcon: require('./serviceCancelledIcon.png'),
   search_icon: require('./search_icon.png'),
   arrow_left: require('./arrow_left.png'),
-  homeBanner: require('./1111111.png')
+  homeBanner: require('./pHomeBanner.png')
 };

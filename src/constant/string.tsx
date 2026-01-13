@@ -369,6 +369,8 @@ export const useString = () => {
     you_have_not_sent_any_quote_please_sent_a_quotes_to_the_service_request: "You have not sent any quote, please sent\na quotes to the service request",
     you_can_also_upload_a_video: "(You can also upload a video)",
     cancellation_not_possible: "Cancellation not possible",
+    are_you_sure_you_want_to_logout: "Are you sure you want to\nlogout?",
+    no_data_found: "No data found",
   };
 };
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -15,7 +15,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { getScaleSize, Storage, useString } from '../../constant';
 
 //COMPONENTS
-import { Text, HomeHeader, SearchComponent, Header, Button } from '../../components';
+import { Text, HomeHeader, SearchComponent, Header, Button, BottomSheet, ProgressView } from '../../components';
 import { SCREENS } from '..';
 import { CommonActions } from '@react-navigation/native';
 
@@ -25,6 +25,9 @@ export default function Profile(props: any) {
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
   const { userType, profile } = useContext<any>(AuthContext);
+
+  const [isLoading, setLoading] = useState(false);
+  const bottomSheetRef = useRef<any>(null);
 
   console.log('user', profile)
 
@@ -52,18 +55,17 @@ export default function Profile(props: any) {
     }
   }
 
-
-
-
   async function logout() {
+    setLoading(true);
+    bottomSheetRef.current.close();
     await Storage.clear()
-   
     props.navigation.dispatch(
       CommonActions.reset({
         index: 0,
         routes: [{ name: SCREENS.Splash.identifier }],
       }),
     );
+    setLoading(false);
   }
 
 
@@ -73,7 +75,7 @@ export default function Profile(props: any) {
         type="profile"
         rightIcon={{ icon: IMAGES.ic_logout, title: STRING.logout }}
         onPress={() => {
-          logout();
+          bottomSheetRef.current.open();
         }}
         screenName={STRING.my_account}
       />
@@ -82,7 +84,16 @@ export default function Profile(props: any) {
           {profile?.user?.profile_photo_url ? (
             <Image source={{ uri: profile?.user?.profile_photo_url }} resizeMode='cover' style={styles(theme).profileContainer} />
           ) : (
-            <View style={styles(theme).profileContainer} />
+            <View style={styles(theme).EmptyProfileContainer}>
+              <Text
+                size={getScaleSize(24)}
+                font={FONTS.Lato.Regular}
+                align="center"
+                color={theme._262B43E5}>
+                {(profile?.user?.first_name?.charAt(0) ?? '').toUpperCase() +
+                  (profile?.user?.last_name?.charAt(0) ?? '').toUpperCase()}
+              </Text>
+            </View>
           )}
           <Text
             size={getScaleSize(22)}
@@ -140,6 +151,18 @@ export default function Profile(props: any) {
           </View>
         </View>
       </ScrollView>
+      <BottomSheet
+        bottomSheetRef={bottomSheetRef}
+        height={getScaleSize(300)}
+        isInfo={true}
+        title={STRING.are_you_sure_you_want_to_logout}
+        buttonTitle={STRING.logout}
+        onPressButton={() => {
+          logout()
+        }}
+      />
+      {isLoading && <ProgressView />}
+      ˝
     </View>
   );
 }
@@ -159,9 +182,20 @@ const styles = (theme: ThemeContextType['theme']) =>
     profileContainer: {
       width: getScaleSize(126),
       height: getScaleSize(126),
+      borderWidth: 1,
+      borderColor: theme._F0EFF0,
+      borderRadius: getScaleSize(126),
+      alignSelf: 'center',
+      marginBottom: getScaleSize(12),
+    },
+    EmptyProfileContainer: {
+      width: getScaleSize(126),
+      height: getScaleSize(126),
       backgroundColor: theme._F0EFF0,
       borderRadius: getScaleSize(126),
       alignSelf: 'center',
+      alignItems: 'center',
+      justifyContent: 'center',
       marginBottom: getScaleSize(12),
     },
     profileItemContainer: {

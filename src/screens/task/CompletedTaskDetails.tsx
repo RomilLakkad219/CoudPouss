@@ -350,13 +350,13 @@ export default function CompletedTaskDetails(props: any) {
                             activeOpacity={1}
                             style={styles(theme).likeIconContainer}
                             onPress={() => {
-                                if (serviceDetails?.provider?.is_favorite) {
+                                if (serviceDetails?.provider?.is_favorate) {
                                     removeFavoriteProfessional();
                                 } else {
                                     addFavoriteProfessional();
                                 }
                             }}>
-                            <Image style={styles(theme).likeIcon} source={serviceDetails?.provider?.is_favorite ? IMAGES.like : IMAGES.like_unfill} />
+                            <Image style={styles(theme).likeIcon} source={serviceDetails?.provider?.is_favorate ? IMAGES.like : IMAGES.like_unfill} />
                         </TouchableOpacity>
                     </View>
                     <View
@@ -383,16 +383,19 @@ export default function CompletedTaskDetails(props: any) {
                             color={'#0F232F'}>
                             {serviceDetails?.provider?.full_name ?? ''}
                         </Text>
-                        <Image
-                            style={{
-                                height: getScaleSize(25),
-                                width: getScaleSize(25),
-                                alignSelf: 'center',
-                                marginLeft: getScaleSize(6),
-                            }}
-                            source={IMAGES.verify}
-                        />
+                        {serviceDetails?.provider?.is_verified &&
+                            <Image
+                                style={{
+                                    height: getScaleSize(25),
+                                    width: getScaleSize(25),
+                                    alignSelf: 'center',
+                                    marginLeft: getScaleSize(6),
+                                }}
+                                source={IMAGES.verify}
+                            />
+                        }
                     </View>
+
                     <View
                         style={[
                             styles(theme).horizontalView,

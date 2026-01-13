@@ -53,6 +53,7 @@ export default function ProfessionalTaskDetails(props: any) {
 
   const item = props?.route?.params?.item ?? {};
 
+  console.log('item==>', item)
   useEffect(() => {
     if (item) {
       getServiceDetails();
@@ -61,19 +62,15 @@ export default function ProfessionalTaskDetails(props: any) {
 
   async function getServiceDetails() {
     try {
-      const params = {
-        service_id: item?.id
-      }
       setLoading(true);
-      const result = await API.Instance.post(API.API_ROUTES.getServiceDetails, params);
-      setLoading(false);
+      const result = await API.Instance.get(API.API_ROUTES.getTsakDetails + `/${item?.quote_status}/${item?.quote_id}`);
       if (result.status) {
+        console.log('getServiceDetails==>', result?.data?.data)
         setServiceDetails(result?.data?.data ?? {});
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
       console.log(error?.message)
     } finally {

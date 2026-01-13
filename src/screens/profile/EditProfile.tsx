@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     Image,
     SafeAreaView,
+    Dimensions,
 } from 'react-native';
 
 //ASSETS
@@ -53,6 +54,11 @@ export default function EditProfile(props: any) {
     const [showCountryCode, setShowCountryCode] = useState(false);
     const [profileImage, setProfileImage] = useState<any>(null);
     const [yearsOfExperience, setYearsOfExperience] = useState<number>(0);
+    const [firstImageURL, setFirstImageURL] = useState<any>(null);
+    const [secondImageURL, setSecondImageURL] = useState<any>(null);
+    const [firstProductImageURL, setFirstProductImageURL] = useState<any>(null);
+    const [secondProductImageURL, setSecondProductImageURL] = useState<any>(null);
+
 
     console.log('profile==>', profile)
 
@@ -62,15 +68,30 @@ export default function EditProfile(props: any) {
         setMobileNumber(profile?.user?.phone_number ?? '');
         setAddress(profile?.user?.address ?? '');
         setYearsOfExperience(profile?.provider_info?.years_of_experience ?? '');
+        setBio(profile?.provider_info?.bio ?? '');
+        setExperienceSpecialities(profile?.provider_info?.experience_speciality ?? '');
+        setAchievements(profile?.provider_info?.achievements ?? '');
+        setFirstImageURL(profile?.past_work_files?.[0] ?? null);
+        setSecondImageURL(profile?.past_work_files?.[1] ?? null);
     }, [profile]);
 
-    const pickImage = async () => {
+    console.log('firstImageURL', profile?.past_work_photos)
+
+    const pickImage = async (type: string) => {
         launchImageLibrary({ mediaType: 'photo' }, (response) => {
             if (!response.didCancel && !response.errorCode && response.assets) {
                 const asset: any = response.assets[0];
                 console.log('asset', asset)
-                setProfileImage(asset);
-                uploadProfileImage(asset);
+                if (type === 'profile') {
+                    setProfileImage(asset);
+                    uploadProfileImage(asset);
+                } else if (type === 'first') {
+                    setFirstImageURL(asset?.uri);
+                    uploadProductImage(asset, 'first');
+                } else if (type === 'second') {
+                    setSecondImageURL(asset?.uri);
+                    uploadProductImage(asset, 'second');
+                }
             } else {
                 console.log('response', response)
             }
@@ -114,7 +135,6 @@ export default function EditProfile(props: any) {
     }
 
     async function onEditUserProfile() {
-
         try {
             const params = {
                 "user_data": {
@@ -123,9 +143,10 @@ export default function EditProfile(props: any) {
                 },
                 "provider_data": {
                     "bio": bio,
-                    "speciality": experienceSpecialities,
+                    "experience_speciality": experienceSpecialities,
                     "achievements": achievements,
-                    "years_of_experience": Number(yearsOfExperience) || 0
+                    "years_of_experience": Number(yearsOfExperience) || 0,
+                    past_work_image_keys: [firstImageURL, secondImageURL]
                 }
             }
             setLoading(true);
@@ -148,6 +169,37 @@ export default function EditProfile(props: any) {
         }
     }
 
+    async function uploadProductImage(asset: any, type: string) {
+        try {
+            const formData = new FormData();
+
+            formData.append('past_work_photos', {
+                uri: asset?.uri,
+                name: asset?.fileName || 'profile_image.jpg',
+                type: asset?.type || 'image/jpeg',
+            });
+            setLoading(true);
+            const result = await API.Instance.post(API.API_ROUTES.uploadProviderJobFiles, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            if (result.status) {
+                console.log('kjsdkjadakjdjasdna', result?.data?.file?.[0]?.storage_key)
+                if (type === 'first') setFirstProductImageURL(result?.data?.file?.[0]?.storage_key);
+                else if (type === 'second') setSecondProductImageURL(result?.data?.file?.[0]?.storage_key);
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error');
+                if (type === 'first') setFirstImageURL(null);
+                else if (type === 'second') setSecondImageURL(null);
+            }
+        } catch (error: any) {
+            if (type === 'first') setFirstImageURL(null);
+            else if (type === 'second') setSecondImageURL(null);
+            SHOW_TOAST(error?.message ?? '', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <View style={styles(theme).container}>
             <Header
@@ -163,12 +215,19 @@ export default function EditProfile(props: any) {
                     <Image source={{ uri: profile?.user?.profile_photo_url }}
                         resizeMode='cover' style={styles(theme).profileContainer} />
                     :
-                    <View style={[styles(theme).profileContainer, {
-                        backgroundColor: theme._F0EFF0,
-                    }]} />
+                    <View style={styles(theme).EmptyProfileContainer}>
+                        <Text
+                            size={getScaleSize(24)}
+                            font={FONTS.Lato.Regular}
+                            align="center"
+                            color={theme._262B43E5}>
+                            {(profile?.user?.first_name?.charAt(0) ?? '').toUpperCase() +
+                                (profile?.user?.last_name?.charAt(0) ?? '').toUpperCase()}
+                        </Text>
+                    </View>
                 }
                 <TouchableOpacity onPress={() => {
-                    pickImage()
+                    pickImage("profile")
                 }}>
                     <Text
                         size={getScaleSize(16)}
@@ -239,6 +298,7 @@ export default function EditProfile(props: any) {
                         inputColor={true}
                         value={address}
                         multiline={true}
+                        numberOfLines={4}
                         inputContainer={styles(theme).inputContainerHeight90}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
@@ -272,6 +332,7 @@ export default function EditProfile(props: any) {
                         value={bio}
                         inputContainer={styles(theme).inputContainerHeight}
                         multiline={true}
+                        numberOfLines={8}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
                             setBio(text);
@@ -285,6 +346,7 @@ export default function EditProfile(props: any) {
                         value={experienceSpecialities}
                         inputContainer={styles(theme).inputContainerHeight}
                         multiline={true}
+                        numberOfLines={8}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
                             setExperienceSpecialities(text);
@@ -298,6 +360,7 @@ export default function EditProfile(props: any) {
                         value={achievements}
                         inputContainer={styles(theme).inputContainerHeight}
                         multiline={true}
+                        numberOfLines={8}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
                             setAchievements(text);
@@ -313,36 +376,59 @@ export default function EditProfile(props: any) {
                     </Text>
                     <View style={styles(theme).imageUploadContent}>
                         <TouchableOpacity
-                            style={[styles(theme).uploadButton, { marginRight: getScaleSize(9) }]}
+                            style={{ flex: 1, marginRight: getScaleSize(9) }}
                             activeOpacity={1}
-                            onPress={() => { }}>
-                            <Image
-                                style={styles(theme).attachmentIcon}
-                                source={IMAGES.upload_attachment}
-                            />
-                            <Text
-                                style={{ marginTop: getScaleSize(8) }}
-                                size={getScaleSize(15)}
-                                font={FONTS.Lato.Regular}
-                                color={theme._818285}>
-                                {STRING.upload_from_device}
-                            </Text>
+                            onPress={() => {
+                                pickImage("first")
+                            }}>
+                            {firstImageURL ? (
+                                <Image
+                                    style={styles(theme).ImageStyle}
+                                    source={{ uri: firstImageURL }}
+                                />
+                            ) : (
+                                <View style={styles(theme).uploadButton}>
+                                    <Image
+                                        style={styles(theme).attachmentIcon}
+                                        source={IMAGES.upload_attachment}
+                                    />
+                                    <Text
+                                        style={{ marginTop: getScaleSize(8) }}
+                                        size={getScaleSize(15)}
+                                        font={FONTS.Lato.Regular}
+                                        color={theme._818285}>
+                                        {STRING.upload_from_device}
+                                    </Text>
+                                </View>
+                            )}
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9) }]}
+                            style={{ flex: 1, marginLeft: getScaleSize(9) }}
                             activeOpacity={1}
-                            onPress={() => { }}>
-                            <Image
-                                style={styles(theme).attachmentIcon}
-                                source={IMAGES.upload_attachment}
-                            />
-                            <Text
-                                style={{ marginTop: getScaleSize(8) }}
-                                size={getScaleSize(15)}
-                                font={FONTS.Lato.Regular}
-                                color={theme._818285}>
-                                {STRING.upload_from_device}
-                            </Text>
+                            onPress={() => {
+                                pickImage("second")
+                            }}>
+                            {secondImageURL ? (
+                                <Image
+                                    style={styles(theme).ImageStyle}
+                                    source={{ uri: secondImageURL }}
+                                />
+                            ) : (
+                                <View style={[styles(theme).uploadButton]}>
+                                    <Image
+                                        style={styles(theme).attachmentIcon}
+                                        source={IMAGES.upload_attachment}
+                                    />
+                                    <Text
+                                        style={{ marginTop: getScaleSize(8) }}
+                                        size={getScaleSize(15)}
+                                        font={FONTS.Lato.Regular}
+                                        color={theme._818285}>
+                                        {STRING.upload_from_device}
+                                    </Text>
+                                </View>
+                            )}
+
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -368,9 +454,20 @@ const styles = (theme: ThemeContextType['theme']) =>
         profileContainer: {
             width: getScaleSize(126),
             height: getScaleSize(126),
+            borderWidth: 1,
+            borderColor: theme._F0EFF0,
+            borderRadius: getScaleSize(126),
+            alignSelf: 'center',
+            marginBottom: getScaleSize(12),
+        },
+        EmptyProfileContainer: {
+            width: getScaleSize(126),
+            height: getScaleSize(126),
             backgroundColor: theme._F0EFF0,
             borderRadius: getScaleSize(126),
             alignSelf: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
             marginBottom: getScaleSize(12),
         },
         mainContainer: {
@@ -404,11 +501,17 @@ const styles = (theme: ThemeContextType['theme']) =>
             marginVertical: getScaleSize(24),
         },
         inputContainerHeight: {
-            height: getScaleSize(200),
+            height: getScaleSize(190),
             textAlignVertical: 'top'
         },
         inputContainerHeight90: {
             height: getScaleSize(90),
             textAlignVertical: 'top'
+        },
+        ImageStyle: {
+            height: getScaleSize(160),
+            width: (Dimensions.get('window').width - getScaleSize(108)) / 2,
+            borderRadius: getScaleSize(8),
+            resizeMode: 'cover',
         }
     });

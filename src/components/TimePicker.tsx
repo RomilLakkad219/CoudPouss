@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import { ThemeContext, ThemeContextType } from '../context';
-import { getScaleSize } from '../constant';
+import { getScaleSize, SHOW_TOAST } from '../constant';
 import { FONTS, IMAGES } from '../assets';
 import Text from './Text';
 import moment from 'moment';
 
 const TimePicker = (props: any) => {
-  const { onTimeChange } = props;
+  const { onTimeChange, selectedDate } = props;
   const { theme } = useContext<any>(ThemeContext);
 
   const currentHour24 = moment().hour();
@@ -19,16 +19,41 @@ const TimePicker = (props: any) => {
   const [isAM, setIsAM] = useState(isCurrentAM);
 
 
-  const updateParent = (hour: number, minute: number, am: boolean) => {
-    onTimeChange && onTimeChange(hour, minute, am);
+  const isFutureDateTime = (
+    selectedDate: string | Date,
+    hour: number,
+    minute: number,
+    am: boolean
+  ): boolean => {
+    // Convert to 24-hour format
+    let hour24 = hour % 12;
+    if (!am) hour24 += 12;
+
+    const selectedDateTime = moment(selectedDate).hour(hour24).minute(minute).second(0).millisecond(0);
+
+    const now = moment();
+
+    return selectedDateTime.isAfter(now);
   };
+
+  const updateParent = (hour: number, minute: number, am: boolean) => {
+    if (isFutureDateTime(selectedDate, hour, minute, am)) {
+      onTimeChange && onTimeChange(hour, minute, am);
+      return true;
+    }
+    else {
+      SHOW_TOAST('Please select a future time', 'error');
+      return false;
+    }
+  };
+
 
   // Handle hour increment
   const incrementHour = () => {
     setSelectedHour(prev => {
       const newHour = prev === 12 ? 1 : prev + 1;
-      updateParent(newHour, selectedMinute, isAM);
-      return newHour;
+      const isValid = updateParent(newHour, selectedMinute, isAM);
+      return isValid ? newHour : prev;
     });
   };
 
@@ -36,8 +61,8 @@ const TimePicker = (props: any) => {
   const decrementHour = () => {
     setSelectedHour(prev => {
       const newHour = prev === 1 ? 12 : prev - 1;
-      updateParent(newHour, selectedMinute, isAM);
-      return newHour;
+      const isValid = updateParent(newHour, selectedMinute, isAM);
+      return isValid ? newHour : prev;
     });
   };
 
@@ -45,8 +70,8 @@ const TimePicker = (props: any) => {
   const incrementMinute = () => {
     setSelectedMinute(prev => {
       const newMinute = prev === 59 ? 0 : prev + 1;
-      updateParent(selectedHour, newMinute, isAM);
-      return newMinute;
+      const isValid = updateParent(selectedHour, newMinute, isAM);
+      return isValid ? newMinute : prev;
     });
   };
 
@@ -54,8 +79,8 @@ const TimePicker = (props: any) => {
   const decrementMinute = () => {
     setSelectedMinute(prev => {
       const newMinute = prev === 0 ? 59 : prev - 1;
-      updateParent(selectedHour, newMinute, isAM);
-      return newMinute;
+      const isValid = updateParent(selectedHour, newMinute, isAM);
+      return isValid ? newMinute : prev;
     });
   };
 
@@ -63,7 +88,8 @@ const TimePicker = (props: any) => {
   const toggleAmPm = () => {
     setIsAM(prev => {
       const newAm = !prev;
-      updateParent(selectedHour, selectedMinute, newAm);
+      const isValid = updateParent(selectedHour, selectedMinute, newAm);
+      return isValid ? newAm : prev;
       return newAm;
     });
   };

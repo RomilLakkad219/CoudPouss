@@ -63,9 +63,10 @@ export default function Task(props: any) {
   async function getQuateList() {
     try {
       setLoading(true);
-      const result = await API.Instance.get(API.API_ROUTES.getQuateList + `?page=${page}&limit=${10}&status=${getStatus()}`);
+      const result = await API.Instance.get(API.API_ROUTES.getQuateList + `?status=${getStatus()}&page=${page}&limit=${PAGE_SIZE}`);
       if (result.status) {
         const newData = result?.data?.data?.results ?? [];
+        console.log('newData==>', newData)
         if (newData.length < PAGE_SIZE) {
           setHasMore(false);
           setQuateList((prev: any) => [...prev, ...newData]);
@@ -112,6 +113,8 @@ export default function Task(props: any) {
           activeOpacity={1}
           onPress={() => {
             setSelectedIndex(0);
+            setPage(1);
+            setQuateList([]);
           }}>
           <View style={[styles(theme).tabItemContainer, { borderBottomWidth: selectedIndex === 0 ? 2 : 0 }]}>
             <Text
@@ -128,6 +131,8 @@ export default function Task(props: any) {
           activeOpacity={1}
           onPress={() => {
             setSelectedIndex(1);
+            setPage(1);
+            setQuateList([]);
           }}>
           <View style={[styles(theme).tabItemContainer, { borderBottomWidth: selectedIndex === 1 ? 2 : 0 }]}>
             <Text
@@ -144,6 +149,8 @@ export default function Task(props: any) {
           activeOpacity={1}
           onPress={() => {
             setSelectedIndex(2);
+            setPage(1);
+            setQuateList([]);
           }}>
           <View style={[styles(theme).tabItemContainer, { borderBottomWidth: selectedIndex === 2 ? 2 : 0 }]}>
             <Text
@@ -176,9 +183,9 @@ export default function Task(props: any) {
                   key={index}
                   item={item}
                   onPressItem={() => {
-                    props.navigation.navigate(
-                      SCREENS.ProfessionalTaskDetails.identifier,
-                    );
+                    props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier, {
+                      item: item
+                    });
                   }}
                   onPressStatus={() => {
                     props.navigation.navigate(SCREENS.TaskStatus.identifier);

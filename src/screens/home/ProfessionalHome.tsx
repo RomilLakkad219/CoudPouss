@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Image,
   SafeAreaView,
+  ImageBackground,
 } from 'react-native';
 
 //ASSETS
@@ -142,11 +143,38 @@ export default function ProfessionalHome(props: any) {
       <ScrollView
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
-        <Image
+        <ImageBackground
           style={styles(theme).bannerView}
+          resizeMode='cover'
           source={IMAGES.homeBanner}
-        />
-        <View style={[styles(theme).directionView,{marginBottom: getScaleSize(24)}]}>
+        >
+          <View style={styles(theme).textView}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text
+                size={getScaleSize(40)}
+                font={FONTS.Lato.Bold}
+                color={theme.white}>
+                {props?.professionalConnectedCount ?? '0'}{' '}
+              </Text>
+              <Text
+                size={getScaleSize(16)}
+                font={FONTS.Lato.Medium}
+                color={theme.white}>
+                {'Professionals\nConnected Today'}
+              </Text>
+            </View>
+            <Text
+              style={{ marginTop: getScaleSize(8) }}
+              size={getScaleSize(12)}
+              font={FONTS.Lato.Regular}
+              color={theme.white}>
+              {
+                'Lorem ipsum a pharetra mattis dilt pulvinar tortor amet vulputate.'
+              }
+            </Text>
+          </View>
+        </ImageBackground>
+        <View style={[styles(theme).directionView, { marginBottom: getScaleSize(24) }]}>
           <Text
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
@@ -177,7 +205,7 @@ export default function ProfessionalHome(props: any) {
             key={index}
             data={item}
             onPress={() => {
-              props.navigation.navigate(SCREENS.ServicePreview.identifier, { 
+              props.navigation.navigate(SCREENS.ServicePreview.identifier, {
                 serviceData: item,
                 isFromHome: true,
               });
@@ -263,10 +291,12 @@ const styles = (theme: ThemeContextType['theme']) =>
       marginHorizontal: getScaleSize(22),
     },
     bannerView: {
-      borderRadius: getScaleSize(25),
-      height: getScaleSize(150),
+     
+      height: ((Dimensions.get('window').width - getScaleSize(44)) * getScaleSize(124)) / getScaleSize(386),
       alignSelf: 'center',
-      width: '100%',
+      width: Dimensions.get('window').width - getScaleSize(44),
+      borderRadius: getScaleSize(25),
+      overflow: 'hidden',
     },
     horizontalContainer: {
       marginTop: getScaleSize(3),
@@ -275,5 +305,11 @@ const styles = (theme: ThemeContextType['theme']) =>
     directionView: {
       flexDirection: 'row',
       alignItems: 'center'
+    },
+    textView:{
+      justifyContent: 'center',
+      flex: 1.0,
+      marginLeft: getScaleSize(135),
+      marginRight: getScaleSize(30),
     }
   });

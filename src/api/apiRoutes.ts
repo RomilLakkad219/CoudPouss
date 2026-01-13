@@ -53,6 +53,7 @@ const API_ROUTES = {
     onCancelService: "service_request/cancel",
     getAllService: "userService/auth/get-selected-services",
     getTsakDetails: "quote_accept/service-provider",
+    getRefreshToken: "userService/auth/refresh-token",
 }
 
 

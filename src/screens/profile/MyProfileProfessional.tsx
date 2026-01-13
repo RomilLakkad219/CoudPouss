@@ -36,6 +36,7 @@ import {
 //PACKAGES
 import { useFocusEffect } from '@react-navigation/native';
 import { SCREENS } from '..';
+import { Rating } from 'react-native-ratings';
 
 export default function MyProfileProfessional(props: any) {
 
@@ -46,6 +47,8 @@ export default function MyProfileProfessional(props: any) {
 
   const [showMore, setShowMore] = useState(false);
   const [showMoreExperience, setShowMoreExperience] = useState(false);
+
+  console.log('profileDATA==>', profile)
 
   return (
     <View style={styles(theme).container}>
@@ -69,9 +72,16 @@ export default function MyProfileProfessional(props: any) {
               source={{ uri: profile?.user?.profile_photo_url }}
             />
             :
-            <View style={[styles(theme).profilePic, {
-              backgroundColor: theme._F0EFF0,
-            }]} />
+            <View style={styles(theme).EmptyProfileContainer}>
+              <Text
+                size={getScaleSize(24)}
+                font={FONTS.Lato.Regular}
+                align="center"
+                color={theme._262B43E5}>
+                {(profile?.user?.first_name?.charAt(0) ?? '').toUpperCase() +
+                  (profile?.user?.last_name?.charAt(0) ?? '').toUpperCase()}
+              </Text>
+            </View>
           }
           <Text
             size={getScaleSize(22)}
@@ -88,7 +98,7 @@ export default function MyProfileProfessional(props: any) {
                   font={FONTS.Lato.Bold}
                   color={'#1D7885'}
                   style={{ alignSelf: 'center' }}>
-                  {'4.6'}
+                  {profile?.customer_ratings?.overall_average ?? '0.0'}
                 </Text>
                 <Text
                   size={getScaleSize(12)}
@@ -136,7 +146,7 @@ export default function MyProfileProfessional(props: any) {
                   font={FONTS.Lato.Bold}
                   color={'#1D7885'}
                   style={{ alignSelf: 'center' }}>
-                  {'4.6'}
+                  {profile?.unique_clients_count ?? '0'}
                 </Text>
                 <Text
                   size={getScaleSize(12)}
@@ -177,19 +187,19 @@ export default function MyProfileProfessional(props: any) {
             numberOfLines={showMoreExperience ? undefined : 3}
             style={{ marginTop: getScaleSize(8) }}
             color={theme._323232}>
-            {
-              'Hi, I’m Bessie — with over 6 years of experience in expert TV mounting and reliable plumbing solutions. I specialize in mounting TVs, shelves, mirrors with precision and care Mounting Expert You Can Trust Over 6 of experience in securely mounting TVs, shelves, mirrors, artwork, and more Reliable & On-Time I value your time and ready to get the job done right the first time Clean Work, Solid Results Every project is done with attention to detail, safety, and durability Respect for Your Space I treat your home like it’s my own. Friendly, professional, and focused on delivering quality you’ll love. Client Satisfaction First I’m proud of my 5-star service and happy clients '
-            }
+            {profile?.provider_info?.experience_speciality ?? '-'}
           </Text>
-          <TouchableOpacity style={{ marginTop: getScaleSize(8) }}
-            onPress={() => setShowMoreExperience(!showMoreExperience)}>
-            <Text
-              size={getScaleSize(16)}
-              font={FONTS.Lato.Medium}
-              color={'#2C6587'}>
-              {showMoreExperience ? STRING.show_less : STRING.read_more}
-            </Text>
-          </TouchableOpacity>
+          {profile?.provider_info?.experience_speciality?.length > 100 &&
+            <TouchableOpacity style={{ marginTop: getScaleSize(8) }}
+              onPress={() => setShowMoreExperience(!showMoreExperience)}>
+              <Text
+                size={getScaleSize(16)}
+                font={FONTS.Lato.Medium}
+                color={'#2C6587'}>
+                {showMoreExperience ? STRING.show_less : STRING.read_more}
+              </Text>
+            </TouchableOpacity>
+          }
         </View>
         <View style={styles(theme).informationContainer}>
           <Text
@@ -203,9 +213,7 @@ export default function MyProfileProfessional(props: any) {
             font={FONTS.Lato.Medium}
             style={{ marginTop: getScaleSize(8) }}
             color={theme._323232}>
-            {
-              'Bessie Cooper has successfully completed over 150 projects, showcasing her expertise in TV mounting and plumbing. Her dedication to quality and customer satisfaction has earned her numerous accolades, including the "Best Service Provider" award in 2022. Clients consistently praise her attention to detail and professionalism, making her a top choice for home improvement services.'
-            }
+            {profile?.provider_info?.achievements ?? '-'}
           </Text>
         </View>
         <View style={styles(theme).informationContainer}>
@@ -216,16 +224,24 @@ export default function MyProfileProfessional(props: any) {
             {STRING.Photosofpastwork}
           </Text>
           <FlatList
-            data={['']}
+            data={profile?.past_work_files ?? []}
             horizontal
             keyExtractor={(item: any, index: number) => index.toString()}
             showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: getScaleSize(12) }}
             renderItem={({ item, index }) => {
               return (
-                <Image
-                  style={[styles(theme).photosView]}
-                  source={{ uri: 'https://picsum.photos/id/1/200/300' }}
-                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    props.navigation.navigate(SCREENS.WebViewScreen.identifier, { url: item });
+                  }}>
+                  <Image
+                    style={[styles(theme).photosView]}
+                    resizeMode="cover"
+                    source={{ uri: item }}
+                  />
+                </TouchableOpacity>
               );
             }}
           />
@@ -246,7 +262,7 @@ export default function MyProfileProfessional(props: any) {
               size={getScaleSize(24)}
               font={FONTS.Lato.SemiBold}
               color={theme._323232}>
-              {'4.6'}
+              {profile?.customer_ratings?.average_rating ?? '0.0'}
             </Text>
             <View
               style={{
@@ -254,84 +270,90 @@ export default function MyProfileProfessional(props: any) {
                 alignSelf: 'center',
               }}>
               <View style={styles(theme).rowView}>
-                {[...Array(5)].map((_, i) => (
-                  <Image
-                    key={i}
-                    source={IMAGES.star}
-                    style={styles(theme).ratingimage}
-                  />
-                ))}
+                <Rating
+                  type="custom"
+                  ratingBackgroundColor="#EDEFF0"
+                  tintColor="#fff" // background color, useful for layout
+                  ratingCount={5}
+                  ratingColor={'#F0B52C'} // grey color
+                  startingValue={profile?.customer_ratings?.average_rating ?? 0}
+                  imageSize={18}
+                  readonly
+                />
               </View>
               <Text
                 size={getScaleSize(12)}
                 style={{ marginTop: getScaleSize(3) }}
                 font={FONTS.Lato.Medium}
                 color={theme._323232}>
-                {'Based on 471 ratings'}
+                {`Based on ${profile?.customer_ratings?.total_ratings ?? 0} ratings`}
               </Text>
             </View>
           </View>
           <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Work quality'}
-              value={'4.6'}
-              fillCount={4.6}
+              value={profile?.customer_ratings?.criteria_averages?.work_quality ?? '0.0'}
+              fillCount={profile?.customer_ratings?.criteria_averages?.work_quality ?? 0}
               totalCount={5}
             />
           </View>
           <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Reliability'}
-              value={'4.6'}
-              fillCount={4.6}
+              value={profile?.customer_ratings?.criteria_averages?.reliability ?? '0.0'}
+              fillCount={profile?.customer_ratings?.criteria_averages?.reliability ?? 0}
               totalCount={5}
             />
           </View>
           <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Punctunality'}
-              value={'4.6'}
-              fillCount={4.6}
+              value={profile?.customer_ratings?.criteria_averages?.punctuality ?? '0.0'}
+              fillCount={profile?.customer_ratings?.criteria_averages?.punctuality ?? 0}
               totalCount={5}
             />
           </View>
           <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Soluction'}
-              value={'4.6'}
-              fillCount={4.6}
+              value={profile?.customer_ratings?.criteria_averages?.solution ?? '0.0'}
+              fillCount={profile?.customer_ratings?.criteria_averages?.solution ?? 0}
               totalCount={5}
             />
           </View>
           <View style={{ marginTop: getScaleSize(15) }}>
             <RattingControler
               title={'Payout'}
-              value={'4.6'}
-              fillCount={3}
+              value={profile?.customer_ratings?.criteria_averages?.payout ?? '0.0'}
+              fillCount={profile?.customer_ratings?.criteria_averages?.payout ?? 0}
               totalCount={5}
             />
           </View>
         </View>
-        <View style={styles(theme).informationContainer}>
-          <Text
-            size={getScaleSize(16)}
-            font={FONTS.Lato.Medium}
-            color={'#2C6587'}>
-            {STRING.RecentWorksReviews}
-          </Text>
-          {['', ''].map((item: any, index: number) => {
-            return (
-              <RatingsReviewsItem
-                key={index}
-                itemContainer={{ marginTop: index === 0 ? getScaleSize(20) : getScaleSize(16) }}
-                onPressShowMore={() => {
-                  setShowMore(!showMore);
-                }}
-                showMore={showMore}
-              />
-            );
-          })}
-        </View>
+        {profile?.recent_reviews?.length > 0 &&
+          <View style={styles(theme).informationContainer}>
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.Medium}
+              color={'#2C6587'}>
+              {STRING.RecentWorksReviews}
+            </Text>
+            {profile?.recent_reviews?.map((item: any, index: number) => {
+              return (
+                <RatingsReviewsItem
+                  key={index}
+                  item={item}
+                  itemContainer={{ marginTop: index === 0 ? getScaleSize(20) : getScaleSize(16) }}
+                  onPressShowMore={() => {
+                    setShowMore(!showMore);
+                  }}
+                  showMore={showMore}
+                />
+              );
+            })}
+          </View>
+        }
         <View style={{ height: getScaleSize(32) }} />
       </ScrollView>
     </View>
@@ -355,8 +377,19 @@ const styles = (theme: ThemeContextType['theme']) =>
     profilePic: {
       height: getScaleSize(130),
       width: getScaleSize(130),
-      borderRadius: getScaleSize(65),
+      borderRadius: getScaleSize(130),
       alignSelf: 'center',
+      borderWidth: 1,
+      borderColor: theme._F0EFF0,
+    },
+    EmptyProfileContainer: {
+      width: getScaleSize(130),
+      height: getScaleSize(130),
+      backgroundColor: theme._F0EFF0,
+      borderRadius: getScaleSize(130),
+      alignSelf: 'center',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     horizontalContainer: {
       flexDirection: 'row',
@@ -373,7 +406,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     photosView: {
       height: getScaleSize(144),
-      width: getScaleSize(180),
+      width: (Dimensions.get('window').width - getScaleSize(108)) / 2,
       borderRadius: 8,
       resizeMode: 'cover',
       marginTop: getScaleSize(18),

@@ -8,6 +8,7 @@ import { API_BASE_URL, DISABLE_API_LOGS } from "./apiRoutes";
 import NetInfo from '@react-native-community/netinfo';
 import { Alert } from "react-native";
 import { EventRegister } from "react-native-event-listeners";
+import { isTokenExpire, refreshAccessToken } from "./token";
 
 let hasShownNoInternetAlert = false;
 
@@ -57,11 +58,21 @@ Instance.interceptors.request.use(
             const result = JSON.parse(userData)
             console.log('result==>', result)
             const accessToken = result?.access_token
-            // const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiM2I1Y2FkZTAtNjFjYi00NzcyLTk0OTItMWM3MmYzOGU4Njk3IiwidXNlcl9yb2xlIjoic2VydmljZV9wcm92aWRlciIsImV4cCI6MTc2NjE1NjQzN30.-juM3t1uh_FHtyqRG4G6xvx_Jaeb4Xwovehz4VOQGMU'
 
             if (accessToken) {
-                // const latestToken = accessToken.reduce((a: any, b: any) => b.updatedAt > a.updatedAt ? b : a);
-                config.headers.Authorization = "Bearer " + `${accessToken}`
+                const isExpired = isTokenExpire(accessToken)
+                if (isExpired) {
+                    const newAccessToken = await refreshAccessToken(result?.refresh_token)
+                    if (newAccessToken) {
+                        config.headers.Authorization = "Bearer " + `${newAccessToken}`
+                    }
+                    else {
+                        EventRegister.emit('onInvalidToken')
+                    }
+                }
+                else {
+                    config.headers.Authorization = "Bearer " + `${accessToken}`
+                }
             }
         }
         return config;

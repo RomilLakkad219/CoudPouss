@@ -23,7 +23,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { CATEGORY_DATA, getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { CATEGORY_DATA, formatDecimalInput, getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -139,7 +139,7 @@ export default function CreateRequest(props: any) {
   }
 
   const pickImage = async (type: string) => {
-    setLoading(true); 
+    setLoading(true);
     launchImageLibrary(
       {
         mediaType: 'mixed', // 👈 image + video
@@ -166,7 +166,7 @@ export default function CreateRequest(props: any) {
             setSecondProductImage(finalAsset);
             uploadProfileImage(finalAsset, type);
           }
-        }else{
+        } else {
           setLoading(false);
         }
       }
@@ -225,16 +225,16 @@ export default function CreateRequest(props: any) {
         else if (type === 'secondProduct') setSecondProductImageURL(result?.data);
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error');
-        if (type === 'first') setFirstImageURL(null);
-        else if (type === 'second') setSecondImageURL(null);
-        else if (type === 'firstProduct') setFirstProductImageURL(null);
-        else if (type === 'secondProduct') setSecondProductImageURL(null);
+        if (type === 'first') setFirstImage(null);
+        else if (type === 'second') setSecondImage(null);
+        else if (type === 'firstProduct') setFirstProductImage(null);
+        else if (type === 'secondProduct') setSecondProductImage(null);
       }
     } catch (error: any) {
-      if (type === 'first') setFirstImageURL(null);
-      else if (type === 'second') setSecondImageURL(null);
-      else if (type === 'firstProduct') setFirstProductImageURL(null);
-      else if (type === 'secondProduct') setSecondProductImageURL(null);
+      if (type === 'first') setFirstImage(null);
+      else if (type === 'second') setSecondImage(null);
+      else if (type === 'firstProduct') setFirstProductImage(null);
+      else if (type === 'secondProduct') setSecondProductImage(null);
       SHOW_TOAST(error?.message ?? '', 'error');
     } finally {
       setLoading(false);
@@ -287,7 +287,9 @@ export default function CreateRequest(props: any) {
         setSelectedProgress(6);
       }
     } else if (selectedProgress == 6) {
-      onCreateRequest();
+      if (!isLoading) {
+        onCreateRequest();
+      }
     }
   }
 
@@ -347,7 +349,10 @@ export default function CreateRequest(props: any) {
         setSelectedProgress(7);
       }
     } else if (selectedProgress == 7) {
-      onCreateRequest();
+      if (!isLoading) {
+        onCreateRequest();
+      }
+
     }
   }
 
@@ -395,6 +400,7 @@ export default function CreateRequest(props: any) {
 
   async function onCreateRequest() {
     try {
+      setLoading(true);
       const date = moment(selectedDate).format("YYYY-MM-DD");
       const time = moment(selectedTime).format("hh:mm A");
       const dateTime = moment(`${date} ${time}`, "YYYY-MM-DD hh:mm A").utc().format();
@@ -443,7 +449,7 @@ export default function CreateRequest(props: any) {
           }
         }
       }
-      setLoading(true);
+
       const result = await API.Instance.post(API.API_ROUTES.onServiceRequest, params);
       console.log('result', result.status, result)
       if (result.status) {
@@ -706,13 +712,11 @@ export default function CreateRequest(props: any) {
                 placeholderTextColor={theme._939393}
                 inputTitle={STRING.EnterValuation}
                 inputColor={theme._555555}
-                value={`${'€'}${valuation}`}
+                value={valuation ? `${'€'}${valuation}` : ''}
                 keyboardType="numeric"
                 autoCapitalize="none"
                 onChangeText={text => {
-                  const cleaned = text.replace(/[^0-9.]/g, '');
-                  const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
-                  setValuation(formatted);
+                  setValuation(formatDecimalInput(text));
                 }}
               />
             </View>
@@ -739,6 +743,7 @@ export default function CreateRequest(props: any) {
             {STRING.ChooseTime}
           </Text>
           <TimePicker
+            selectedDate={selectedDate}
             onTimeChange={(hour: number, minute: number, am: boolean) => {
               // setSelectedTime(hour, minute, am);
               let hour24 = hour % 12;
@@ -867,7 +872,7 @@ export default function CreateRequest(props: any) {
           {STRING.upload_message}
         </Text>
         <Text
-          style={{ }}
+          style={{}}
           size={getScaleSize(18)}
           font={FONTS.Lato.SemiBold}
           color={theme._939393}>

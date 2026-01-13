@@ -62,11 +62,11 @@ const CategoryDropdown = (props: DropdownProps) => {
                 containerStyle={styles(theme).containerStyle}
                 data={data}
                 showsVerticalScrollIndicator={false}
-                maxHeight={getScaleSize(400)}
+                maxHeight={getScaleSize(500)}
                 labelField="category_name"
                 valueField="category_name"
                 placeholder={STRING.select_category}
-                value={selectedItem?.name}
+                value={selectedItem?.category_name ?? "category_name"}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={(item) => {
@@ -107,6 +107,7 @@ const styles = (theme: ThemeContextType['theme']) =>
             fontSize: getScaleSize(18),
             fontFamily: FONTS.Lato.Regular,
             color: theme._939393,
+            lineHeight: getScaleSize(32),
         },
         selectedTextStyle: {
             fontSize: getScaleSize(16),

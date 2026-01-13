@@ -185,14 +185,20 @@ export default function MyProfile(props: any) {
             />
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles(theme).mainContainer}>
-                    {profile?.user?.profile_photo_url ?
-                        <Image source={{ uri: profile?.user?.profile_photo_url }}
-                            resizeMode='cover' style={styles(theme).profileContainer} />
-                        :
-                        <View style={[styles(theme).profileContainer, {
-                            backgroundColor: theme._F0EFF0,
-                        }]} />
-                    }
+                    {profile?.user?.profile_photo_url ? (
+                        <Image source={{ uri: profile?.user?.profile_photo_url }} resizeMode='cover' style={styles(theme).profileContainer} />
+                    ) : (
+                        <View style={styles(theme).EmptyProfileContainer}>
+                            <Text
+                                size={getScaleSize(24)}
+                                font={FONTS.Lato.Regular}
+                                align="center"
+                                color={theme._262B43E5}>
+                                {(profile?.user?.first_name?.charAt(0) ?? '').toUpperCase() +
+                                    (profile?.user?.last_name?.charAt(0) ?? '').toUpperCase()}
+                            </Text>
+                        </View>
+                    )}
                     <TouchableOpacity onPress={() => {
                         pickImage()
                     }}>
@@ -313,6 +319,18 @@ const styles = (theme: ThemeContextType['theme']) =>
             height: getScaleSize(126),
             borderRadius: getScaleSize(126),
             alignSelf: 'center',
+            borderWidth: 1,
+            borderColor: theme._F0EFF0,
+            marginBottom: getScaleSize(12),
+        },
+        EmptyProfileContainer: {
+            width: getScaleSize(126),
+            height: getScaleSize(126),
+            backgroundColor: theme._F0EFF0,
+            borderRadius: getScaleSize(126),
+            alignSelf: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
             marginBottom: getScaleSize(12),
         },
     });

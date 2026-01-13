@@ -45,159 +45,94 @@ function Tabbar(props: any) {
   }
 
 
-  let images: any = [];
-  let names: any = [];
+    let images: any = [];
+    let names: any = [];
 
-  if (userType === 'service_provider') {
-    images = [
-      IMAGES.home_unselected,
-      IMAGES.request_unselected,
-      IMAGES.chat_unselected,
-      IMAGES.profile_unselected,
-    ];
+    if (userType === 'service_provider') {
+      images = [
+        IMAGES.home_unselected,
+        IMAGES.request_unselected,
+        IMAGES.chat_unselected,
+        IMAGES.profile_unselected,
+      ];
 
-    names = ['Home', 'Task', 'Chat', 'Profile'];
-  } else {
-    images = [
-      IMAGES.home_unselected,
-      IMAGES.request_unselected,
-      IMAGES.plus,
-      IMAGES.chat_unselected,
-      IMAGES.profile_unselected,
-    ];
-
-    names = ['Home', 'Request', '', 'Chat', 'Profile'];
-  }
-
-  const STRING = useString();
-
-  function onPress(name: string) {
-    if (name === 'plus') {
-      props.navigation.navigate(SCREENS.CreateRequest.identifier);
+      names = ['Home', 'Task', 'Chat', 'Profile'];
     } else {
-      props.navigation.navigate(name);
+      images = [
+        IMAGES.home_unselected,
+        IMAGES.request_unselected,
+        IMAGES.plus,
+        IMAGES.chat_unselected,
+        IMAGES.profile_unselected,
+      ];
+
+      names = ['Home', 'Request', '', 'Chat', 'Profile'];
     }
-  }
+
+    const STRING = useString();
+
+    function onPress(name: string) {
+      if (name === 'plus') {
+        props.navigation.navigate(SCREENS.CreateRequest.identifier);
+      } else {
+        props.navigation.navigate(name);
+      }
+    }
 
 
 
-  return (
-    <View style={styles(theme).mainView}>
-      <View style={styles(theme).tabContainer}>
-        {props.state.routes.map((route: any, index: number) => {
-          return (
-            <Item
-              key={index}
-              onPress={() => onPress(route.name)}
-              title={route.name}
-              index={index}
-              selected={props.state.index == index}
-              image={images[index]}
-            />
-          );
-        })}
-      </View>
-      <SafeAreaView edges={['bottom']} />
-    </View>
-  );
-}
-
-const Item = (props: any) => {
-  const { theme } = useContext<any>(ThemeContext);
-
-  const { userType } = useContext<any>(AuthContext);
-
-  let images: any = [];
-  let names: any = [];
-
-  if (userType === 'service_provider') {
-    images = [
-      IMAGES.home_unselected,
-      IMAGES.request_unselected,
-      IMAGES.chat_unselected,
-      IMAGES.profile_unselected,
-    ];
-
-    names = ['Home', 'Task', 'Chat', 'Profile'];
-  } else {
-    images = [
-      IMAGES.home_unselected,
-      IMAGES.request_unselected,
-      IMAGES.plus,
-      IMAGES.chat_unselected,
-      IMAGES.profile_unselected,
-    ];
-
-    names = ['Home', 'Request', '', 'Chat', 'Profile'];
-  }
-
-  const STRING = useString();
-  if (userType === 'service_provider') {
     return (
-      <TouchableOpacity
-        onPress={props.onPress}
-        style={styles(theme).itemContainer}>
-        <View>
-          {/*  */}
-          {props?.selected ? (
-            <View style={{ alignSelf: 'center' }}>
-              <Image
-                style={
-                  props.selected
-                    ? styles(theme).itemImageSelected
-                    : styles(theme).itemImage
-                }
-                resizeMode="contain"
-                tintColor={theme.primary}
-                source={images[props.index]}
+      <View style={styles(theme).mainView}>
+        <View style={styles(theme).tabContainer}>
+          {props.state.routes.map((route: any, index: number) => {
+            return (
+              <Item
+                key={index}
+                onPress={() => onPress(route.name)}
+                title={route.name}
+                index={index}
+                selected={props.state.index == index}
+                image={images[index]}
               />
-              <Text
-                style={{ marginTop: getScaleSize(8) }}
-                size={getScaleSize(14)}
-                font={FONTS.Lato.Bold}
-                color={theme.primary}
-                align="center">
-                {names[props.index]}
-              </Text>
-            </View>
-          ) : (
-            <View style={{ alignSelf: 'center' }}>
-              <Image
-                style={
-                  props.selected
-                    ? styles(theme).itemImageSelected
-                    : styles(theme).itemImage
-                }
-                resizeMode="contain"
-                source={images[props.index]}
-              />
-              <Text
-                style={{ marginTop: getScaleSize(8) }}
-                size={getScaleSize(12)}
-                font={FONTS.Lato.Medium}
-                color={'#E6E6E6'}
-                align="center">
-                {names[props.index]}
-              </Text>
-            </View>
-          )}
+            );
+          })}
         </View>
-      </TouchableOpacity>
+        <SafeAreaView edges={['bottom']} />
+      </View>
     );
-  } else {
-    if (props?.index == 2) {
-      return (
-        <TouchableOpacity
-          onPress={() => { props.onPress(SCREENS.CreateRequest.identifier) }}
-          style={{ alignSelf: 'center', marginTop: getScaleSize(-80) }}>
-          <Image
-            style={{ height: getScaleSize(98), width: getScaleSize(98) }}
-            resizeMode="contain"
-            source={IMAGES.plus}
-          />
-        </TouchableOpacity>
-      );
+  }
+
+  const Item = (props: any) => {
+    const { theme } = useContext<any>(ThemeContext);
+
+    const { userType } = useContext<any>(AuthContext);
+
+    let images: any = [];
+    let names: any = [];
+
+    if (userType === 'service_provider') {
+      images = [
+        IMAGES.home_unselected,
+        IMAGES.request_unselected,
+        IMAGES.chat_unselected,
+        IMAGES.profile_unselected,
+      ];
+
+      names = ['Home', 'Task', 'Chat', 'Profile'];
     } else {
+      images = [
+        IMAGES.home_unselected,
+        IMAGES.request_unselected,
+        IMAGES.plus,
+        IMAGES.chat_unselected,
+        IMAGES.profile_unselected,
+      ];
+
+      names = ['Home', 'Request', '', 'Chat', 'Profile'];
+    }
+
+    const STRING = useString();
+    if (userType === 'service_provider') {
       return (
         <TouchableOpacity
           onPress={props.onPress}
@@ -249,9 +184,74 @@ const Item = (props: any) => {
           </View>
         </TouchableOpacity>
       );
+    } else {
+      if (props?.index == 2) {
+        return (
+          <TouchableOpacity
+            onPress={() => { props.onPress(SCREENS.CreateRequest.identifier) }}
+            style={{ alignSelf: 'center', marginTop: getScaleSize(-80) }}>
+            <Image
+              style={{ height: getScaleSize(98), width: getScaleSize(98) }}
+              resizeMode="contain"
+              source={IMAGES.plus}
+            />
+          </TouchableOpacity>
+        );
+      } else {
+        return (
+          <TouchableOpacity
+            onPress={props.onPress}
+            style={styles(theme).itemContainer}>
+            <View>
+              {/*  */}
+              {props?.selected ? (
+                <View style={{ alignSelf: 'center' }}>
+                  <Image
+                    style={
+                      props.selected
+                        ? styles(theme).itemImageSelected
+                        : styles(theme).itemImage
+                    }
+                    resizeMode="contain"
+                    tintColor={theme.primary}
+                    source={images[props.index]}
+                  />
+                  <Text
+                    style={{ marginTop: getScaleSize(8) }}
+                    size={getScaleSize(14)}
+                    font={FONTS.Lato.Bold}
+                    color={theme.primary}
+                    align="center">
+                    {names[props.index]}
+                  </Text>
+                </View>
+              ) : (
+                <View style={{ alignSelf: 'center' }}>
+                  <Image
+                    style={
+                      props.selected
+                        ? styles(theme).itemImageSelected
+                        : styles(theme).itemImage
+                    }
+                    resizeMode="contain"
+                    source={images[props.index]}
+                  />
+                  <Text
+                    style={{ marginTop: getScaleSize(8) }}
+                    size={getScaleSize(12)}
+                    font={FONTS.Lato.Medium}
+                    color={'#E6E6E6'}
+                    align="center">
+                    {names[props.index]}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        );
+      }
     }
-  }
-};
+  };
 
 const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({

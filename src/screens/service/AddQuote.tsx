@@ -20,7 +20,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
+import { formatDecimalInput, getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -60,6 +60,8 @@ export default function AddQuote(props: any) {
   const [videoIds, setVideoIds] = useState<string[]>([]);
   const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
   const [isServiceDetails, setServiceDetails] = useState<any>(serviceDetails ?? '')
+  const [amountError, setAmountError] = useState('');
+  const [descriptionError, setDescriptionError] = useState('');
 
   useEffect(() => {
     if (!isServiceDetails && isItem) {
@@ -131,12 +133,12 @@ export default function AddQuote(props: any) {
 
           const id = await uploadFile(asset);
 
-            setPhotoIds(prev => [...prev, id]);
+          setPhotoIds(prev => [...prev, id]);
 
           if (index === 1) setDoc1(asset);
           if (index === 2) setDoc2(asset);
 
-          SHOW_SUCCESS_TOAST('Document uploaded successfully');
+          SHOW_TOAST('Document uploaded successfully', 'success');
         } catch (e: any) {
           SHOW_TOAST(e.message || 'Upload failed', 'error');
         } finally {
@@ -198,16 +200,22 @@ export default function AddQuote(props: any) {
     );
   };
 
-  
+
   async function sendQuote() {
 
     // amount validation only for professional
     if (profile?.user?.service_provider_type === 'professional' && !amount) {
-      return SHOW_TOAST('Please enter amount', 'error');
+      return setAmountError('Please enter amount');
+    }
+    else {
+      setAmountError('');
     }
 
     if (!desctiption) {
-      return SHOW_TOAST('Please enter short description', 'error');
+      return setDescriptionError('Please enter short description');
+    }
+    else {
+      setDescriptionError('');
     }
 
     try {
@@ -249,7 +257,7 @@ export default function AddQuote(props: any) {
       setLoading(false);
 
       if (result?.status) {
-        props.navigation.navigate(SCREENS.Success.identifier,{
+        props.navigation.navigate(SCREENS.Success.identifier, {
           isFromHome: true,
         });
       } else {
@@ -422,42 +430,36 @@ export default function AddQuote(props: any) {
         </View>
         {profile?.user?.service_provider_type === 'professional' &&
           <Input
-            placeholder={STRING.enter_email_or_mobile_number}
-            placeholderTextColor={theme._424242}
+            placeholder={STRING.EnterQuoteAmount}
+            placeholderTextColor={theme._D5D5D5}
             inputTitle={STRING.EnterQuoteAmount}
             inputColor={true}
             continerStyle={{ marginTop: getScaleSize(16) }}
-            value={`${'€'}${amount}`}
-            keyboardType="numeric"
+            value={amount ? `${'€'}${amount}` : ''}
+            keyboardType="decimal-pad"
             autoCapitalize="none"
             onChangeText={text => {
-              const cleaned = text.replace(/[^0-9.]/g, '');
-              const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
-              setAmount(formatted);
+              setAmount(formatDecimalInput(text));
+              setAmountError('');
             }}
+            isError={amountError}
           />
         }
-        <Text
-          style={{ marginTop: getScaleSize(12) }}
-          size={getScaleSize(17)}
-          font={FONTS.Lato.Medium}
-          color={theme._424242}>
-          {STRING.Addpersonalizedshortmessage}
-        </Text>
-        <View style={styles(theme).inputContainer}>
-          <TextInput
-            style={styles(theme).textInput}
-            value={desctiption}
-            onChangeText={setDescription}
-            placeholder={STRING.Enterdescriptionhere}
-            placeholderTextColor="#999"
-            multiline={true}
-            numberOfLines={8}
-            textAlignVertical="top"
-            blurOnSubmit={true}
-            returnKeyType="default"
-          />
-        </View>
+        <Input
+          inputTitle={STRING.Addpersonalizedshortmessage}
+          placeholder={STRING.Enterdescriptionhere}
+          inputColor={true}
+          value={desctiption}
+          continerStyle={{ marginTop: getScaleSize(16) }}
+          inputContainer={styles(theme).inputContainerHeight}
+          multiline={true}
+          numberOfLines={8}
+          onChangeText={text => {
+            setDescription(text);
+            setDescriptionError('');
+          }}
+          isError={descriptionError}
+        />
         <Text
           style={{ marginTop: getScaleSize(20) }}
           size={getScaleSize(17)}
@@ -741,5 +743,9 @@ const styles = (theme: ThemeContextType['theme']) =>
       minHeight: getScaleSize(240),
       textAlignVertical: 'top',
       fontFamily: FONTS.Lato.Regular,
+    },
+    inputContainerHeight: {
+      minHeight: getScaleSize(190),
+      textAlignVertical: 'top'
     },
   });

@@ -284,14 +284,16 @@ export default function ServiceConfirmed(props: any) {
                   color={'#0F232F'}>
                   {paymentDetails?.provider_name ?? '-'}
                 </Text>
-                <Image
-                  style={{
-                    height: getScaleSize(25),
-                    width: getScaleSize(25),
-                    marginLeft: getScaleSize(6),
-                  }}
-                  source={IMAGES.verify}
-                />
+                {paymentDetails?.provider_is_verified &&
+                  <Image
+                    style={{
+                      height: getScaleSize(25),
+                      width: getScaleSize(25),
+                      marginLeft: getScaleSize(6),
+                    }}
+                    source={IMAGES.verify}
+                  />
+                }
               </View>
               <View style={[styles(theme).flexRow, { marginLeft: getScaleSize(16), marginTop: getScaleSize(6) }]}>
                 <Image source={IMAGES.ic_phone} style={styles(theme).phoneIcon} />

@@ -172,7 +172,6 @@ export default function Assistance(props: any) {
       </View>
       <View style={styles(theme).deviderView}></View>
       <View style={{ flex: 1, overflow: 'hidden' }}>
-
         <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1000, backgroundColor: '#fff' }, animatedHeaderStyle]}>
           <>
             {bannerData ? (
@@ -242,7 +241,6 @@ export default function Assistance(props: any) {
             )}
           </>
         </Animated.View>
-
         {filteredSubCategories.length > 0 ?
           <Animated.FlatList
             data={filteredSubCategories}
@@ -254,7 +252,7 @@ export default function Assistance(props: any) {
             onScroll={scrollHandler}
             scrollEventThrottle={16}
             ListHeaderComponent={() => {
-              return <View style={{ height: getScaleSize(324) }} />;
+              return <View style={{ height:categoryList.length > 1 ? getScaleSize(324) : getScaleSize(230) }} />;
             }}
             ListFooterComponent={() => {
               return <View style={{ height: getScaleSize(50) }} />;
