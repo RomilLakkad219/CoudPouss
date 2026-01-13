@@ -140,9 +140,13 @@ export default function SubscriptionSuccessful(props: any) {
                 style={{ marginBottom: getScaleSize(24), marginHorizontal: getScaleSize(24) }}
                 onPress={() => {
                     if (planDetails?.type === 'professional') {
-                        props.navigation.navigate(SCREENS.AdditionalDetails.identifier);
+                        props.navigation.navigate(SCREENS.AdditionalDetails.identifier,{
+                            planDetails: planDetails,
+                        });
                     } else {
-                        props.navigation.navigate(SCREENS.YearsOfExperience.identifier);
+                        props.navigation.navigate(SCREENS.YearsOfExperience.identifier,{
+                            planDetails: planDetails,
+                        });
                     }
                 }}
             />

@@ -17,10 +17,18 @@ export default function ServiceItem(props: any) {
             }}
             style={[styles(theme).container, itemContainer]}>
             {isSelectedBox &&
-                <View style={styles(theme).iconView} />
+                <Image
+                    source={item.image}
+                    resizeMode='cover'
+                    style={styles(theme).iconView}
+                />
             }
             {isReview &&
-                <View style={styles(theme).reviewIcon} />
+                <Image
+                    source={item.image}
+                    resizeMode='cover'
+                    style={styles(theme).reviewIcon}
+                />
             }
             {isManage &&
                 <View style={styles(theme).iconView} />
@@ -31,7 +39,7 @@ export default function ServiceItem(props: any) {
                 font={FONTS.Lato.SemiBold}
                 color={theme._323232}
             >
-                {item.title ?? ''}
+                {item.subcategory_name ?? ''}
             </Text>
             {isReview &&
                 (

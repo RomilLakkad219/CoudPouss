@@ -20,7 +20,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
+import { formatDecimalInput, getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -60,6 +60,8 @@ export default function AddQuote(props: any) {
   const [videoIds, setVideoIds] = useState<string[]>([]);
   const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
   const [isServiceDetails, setServiceDetails] = useState<any>(serviceDetails ?? '')
+  const [amountError, setAmountError] = useState('');
+  const [descriptionError, setDescriptionError] = useState('');
 
   useEffect(() => {
     if (!isServiceDetails && isItem) {
@@ -90,28 +92,22 @@ export default function AddQuote(props: any) {
     const formData = new FormData();
 
     formData.append('file', {
-      uri:
-        Platform.OS === 'ios'
-          ? asset.uri.replace('file://', '')
-          : asset.uri,
+      uri: Platform.OS === 'ios'
+        ? asset.uri.replace('file://', '')
+        : asset.uri,
       name: asset.fileName || `file_${Date.now()}`,
       type: asset.type || 'image/jpeg',
     } as any);
 
-    const res: any = await API.Instance.post(
-      API.API_ROUTES.fileUploadProfessionalServices,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+    const res: any = await API.Instance.post(API.API_ROUTES.fileUploadProfessionalServices, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
     );
-
     if (!res?.status) {
       throw new Error(res?.message || 'File upload failed');
     }
-
     return res.data.storage_key;
   };
 
@@ -142,7 +138,7 @@ export default function AddQuote(props: any) {
           if (index === 1) setDoc1(asset);
           if (index === 2) setDoc2(asset);
 
-          SHOW_SUCCESS_TOAST('Document uploaded successfully');
+          SHOW_TOAST('Document uploaded successfully', 'success');
         } catch (e: any) {
           SHOW_TOAST(e.message || 'Upload failed', 'error');
         } finally {
@@ -204,46 +200,22 @@ export default function AddQuote(props: any) {
     );
   };
 
-  // async function sendQuote() {
-  //   if (!amount) return SHOW_TOAST('Please enter amount', 'error');
-  //   if (!desctiption) return SHOW_TOAST('Please enter short description', 'error');
-
-  //   try {
-  //     setLoading(true);
-  //     const payload = {
-  //       servicesid: serviceDetails?.service_id,
-  //       provider_quote_amount: amount,
-  //       description: desctiption,
-  //       offer_photoids: photoIds,
-  //       offer_videoids: videoIds,
-  //     };
-
-  //     const result: any = await API.Instance.post(
-  //       API.API_ROUTES.sendQuoteRequest,
-  //       payload
-  //     );
-  //     setLoading(false);
-
-  //     if (result?.status) {
-  //       props.navigation.navigate(SCREENS.Success.identifier);
-  //     } else {
-  //       SHOW_TOAST(result?.message, 'error');
-  //     }
-  //   } catch (e: any) {
-  //     setLoading(false);
-  //     SHOW_TOAST(e?.message || 'Something went wrong', 'error');
-  //   }
-  // }
 
   async function sendQuote() {
 
     // amount validation only for professional
-    if (profile?.service_provider_type === 'professional' && !amount) {
-      return SHOW_TOAST('Please enter amount', 'error');
+    if (profile?.user?.service_provider_type === 'professional' && !amount) {
+      return setAmountError('Please enter amount');
+    }
+    else {
+      setAmountError('');
     }
 
     if (!desctiption) {
-      return SHOW_TOAST('Please enter short description', 'error');
+      return setDescriptionError('Please enter short description');
+    }
+    else {
+      setDescriptionError('');
     }
 
     try {
@@ -255,7 +227,7 @@ export default function AddQuote(props: any) {
       };
 
       // PROFESSIONAL PAYLOAD
-      if (profile?.service_provider_type === 'professional') {
+      if (profile?.user?.service_provider_type === 'professional') {
         payload = {
           ...payload,
           provider_quote_amount: amount,
@@ -265,7 +237,7 @@ export default function AddQuote(props: any) {
       }
 
       // NON-PROFESSIONAL PAYLOAD
-      if (profile?.service_provider_type === 'non_professional') {
+      if (profile?.user?.service_provider_type === 'non_professional') {
         payload = {
           ...payload,
           offer_photos: photoIds.map(key => ({
@@ -285,7 +257,9 @@ export default function AddQuote(props: any) {
       setLoading(false);
 
       if (result?.status) {
-        props.navigation.navigate(SCREENS.Success.identifier);
+        props.navigation.navigate(SCREENS.Success.identifier, {
+          isFromHome: true,
+        });
       } else {
         SHOW_TOAST(result?.message || 'Failed to send quote', 'error');
       }
@@ -312,7 +286,7 @@ export default function AddQuote(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          {isServiceDetails?.subcategory_info?.sub_category_name?.service_photo === null ?
+          {isServiceDetails?.subcategory_info?.sub_category_img_url === null ?
             <View style={[styles(theme).imageView, {
               backgroundColor: 'gray'
             }]}>
@@ -320,8 +294,8 @@ export default function AddQuote(props: any) {
             :
             <Image
               style={styles(theme).imageView}
-              resizeMode='contain'
-              source={{ uri: isServiceDetails?.subcategory_info?.sub_category_name?.service_photo }}
+              resizeMode='cover'
+              source={{ uri: isServiceDetails?.subcategory_info?.sub_category_img_url }}
             />
           }
           <Text
@@ -332,7 +306,7 @@ export default function AddQuote(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {isServiceDetails?.subcategory_info?.sub_category_name?.name}
+            {isServiceDetails?.subcategory_info?.sub_category_name ?? ''}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -387,7 +361,7 @@ export default function AddQuote(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {`${isServiceDetails?.category_info?.category_name?.name} Services`}
+                  {`${isServiceDetails?.category_info?.category_name ?? ''} Services`}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -454,44 +428,38 @@ export default function AddQuote(props: any) {
             />
           </View>
         </View>
-        {profile?.service_provider_type === 'professional' &&
+        {profile?.user?.service_provider_type === 'professional' &&
           <Input
-            placeholder={STRING.enter_email_or_mobile_number}
-            placeholderTextColor={theme._424242}
+            placeholder={STRING.EnterQuoteAmount}
+            placeholderTextColor={theme._D5D5D5}
             inputTitle={STRING.EnterQuoteAmount}
             inputColor={true}
             continerStyle={{ marginTop: getScaleSize(16) }}
-            value={`${'€'}${amount}`}
-            keyboardType="numeric"
+            value={amount ? `${'€'}${amount}` : ''}
+            keyboardType="decimal-pad"
             autoCapitalize="none"
             onChangeText={text => {
-              const cleaned = text.replace(/[^0-9.]/g, '');
-              const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
-              setAmount(formatted);
+              setAmount(formatDecimalInput(text));
+              setAmountError('');
             }}
+            isError={amountError}
           />
         }
-        <Text
-          style={{ marginTop: getScaleSize(12) }}
-          size={getScaleSize(17)}
-          font={FONTS.Lato.Medium}
-          color={theme._424242}>
-          {STRING.Addpersonalizedshortmessage}
-        </Text>
-        <View style={styles(theme).inputContainer}>
-          <TextInput
-            style={styles(theme).textInput}
-            value={desctiption}
-            onChangeText={setDescription}
-            placeholder={STRING.Enterdescriptionhere}
-            placeholderTextColor="#999"
-            multiline={true}
-            numberOfLines={8}
-            textAlignVertical="top"
-            blurOnSubmit={true}
-            returnKeyType="default"
-          />
-        </View>
+        <Input
+          inputTitle={STRING.Addpersonalizedshortmessage}
+          placeholder={STRING.Enterdescriptionhere}
+          inputColor={true}
+          value={desctiption}
+          continerStyle={{ marginTop: getScaleSize(16) }}
+          inputContainer={styles(theme).inputContainerHeight}
+          multiline={true}
+          numberOfLines={8}
+          onChangeText={text => {
+            setDescription(text);
+            setDescriptionError('');
+          }}
+          isError={descriptionError}
+        />
         <Text
           style={{ marginTop: getScaleSize(20) }}
           size={getScaleSize(17)}
@@ -775,5 +743,9 @@ const styles = (theme: ThemeContextType['theme']) =>
       minHeight: getScaleSize(240),
       textAlignVertical: 'top',
       fontFamily: FONTS.Lato.Regular,
+    },
+    inputContainerHeight: {
+      minHeight: getScaleSize(190),
+      textAlignVertical: 'top'
     },
   });

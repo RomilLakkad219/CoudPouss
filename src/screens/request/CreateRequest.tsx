@@ -23,7 +23,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { CATEGORY_DATA, getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { CATEGORY_DATA, formatDecimalInput, getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -33,6 +33,7 @@ import {
   Header,
   Input,
   ProgressSlider,
+  ProgressView,
   SearchComponent,
   ServiceItem,
   Text,
@@ -45,6 +46,7 @@ import { SCREENS } from '..';
 import { API } from '../../api';
 import { launchImageLibrary } from 'react-native-image-picker';
 import moment from 'moment';
+import { createThumbnail } from 'react-native-create-thumbnail';
 
 const { width } = Dimensions.get('window');
 const cellSize = (width - 30) / 7;
@@ -53,9 +55,18 @@ export default function CreateRequest(props: any) {
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
 
+  const category = props.route.params?.category;
+  const subCategory = props.route.params?.subCategory;
+
+
+  useEffect(() => {
+    setSelectedCategoryItem(category ?? null);
+    setSelectSubCategoryItem(subCategory ?? null);
+  }, [category, subCategory]);
+
   const patterns = ['small', 'large', 'large', 'small'];
 
-  const [selectedProgress, setSelectedProgress] = useState(1);
+  const [selectedProgress, setSelectedProgress] = useState(category ? 3 : 1);
   const [selectedCategory, setSelectedCategory] = useState('professional');
   const [selectedCategoryItem, setSelectedCategoryItem] = useState<any>(null);
   const [description, setDescription] = useState('');
@@ -78,7 +89,6 @@ export default function CreateRequest(props: any) {
   const [secondProductImage, setSecondProductImage] = useState<any>(null);
   const [firstProductImageURL, setFirstProductImageURL] = useState<any>(null);
   const [secondProductImageURL, setSecondProductImageURL] = useState<any>(null);
-
 
   useEffect(() => {
     getAllCategories();
@@ -129,68 +139,103 @@ export default function CreateRequest(props: any) {
   }
 
   const pickImage = async (type: string) => {
-    launchImageLibrary({ mediaType: 'photo' }, (response) => {
-      if (!response.didCancel && !response.errorCode && response.assets) {
-        const asset: any = response.assets[0];
-        console.log('asset', asset)
-        if (type === 'first') {
-          setFirstImage(asset);
-          uploadProfileImage(asset, type);
-        } else if (type === 'second') {
-          setSecondImage(asset);
-          uploadProfileImage(asset, type);
+    setLoading(true);
+    launchImageLibrary(
+      {
+        mediaType: 'mixed', // 👈 image + video
+        selectionLimit: 1,
+      },
+      async (response) => {
+        if (!response.didCancel && !response.errorCode && response.assets) {
+          const asset: any = response.assets[0];
+          console.log('asset', asset);
+
+          // 👇 ADD thumbnail handling
+          const finalAsset = await handleThumbnail(asset);
+
+          if (type === 'first') {
+            setFirstImage(finalAsset);
+            uploadProfileImage(finalAsset, type);
+          } else if (type === 'second') {
+            setSecondImage(finalAsset);
+            uploadProfileImage(finalAsset, type);
+          } else if (type === 'firstProduct') {
+            setFirstProductImage(finalAsset);
+            uploadProfileImage(finalAsset, type);
+          } else if (type === 'secondProduct') {
+            setSecondProductImage(finalAsset);
+            uploadProfileImage(finalAsset, type);
+          }
+        } else {
+          setLoading(false);
         }
-        else if (type === 'firstProduct') {
-          setFirstProductImage(asset);
-          uploadProfileImage(asset, type);
-        } else if (type === 'secondProduct') {
-          setSecondProductImage(asset);
-          uploadProfileImage(asset, type);
-        }
-      } else {
-        console.log('response', response)
       }
-    });
-  }
+    );
+  };
+
+  const handleThumbnail = async (asset: any) => {
+    // IMAGE → return same asset
+    if (asset?.type?.startsWith('image')) {
+      return asset;
+    }
+
+    // VIDEO → create thumbnail
+    if (asset?.type?.startsWith('video')) {
+      try {
+        const thumbnail = await createThumbnail({
+          url: asset.uri,
+          timeStamp: 1000, // 1 second
+        });
+
+        return {
+          ...asset,
+          thumbnailUri: thumbnail.path,
+          thumbnailType: 'image/jpeg',
+        };
+      } catch (e) {
+        console.log('Thumbnail error:', e);
+        return asset;
+      }
+    }
+
+    return asset;
+  };
 
   async function uploadProfileImage(asset: any, type: string) {
     try {
       const formData = new FormData();
+
+      const isVideo = asset?.type?.startsWith('video');
+
       formData.append('file', {
-        uri: asset?.uri,
-        name: asset?.fileName || 'profile_image.jpg',
-        type: asset?.type || 'image/jpeg',
+        uri: isVideo ? asset.thumbnailUri : asset.uri,
+        name: isVideo
+          ? `video_thumb_${Date.now()}.jpg`
+          : asset?.fileName || 'profile_image.jpg',
+        type: isVideo ? 'image/jpeg' : asset?.type || 'image/jpeg',
       });
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.uploadServiceRequestImage, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setLoading(false);
-      console.log('result', result.status, result)
       if (result.status) {
-        console.log('result?.data?.data', result?.data)
-        if (type === 'first') {
-          setFirstImageURL(result?.data);
-        } else if (type === 'second') {
-          setSecondImageURL(result?.data);
-        } else if (type === 'firstProduct') {
-          setFirstProductImageURL(result?.data);
-        } else if (type === 'secondProduct') {
-          setSecondProductImageURL(result?.data);
-        }
+        if (type === 'first') setFirstImageURL(result?.data);
+        else if (type === 'second') setSecondImageURL(result?.data);
+        else if (type === 'firstProduct') setFirstProductImageURL(result?.data);
+        else if (type === 'secondProduct') setSecondProductImageURL(result?.data);
       } else {
-        SHOW_TOAST(result?.data?.message ?? '', 'error')
-        setFirstImage(null);
+        SHOW_TOAST(result?.data?.message ?? '', 'error');
+        if (type === 'first') setFirstImage(null);
+        else if (type === 'second') setSecondImage(null);
+        else if (type === 'firstProduct') setFirstProductImage(null);
+        else if (type === 'secondProduct') setSecondProductImage(null);
       }
-      console.log('error==>', result?.data?.message)
-    }
-    catch (error: any) {
-      setFirstImage(null);
-      setLoading(false);
+    } catch (error: any) {
+      if (type === 'first') setFirstImage(null);
+      else if (type === 'second') setSecondImage(null);
+      else if (type === 'firstProduct') setFirstProductImage(null);
+      else if (type === 'secondProduct') setSecondProductImage(null);
       SHOW_TOAST(error?.message ?? '', 'error');
-      console.log(error?.message)
     } finally {
       setLoading(false);
     }
@@ -198,17 +243,22 @@ export default function CreateRequest(props: any) {
 
   function onNextProfessional() {
     if (selectedProgress === 1) {
-      setSelectedProgress(2);
-    } else if (selectedProgress === 2) {
       if (!selectedCategoryItem) {
         SHOW_TOAST('Please select a category', 'error');
+        return;
+      } else {
+        setSelectedProgress(2);
+      }
+    } else if (selectedProgress === 2) {
+      if (!selectSubCategoryItem) {
+        SHOW_TOAST('Please select a service', 'error');
         return;
       } else {
         setSelectedProgress(3);
       }
     } else if (selectedProgress === 3) {
-      if (!selectSubCategoryItem) {
-        SHOW_TOAST('Please select a service', 'error');
+      if (!selectedCategory) {
+        SHOW_TOAST('Please select a service provider', 'error');
         return;
       } else {
         setSelectedProgress(4);
@@ -237,23 +287,30 @@ export default function CreateRequest(props: any) {
         setSelectedProgress(6);
       }
     } else if (selectedProgress == 6) {
-      onCreateRequest();
+      if (!isLoading) {
+        onCreateRequest();
+      }
     }
   }
 
   function onNextNonProfessional() {
     if (selectedProgress === 1) {
-      setSelectedProgress(2);
-    } else if (selectedProgress === 2) {
       if (!selectedCategoryItem) {
         SHOW_TOAST('Please select a category', 'error');
+        return;
+      } else {
+        setSelectedProgress(2);
+      }
+    } else if (selectedProgress === 2) {
+      if (!selectSubCategoryItem) {
+        SHOW_TOAST('Please select a service', 'error');
         return;
       } else {
         setSelectedProgress(3);
       }
     } else if (selectedProgress === 3) {
-      if (!selectSubCategoryItem) {
-        SHOW_TOAST('Please select a service', 'error');
+      if (!selectedCategory) {
+        SHOW_TOAST('Please select a service provider', 'error');
         return;
       } else {
         setSelectedProgress(4);
@@ -292,7 +349,10 @@ export default function CreateRequest(props: any) {
         setSelectedProgress(7);
       }
     } else if (selectedProgress == 7) {
-      onCreateRequest();
+      if (!isLoading) {
+        onCreateRequest();
+      }
+
     }
   }
 
@@ -302,7 +362,11 @@ export default function CreateRequest(props: any) {
     } else if (selectedProgress === 2) {
       setSelectedProgress(1);
     } else if (selectedProgress === 3) {
-      setSelectedProgress(2);
+      if (category && subCategory) {
+        props.navigation.goBack();
+      } else {
+        setSelectedProgress(2);
+      }
     } else if (selectedProgress === 4) {
       setSelectedProgress(3);
     } else if (selectedProgress == 5) {
@@ -318,7 +382,11 @@ export default function CreateRequest(props: any) {
     } else if (selectedProgress === 2) {
       setSelectedProgress(1);
     } else if (selectedProgress === 3) {
-      setSelectedProgress(2);
+      if (category && subCategory) {
+        props.navigation.goBack();
+      } else {
+        setSelectedProgress(2);
+      }
     } else if (selectedProgress === 4) {
       setSelectedProgress(3);
     } else if (selectedProgress == 5) {
@@ -327,11 +395,12 @@ export default function CreateRequest(props: any) {
       setSelectedProgress(5);
     } else if (selectedProgress === 7) {
       setSelectedProgress(4);
-    } 
+    }
   }
 
   async function onCreateRequest() {
     try {
+      setLoading(true);
       const date = moment(selectedDate).format("YYYY-MM-DD");
       const time = moment(selectedTime).format("hh:mm A");
       const dateTime = moment(`${date} ${time}`, "YYYY-MM-DD hh:mm A").utc().format();
@@ -380,7 +449,7 @@ export default function CreateRequest(props: any) {
           }
         }
       }
-      setLoading(true);
+
       const result = await API.Instance.post(API.API_ROUTES.onServiceRequest, params);
       console.log('result', result.status, result)
       if (result.status) {
@@ -406,11 +475,11 @@ export default function CreateRequest(props: any) {
 
   function renderProfessional() {
     if (selectedProgress === 1) {
-      return renderServiceProviderView()
-    } else if (selectedProgress === 2) {
       return renderCategoryView();
-    } else if (selectedProgress === 3) {
+    } else if (selectedProgress === 2) {
       return renderServiceView();
+    } else if (selectedProgress === 3) {
+      return renderServiceProviderView()
     } else if (selectedProgress === 4) {
       return renderDescriptionView();
     } else if (selectedProgress === 5) {
@@ -422,11 +491,11 @@ export default function CreateRequest(props: any) {
 
   function renderNonProfessional() {
     if (selectedProgress === 1) {
-      return renderServiceProviderView();
-    } else if (selectedProgress === 2) {
       return renderCategoryView();
-    } else if (selectedProgress === 3) {
+    } else if (selectedProgress === 2) {
       return renderServiceView();
+    } else if (selectedProgress === 3) {
+      return renderServiceProviderView();
     } else if (selectedProgress === 4) {
       return renderDescriptionView();
     } else if (selectedProgress === 5) {
@@ -437,6 +506,10 @@ export default function CreateRequest(props: any) {
       return renderPreview();
     }
   }
+
+  const getPreviewUri = (asset: any) => {
+    return asset?.thumbnailUri || asset?.uri;
+  };
 
   function renderPreview() {
     return (
@@ -463,10 +536,14 @@ export default function CreateRequest(props: any) {
             {selectedCategoryItem?.category_name ?? 'No Category Selected'}
           </Text>
           <View style={styles(theme).categoryView}>
-            <Image
-              style={styles(theme).imageView}
-              source={{ uri: 'https://picsum.photos/id/1/200/300' }}
-            />
+            {selectSubCategoryItem?.image ?
+              <Image
+                style={styles(theme).imageView}
+                source={{ uri: selectSubCategoryItem?.image }}
+              />
+              :
+              <View style={[styles(theme).imageView, { backgroundColor: theme._D5D5D5 }]} />
+            }
             <Text
               style={{
                 marginTop: getScaleSize(16),
@@ -553,16 +630,16 @@ export default function CreateRequest(props: any) {
                 {STRING.product_images}
               </Text>
               <View style={styles(theme).photosViewContainer}>
-                {firstProductImage?.uri && (
+                {firstProductImage && (
                   <Image
                     style={[styles(theme).photosView]}
-                    source={{ uri: firstProductImage?.uri }}
+                    source={{ uri: getPreviewUri(firstProductImage) }}
                   />
                 )}
-                {secondProductImage?.uri && (
+                {secondProductImage && (
                   <Image
                     style={[styles(theme).photosView]}
-                    source={{ uri: secondProductImage?.uri }}
+                    source={{ uri: getPreviewUri(secondProductImage) }}
                   />
                 )}
 
@@ -592,16 +669,16 @@ export default function CreateRequest(props: any) {
             {STRING.Jobphotos}
           </Text>
           <View style={styles(theme).photosViewContainer}>
-            {firstImage?.uri && (
+            {firstImage && (
               <Image
                 style={[styles(theme).photosView]}
-                source={{ uri: firstImage?.uri }}
+                source={{ uri: getPreviewUri(firstImage) }}
               />
             )}
-            {secondImage?.uri && (
+            {secondImage && (
               <Image
                 style={[styles(theme).photosView]}
-                source={{ uri: secondImage?.uri }}
+                source={{ uri: getPreviewUri(secondImage) }}
               />
             )}
           </View>
@@ -635,13 +712,11 @@ export default function CreateRequest(props: any) {
                 placeholderTextColor={theme._939393}
                 inputTitle={STRING.EnterValuation}
                 inputColor={theme._555555}
-                value={`${'€'}${valuation}`}
+                value={valuation ? `${'€'}${valuation}` : ''}
                 keyboardType="numeric"
                 autoCapitalize="none"
                 onChangeText={text => {
-                  const cleaned = text.replace(/[^0-9.]/g, '');
-                  const formatted = cleaned.replace(/^(\d*\.?\d{0,2}).*$/, '$1');
-                  setValuation(formatted);
+                  setValuation(formatDecimalInput(text));
                 }}
               />
             </View>
@@ -668,6 +743,7 @@ export default function CreateRequest(props: any) {
             {STRING.ChooseTime}
           </Text>
           <TimePicker
+            selectedDate={selectedDate}
             onTimeChange={(hour: number, minute: number, am: boolean) => {
               // setSelectedTime(hour, minute, am);
               let hour24 = hour % 12;
@@ -680,9 +756,7 @@ export default function CreateRequest(props: any) {
                 .format();
               setSelectedTime(new Date(utcString));
             }}
-
           />
-
           <View style={{ height: 16 }} />
         </View>
       </ScrollView>
@@ -739,11 +813,11 @@ export default function CreateRequest(props: any) {
             onPress={() => {
               pickImage('first');
             }}>
-            {firstImage?.uri ? (
+            {firstImage ? (
               <Image
                 resizeMode='cover'
                 style={styles(theme).viewImage}
-                source={{ uri: firstImage?.uri }}
+                source={{ uri: getPreviewUri(firstImage) }}
               />
             ) : (
               <>
@@ -767,11 +841,11 @@ export default function CreateRequest(props: any) {
             onPress={() => {
               pickImage('second');
             }}>
-            {secondImage?.uri ? (
+            {secondImage ? (
               <Image
                 resizeMode='cover'
                 style={styles(theme).viewImage}
-                source={{ uri: secondImage?.uri }}
+                source={{ uri: getPreviewUri(secondImage) }}
               />
             ) : (
               <>
@@ -796,6 +870,13 @@ export default function CreateRequest(props: any) {
           font={FONTS.Lato.SemiBold}
           color={theme._939393}>
           {STRING.upload_message}
+        </Text>
+        <Text
+          style={{}}
+          size={getScaleSize(18)}
+          font={FONTS.Lato.SemiBold}
+          color={theme._939393}>
+          {STRING.you_can_also_upload_a_video}
         </Text>
       </View>
     );
@@ -864,11 +945,11 @@ export default function CreateRequest(props: any) {
               onPress={() => {
                 pickImage('firstProduct');
               }}>
-              {firstProductImage?.uri ? (
+              {firstProductImage ? (
                 <Image
                   resizeMode='cover'
                   style={styles(theme).viewImage}
-                  source={{ uri: firstProductImage?.uri }}
+                  source={{ uri: getPreviewUri(firstProductImage) }}
                 />
               ) : (
                 <>
@@ -892,11 +973,11 @@ export default function CreateRequest(props: any) {
               onPress={() => {
                 pickImage('secondProduct');
               }}>
-              {secondProductImage?.uri ? (
+              {secondProductImage ? (
                 <Image
                   resizeMode='cover'
                   style={styles(theme).viewImage}
-                  source={{ uri: secondProductImage?.uri }}
+                  source={{ uri: getPreviewUri(secondProductImage) }}
                 />
               ) : (
                 <>
@@ -1102,8 +1183,6 @@ export default function CreateRequest(props: any) {
     );
   }
 
-
-
   return (
     <View style={styles(theme).container}>
       <Header
@@ -1166,6 +1245,7 @@ export default function CreateRequest(props: any) {
           </Text>
         </TouchableOpacity>
       </View>
+      {isLoading && <ProgressView />}
     </View>
   );
 }

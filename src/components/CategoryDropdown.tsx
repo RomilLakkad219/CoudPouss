@@ -24,14 +24,17 @@ const CategoryDropdown = (props: DropdownProps) => {
     
     const [isFocus, setIsFocus] = useState(false);
 
+    console.log('selectedItem==>', selectedItem)
+
     const renderItem = (item: any) => {
         const isSelected = item?.id === selectedItem?.id;
         return (
             <View style={styles(theme).item}>
                 <View style={styles(theme).iconLabelContainer}>
                     <Image
-                        source={item.icon}
-                        style={[styles(theme).icon, { tintColor: isSelected ? theme._2C6587 : theme._C1C1C1 }]}
+                        source={{uri: item.category_logo}}
+                        style={[styles(theme).icon]}
+                        resizeMode='cover'
                     />
                     <Text
                         size={getScaleSize(16)}
@@ -49,6 +52,7 @@ const CategoryDropdown = (props: DropdownProps) => {
         );
     };
 
+
     return (
         <View style={container}>
             <Dropdown
@@ -58,11 +62,11 @@ const CategoryDropdown = (props: DropdownProps) => {
                 containerStyle={styles(theme).containerStyle}
                 data={data}
                 showsVerticalScrollIndicator={false}
-                maxHeight={getScaleSize(400)}
+                maxHeight={getScaleSize(500)}
                 labelField="category_name"
                 valueField="category_name"
                 placeholder={STRING.select_category}
-                value={selectedItem?.name}
+                value={selectedItem?.category_name ?? "category_name"}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={(item) => {
@@ -73,10 +77,10 @@ const CategoryDropdown = (props: DropdownProps) => {
                 renderLeftIcon={() => {
                     return (
                         <>
-                            {selectedItem?.icon &&
-                                <Image source={selectedItem?.icon} style={[styles(theme).icon, { tintColor: theme._2C6587 }]} />
+                            {selectedItem?.category_logo &&
+                                <Image source={{uri: selectedItem?.category_logo}} style={[styles(theme).icon]} resizeMode='cover' />
                             }
-                        </>
+                        </> 
                     )
                 }}
             />
@@ -103,6 +107,7 @@ const styles = (theme: ThemeContextType['theme']) =>
             fontSize: getScaleSize(18),
             fontFamily: FONTS.Lato.Regular,
             color: theme._939393,
+            lineHeight: getScaleSize(32),
         },
         selectedTextStyle: {
             fontSize: getScaleSize(16),

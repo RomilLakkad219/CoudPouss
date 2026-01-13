@@ -55,6 +55,7 @@ export default function ServicePreview(props: any) {
   const { profile } = useContext(AuthContext)
 
   const serviceData = props?.route?.params?.serviceData
+  const isFromHome = props?.route?.params?.isFromHome ?? false;
 
   const [isStatus, setIsStatus] = useState(false);
   const [visibleTaskDetails, setVisibleTaskDetails] = useState(false);
@@ -110,7 +111,7 @@ export default function ServicePreview(props: any) {
         style={styles(theme).scrolledContainer}
         showsVerticalScrollIndicator={false}>
         <View style={styles(theme).imageContainer}>
-          {serviceDetails?.subcategory_info?.sub_category_name?.service_photo === null ?
+          {serviceDetails?.subcategory_info?.sub_category_img_url === null ?
             <View style={[styles(theme).imageView, {
               backgroundColor: 'gray'
             }]}>
@@ -118,8 +119,8 @@ export default function ServicePreview(props: any) {
             :
             <Image
               style={styles(theme).imageView}
-              resizeMode='contain'
-              source={{ uri: serviceDetails?.subcategory_info?.sub_category_name?.service_photo }}
+              resizeMode='cover'
+              source={{ uri: serviceDetails?.subcategory_info?.sub_category_img_url }}
             />
           }
           <Text
@@ -130,7 +131,7 @@ export default function ServicePreview(props: any) {
             size={getScaleSize(24)}
             font={FONTS.Lato.Bold}
             color={theme.primary}>
-            {serviceDetails?.subcategory_info?.sub_category_name?.name}
+            {serviceDetails?.subcategory_info?.sub_category_name ?? ''}
           </Text>
           <View style={styles(theme).informationView}>
             <View style={styles(theme).horizontalView}>
@@ -173,10 +174,15 @@ export default function ServicePreview(props: any) {
                 { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
-                <Image
-                  style={styles(theme).informationIcon}
-                  source={IMAGES.service}
-                />
+                {serviceDetails?.category_info?.category_logo_url ?
+                  <Image
+                    style={styles(theme).informationIcon}
+                    source={{ uri: serviceDetails?.category_info?.category_logo_url }}
+                    resizeMode='cover'
+                  />
+                  :
+                  <View style={[styles(theme).informationIcon]} />
+                }
                 <Text
                   style={{
                     marginHorizontal: getScaleSize(8),
@@ -185,7 +191,7 @@ export default function ServicePreview(props: any) {
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
-                  {`${serviceDetails?.category_info?.category_name?.name} Services`}
+                  {`${serviceDetails?.category_info?.category_name ?? 'No'} Service`}
                 </Text>
               </View>
               <View style={styles(theme).itemView}>
@@ -202,7 +208,7 @@ export default function ServicePreview(props: any) {
                   font={FONTS.Lato.Medium}
                   numberOfLines={2}
                   color={theme.primary}>
-                  {serviceDetails?.about_client?.address}
+                  {serviceDetails?.about_client?.address ?? '-'}
                 </Text>
               </View>
             </View>
@@ -223,16 +229,16 @@ export default function ServicePreview(props: any) {
               styles(theme).horizontalView,
               { marginTop: getScaleSize(16) },
             ]}>
-            {serviceDetails?.about_client?.profile_photo === null ?
+            {serviceDetails?.about_client?.profile_photo ?
               <Image
                 style={styles(theme).profilePicView}
-                source={IMAGES.user_placeholder}
+                resizeMode='cover'
+                source={{ uri: serviceDetails?.about_client?.profile_photo }}
               />
               :
               <Image
                 style={styles(theme).profilePicView}
-                resizeMode='contain'
-                source={{ uri: serviceDetails?.about_client?.profile_photo }}
+                source={IMAGES.user_placeholder}
               />
             }
             <Text
@@ -242,18 +248,9 @@ export default function ServicePreview(props: any) {
               color={'#0F232F'}>
               {serviceDetails?.about_client?.name}
             </Text>
-            <Image
-              style={{
-                height: getScaleSize(25),
-                width: getScaleSize(25),
-                alignSelf: 'center',
-                marginLeft: getScaleSize(6),
-              }}
-              source={IMAGES.verify}
-            />
           </View>
         </View>
-        {profile?.service_provider_type === 'non_professional' &&
+        {profile?.user?.service_provider_type === 'non_professional' &&
           <View style={styles(theme).profileContainer}>
             <View>
               <Text
@@ -273,7 +270,7 @@ export default function ServicePreview(props: any) {
             </View>
           </View>
         }
-        {profile?.service_provider_type === 'non_professional' &&
+        {profile?.user?.service_provider_type === 'non_professional' &&
           <View style={styles(theme).profileContainer}>
             <View>
               <Text
@@ -293,7 +290,7 @@ export default function ServicePreview(props: any) {
             </View>
           </View>
         }
-        {profile?.service_provider_type === 'non_professional' &&
+        {profile?.user?.service_provider_type === 'non_professional' &&
           <View style={styles(theme).profileContainer}>
             <View>
               <Text
@@ -313,7 +310,7 @@ export default function ServicePreview(props: any) {
                       {item ?
                         <Image
                           style={styles(theme).photosView}
-                          resizeMode='contain'
+                          resizeMode='cover'
                           source={{ uri: item }}
                         />
                         :
@@ -353,11 +350,12 @@ export default function ServicePreview(props: any) {
           data={serviceDetails?.job_photos}
           horizontal
           showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: getScaleSize(16), marginBottom: getScaleSize(24) }}
           renderItem={({ item, index }) => {
             return (
               <Image
                 style={styles(theme).photosView}
-                resizeMode='contain'
+                resizeMode='cover'
                 source={{ uri: item }}
               />
             );
@@ -373,7 +371,7 @@ export default function ServicePreview(props: any) {
           <Text
             size={getScaleSize(14)}
             font={FONTS.Lato.Medium}
-            color={'#424242'}>
+            color={theme._2C6587}>
             {STRING.EstimatedCost}
           </Text>
           <Text
@@ -389,7 +387,8 @@ export default function ServicePreview(props: any) {
           activeOpacity={1}
           onPress={() => {
             props.navigation.navigate(SCREENS.AddQuote.identifier, {
-              item: serviceDetails
+              item: serviceDetails,
+              isFromHome: isFromHome,
             })
           }}>
           <Text
@@ -512,10 +511,11 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     photosView: {
       height: getScaleSize(144),
-      width: getScaleSize(180),
+      width: (Dimensions.get('window').width - getScaleSize(66)) / 2,
       borderRadius: 8,
       resizeMode: 'cover',
       marginTop: getScaleSize(18),
+      backgroundColor: theme._EAF0F3,
     },
     buttonContainer: {
       flexDirection: 'row',

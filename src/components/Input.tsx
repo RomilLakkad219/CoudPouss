@@ -122,9 +122,7 @@ function Input(props: InputProps & TextInputProps) {
             {...props}
             style={[styles(theme).input, inputContainer]}
             placeholderTextColor={
-              isError
-                ? theme._EF5350
-                : placeholderTextColor
+              placeholderTextColor
                   ? placeholderTextColor
                   : theme._939393
             }

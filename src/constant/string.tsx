@@ -224,8 +224,6 @@ export const useString = () => {
     Rejectedforanotherreason: 'Rejected for another reason',
     Cancel: 'Cancel',
     ConfirmServicerequest: 'Confirm Service request ?',
-    popup_message:
-      'You are about to confirm a service at the rate of 499€ with the Provider Wade Warren, Are you sure you want to continue? ',
     No: 'No',
     Yes: 'Yes',
     Proceedtopayment: 'Proceed to payment',
@@ -358,7 +356,21 @@ export const useString = () => {
     what_are_you_looking_for: "What are you looking for?",
     filters: 'Filters',
     Choose_Date_Time: "Choose Date & Time",
-    product: "Product"
+    product: "Product",
+    service_cancelled: "Service Cancelled",
+    cancelled_message: "This cancellation is happened in less than 48 hours before the scheduled service time. According to policy, your payment will not be fully refunded. A 5% service fee is charged.",
+    service_cancelled_message: "Your service has been successfully cancelled. Here are the details regarding your payment and the cancellation policy.",
+    service_fee: "Service Fee (5%)",
+    cancel_scheduled_service: "Cancel Scheduled Service",
+    are_you_sure_you_want_to_cancel_your_scheduled_service_with_the_expert: "Are you sure you want to cancel your scheduled service with the expert?",
+    payment_breakdown: "Payment Breakdown",
+    confirm_cancellation: "Confirm Cancellation",
+    keep_booking: "Keep Booking",
+    you_have_not_sent_any_quote_please_sent_a_quotes_to_the_service_request: "You have not sent any quote, please sent\na quotes to the service request",
+    you_can_also_upload_a_video: "(You can also upload a video)",
+    cancellation_not_possible: "Cancellation not possible",
+    are_you_sure_you_want_to_logout: "Are you sure you want to\nlogout?",
+    no_data_found: "No data found",
   };
 };
 

@@ -9,7 +9,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { getScaleSize, REGEX, SHOW_TOAST, Storage, useString } from '../../constant';
 
 //COMPONENTS
-import { Header, Input, Text, Button, SelectCountrySheet } from '../../components';
+import { Header, Input, Text, Button, SelectCountrySheet, ProgressView } from '../../components';
 
 //SCREENS
 import { SCREENS } from '..';
@@ -25,8 +25,8 @@ export default function Login(props: any) {
   const { setUser, setUserType, setProfile } = useContext<any>(AuthContext);
   const { theme } = useContext<any>(ThemeContext);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('Professionaltest41@yopmail.com');
+  const [password, setPassword] = useState('Test@123');
   const [show, setShow] = useState(true);
   const [passwordError, setPasswordError] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -74,8 +74,6 @@ export default function Login(props: any) {
     try {
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.login, params);
-      setLoading(false);
-
       if (result.status) {
         Storage.save(Storage.USER_DETAILS, JSON.stringify(result?.data?.data));
         setUser(result?.data?.data);
@@ -85,8 +83,9 @@ export default function Login(props: any) {
         SHOW_TOAST(result?.data?.message, 'error')
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -94,27 +93,26 @@ export default function Login(props: any) {
     try {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getUserDetails);
-      setLoading(false);
-
       if (result.status) {
-        setProfile(result?.data?.data?.user)
+        console.log('profile result==>', JSON.stringify(result?.data?.data))
+        setProfile(result?.data?.data)
         props.navigation.dispatch(
           CommonActions.reset({
             index: 0,
             routes: [{
-              name: SCREENS.BottomBar.identifier, 
+              name: SCREENS.BottomBar.identifier,
             }],
           }),
         )
       } else {
-        setLoading(false);
         SHOW_TOAST(result?.data?.message, 'error')
         console.log('ERR', result?.data?.message)
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
       return null;
+    }finally{
+      setLoading(false);
     }
   }
 
@@ -247,6 +245,7 @@ export default function Login(props: any) {
           setVisibleCountry(false);
         }}
       />
+      {isLoading && <ProgressView />}
     </View>
   );
 }

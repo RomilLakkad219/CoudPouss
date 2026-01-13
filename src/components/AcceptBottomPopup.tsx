@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,16 +9,16 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import {ThemeContext, ThemeContextType} from '../context';
-import {getScaleSize, useString} from '../constant';
-import {FONTS, IMAGES} from '../assets';
+import { ThemeContext, ThemeContextType } from '../context';
+import { getScaleSize, useString } from '../constant';
+import { FONTS, IMAGES } from '../assets';
 import Text from './Text';
-import {constant} from 'lodash';
+import { constant } from 'lodash';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 const AcceptBottomPopup = (props: any) => {
   const STRING = useString();
-  const {theme} = useContext<any>(ThemeContext);
+  const { theme } = useContext<any>(ThemeContext);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -78,7 +78,7 @@ const AcceptBottomPopup = (props: any) => {
   };
 
   return (
-    <View style={{backgroundColor: 'rgba(0,0,0,0.3)'}}>
+    <View style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
       <RBSheet
         ref={props.onRef}
         closeOnDragDown={true}
@@ -89,34 +89,34 @@ const AcceptBottomPopup = (props: any) => {
         customStyles={{
           container: {
             backgroundColor: '#FFF',
-            height: getScaleSize(350),
+            height: getScaleSize(400),
             borderTopLeftRadius: getScaleSize(20),
             borderTopRightRadius: getScaleSize(20),
           },
         }}>
         <View style={styles(theme).content}>
-          <Image style={styles(theme).icon} source={IMAGES.accept_icon} />
-          <Text
-            size={getScaleSize(22)}
-            font={FONTS.Lato.Bold}
-            color={theme.primary}
-            style={{alignSelf: 'center', marginTop: getScaleSize(16)}}>
-            {STRING.ConfirmServicerequest}
-          </Text>
-
-          <Text
-            size={getScaleSize(22)}
-            font={FONTS.Lato.SemiBold}
-            color={'#424242'}
-            align="center"
-            style={{
-              alignSelf: 'center',
-              marginTop: getScaleSize(16),
-              marginHorizontal: getScaleSize(22),
-            }}>
-            {STRING.popup_message}
-          </Text>
-
+          <View style={{flex: 1.0}}>
+            <Image style={styles(theme).icon} source={IMAGES.accept_icon} />
+            <Text
+              size={getScaleSize(22)}
+              font={FONTS.Lato.Bold}
+              color={theme.primary}
+              style={{ alignSelf: 'center', marginTop: getScaleSize(16) }}>
+              {STRING.ConfirmServicerequest}
+            </Text>
+            <Text
+              size={getScaleSize(22)}
+              font={FONTS.Lato.SemiBold}
+              color={'#424242'}
+              align="center"
+              style={{
+                alignSelf: 'center',
+                marginTop: getScaleSize(16),
+                marginHorizontal: getScaleSize(22),
+              }}>
+              {props?.title}
+            </Text>
+          </View>
           <View style={styles(theme).buttonContainer}>
             <TouchableOpacity
               style={styles(theme).backButtonContainer}
@@ -128,7 +128,7 @@ const AcceptBottomPopup = (props: any) => {
                 size={getScaleSize(19)}
                 font={FONTS.Lato.Bold}
                 color={theme.primary}
-                style={{alignSelf: 'center'}}>
+                style={{ alignSelf: 'center' }}>
                 {STRING.No}
               </Text>
             </TouchableOpacity>
@@ -142,7 +142,7 @@ const AcceptBottomPopup = (props: any) => {
                 size={getScaleSize(19)}
                 font={FONTS.Lato.Bold}
                 color={theme.white}
-                style={{alignSelf: 'center'}}>
+                style={{ alignSelf: 'center' }}>
                 {STRING.Yes}
               </Text>
             </TouchableOpacity>
@@ -161,6 +161,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     content: {
       paddingVertical: getScaleSize(24),
+      flex: 1.0,
     },
     icon: {
       height: getScaleSize(60),
@@ -185,7 +186,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     buttonContainer: {
       flexDirection: 'row',
       marginHorizontal: getScaleSize(22),
-      marginTop: getScaleSize(24),
+      marginVertical: getScaleSize(16),
     },
     backButtonContainer: {
       flex: 1.0,

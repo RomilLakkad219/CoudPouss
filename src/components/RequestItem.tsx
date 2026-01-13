@@ -29,10 +29,14 @@ function RequestItem(props: any) {
   function getStatus(status: any) {
     if (status === 'open') {
       return 'Open Proposal';
-    } else if (status === 'accepted') {
+    } else if (status === 'pending') {
       return 'Responsed';
-    } else if (status === 'completed') {
+    } else if (status === 'accepted') {
       return 'Validation';
+    } else if (status === 'completed') {
+      return 'Completed';
+    } else if (status === 'cancelled') {
+      return 'Cancelled';
     }
   }
 
@@ -41,11 +45,17 @@ function RequestItem(props: any) {
       props.onPress()
     }}>
       <View style={styles(theme).horizontalContainer}>
-        <Image
-          source={IMAGES.service_icon}
-          style={styles(theme).imageIcon}
-          resizeMode="contain"
-        />
+        <View style={styles(theme).imageContainer}>
+          {item?.category_logo ?
+            <Image
+              source={{ uri: item?.category_logo }}
+              style={styles(theme).imageIcon}
+              resizeMode="cover"
+            />
+            :
+            <View style={styles(theme).imageIcon} />
+          }
+        </View>
         <Text
           style={{ marginLeft: getScaleSize(16), alignSelf: 'center' }}
           size={getScaleSize(24)}
@@ -54,12 +64,13 @@ function RequestItem(props: any) {
           {`${item?.category_name} Service`}
         </Text>
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: getScaleSize(12) }}>
+      <View style={{ flex: 1.0, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: getScaleSize(12) }}>
         <Text
+          style={{ flex: 1.0 }}
           size={getScaleSize(20)}
           font={FONTS.Lato.SemiBold}
           color={theme.primary}>
-          {item?.sub_category_name}
+          {item?.sub_category_name ?? ''}
         </Text>
         {selectedFilter?.title === 'All' && (
           <View style={styles(theme).statusContainer}>
@@ -100,7 +111,7 @@ function RequestItem(props: any) {
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>
-            {moment(item?.chossen_time).format('DD MMM')}
+            {moment(item?.chosen_datetime).format('DD MMM')}
           </Text>
         </View>
         <View style={[styles(theme).horizontalContainer, { marginTop: getScaleSize(3) }]}>
@@ -115,7 +126,7 @@ function RequestItem(props: any) {
             size={getScaleSize(20)}
             font={FONTS.Lato.SemiBold}
             color={theme.primary}>
-            {moment(item?.chossen_time).format('hh:mm A')}
+            {moment(item?.chosen_datetime).format('hh:mm A')}
           </Text>
         </View>
       </View>
@@ -136,9 +147,17 @@ const styles = (theme: ThemeContextType['theme']) =>
     horizontalContainer: {
       flexDirection: 'row',
     },
-    imageIcon: {
-      width: getScaleSize(48),
+    imageContainer: {
       height: getScaleSize(44),
+      width: getScaleSize(44),
+      borderRadius: getScaleSize(10),
+      backgroundColor: theme._2C6587,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    imageIcon: {
+      width: getScaleSize(24),
+      height: getScaleSize(24),
     },
     detailsView: {
       backgroundColor: theme.white,
@@ -152,6 +171,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       borderRadius: getScaleSize(16),
       paddingVertical: getScaleSize(4),
       paddingHorizontal: getScaleSize(10),
+      marginLeft: getScaleSize(8),
     }
   });
 
