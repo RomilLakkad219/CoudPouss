@@ -6,13 +6,13 @@ import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString, SHOW_TOAST, CATEGORY_DATA, SERVICES_DATA } from '../../constant';
+import { getScaleSize, useString, SHOW_TOAST, arrayIcons } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //COMPONENTS
-import { Header, Input, Text, Button, CategoryDropdown, ServiceItem } from '../../components';
+import { Header, Input, Text, Button, ServiceItem } from '../../components';
 import { API } from '../../api';
 
 
@@ -92,7 +92,10 @@ export default function ReviewServices(props: any) {
                             return (
                                 <View key={index} style={styles(theme).itemContainer}>
                                     <View style={styles(theme).sectionHeaderContainer}>
-                                        <Image source={section?.category?.category_logo} style={styles(theme).sectionHeaderIcon} />
+                                        <Image 
+                                        source={arrayIcons[section?.category?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any} 
+                                        style={[styles(theme).sectionHeaderIcon, { tintColor: theme._2C6587 }]} 
+                                        resizeMode='cover' />
                                         <Text size={getScaleSize(16)}
                                             font={FONTS.Lato.SemiBold}
                                             color={theme._2C6587}>

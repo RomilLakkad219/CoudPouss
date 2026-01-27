@@ -20,7 +20,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { formatDecimalInput, getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
+import { arrayIcons, formatDecimalInput, getScaleSize, SHOW_SUCCESS_TOAST, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -62,12 +62,19 @@ export default function AddQuote(props: any) {
   const [isServiceDetails, setServiceDetails] = useState<any>(serviceDetails ?? '')
   const [amountError, setAmountError] = useState('');
   const [descriptionError, setDescriptionError] = useState('');
+  const [docError, setDocError] = useState('');
+  const [videoError, setVideoError] = useState('');
 
   useEffect(() => {
     if (!isServiceDetails && isItem) {
       getServicesDetails()
     }
   }, [])
+
+
+  console.log('photoIds==>', photoIds.length > 0, photoIds, videoIds)
+
+
 
   async function getServicesDetails() {
     try {
@@ -88,30 +95,43 @@ export default function AddQuote(props: any) {
     }
   }
 
-  const uploadFile = async (asset: any) => {
-    const formData = new FormData();
-
-    formData.append('file', {
-      uri: Platform.OS === 'ios'
-        ? asset.uri.replace('file://', '')
-        : asset.uri,
-      name: asset.fileName || `file_${Date.now()}`,
-      type: asset.type || 'image/jpeg',
-    } as any);
-
-    const res: any = await API.Instance.post(API.API_ROUTES.fileUploadProfessionalServices, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+  async function uploadFile(asset: any) {
+    try {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: Platform.OS === 'ios'
+          ? asset.uri.replace('file://', '')
+          : asset.uri,
+        name: asset.fileName || `file_${Date.now()}`,
+        type: asset.type || 'image/jpeg',
+      } as any);
+      setLoading(true);
+      const result: any = await API.Instance.post(API.API_ROUTES.fileUploadProfessionalServices, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (result.status) {
+        SHOW_TOAST(result?.data?.message ?? '', 'success')
+        return result?.data?.storage_key;
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+        return null;
+      }
     }
-    );
-    if (!res?.status) {
-      throw new Error(res?.message || 'File upload failed');
+    catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+      return null;
+    } finally {
+      setLoading(false);
     }
-    return res.data.storage_key;
-  };
+  }
+
+  // return res.data.storage_key;
 
   const pickDocument = async (index: number) => {
+    setDocError('');
+    setLoading(true);
     launchImageLibrary(
       {
         mediaType: 'photo',
@@ -132,15 +152,19 @@ export default function AddQuote(props: any) {
           setLoading(true);
 
           const id = await uploadFile(asset);
-
-          setPhotoIds(prev => [...prev, id]);
-
-          if (index === 1) setDoc1(asset);
-          if (index === 2) setDoc2(asset);
-
-          SHOW_TOAST('Document uploaded successfully', 'success');
+          if (id) {
+            setPhotoIds(prev => [...prev, id]);
+            if (index === 1) setDoc1(asset);
+            if (index === 2) setDoc2(asset);
+            SHOW_TOAST('Document uploaded successfully', 'success');
+          } else {
+            SHOW_TOAST('Document upload failed', 'error');
+          }
         } catch (e: any) {
-          SHOW_TOAST(e.message || 'Upload failed', 'error');
+          SHOW_TOAST('Document upload failed', 'error');
+          setPhotoIds(prev => prev.filter(id => id !== id));
+          if (index === 1) setDoc1(null);
+          if (index === 2) setDoc2(null);
         } finally {
           setLoading(false);
         }
@@ -149,6 +173,7 @@ export default function AddQuote(props: any) {
   };
 
   const pickVideo = () => {
+    setVideoError('');
     launchImageLibrary(
       {
         mediaType: 'video',
@@ -162,6 +187,7 @@ export default function AddQuote(props: any) {
         }
 
         const asset = response.assets?.[0];
+        console.log('asset==>', asset, response)
         if (!asset) return;
 
         if (!asset.uri) {
@@ -179,8 +205,14 @@ export default function AddQuote(props: any) {
 
           //  Upload video
           const id = await uploadFile(asset);
-          setVideo(asset);
-          setVideoIds(prev => [...prev, id]);
+          if (id) {
+            setVideoIds(prev => [...prev, id]);
+            setVideo(asset);
+            SHOW_TOAST('Video uploaded successfully', 'success');
+          } else {
+            SHOW_TOAST('Video upload failed', 'error');
+            return
+          }
 
           //  Create thumbnail
           const thumbnail = await createThumbnail({
@@ -205,77 +237,69 @@ export default function AddQuote(props: any) {
 
     // amount validation only for professional
     if (profile?.user?.service_provider_type === 'professional' && !amount) {
-      return setAmountError('Please enter amount');
-    }
-    else {
-      setAmountError('');
-    }
+      setAmountError('Please enter amount');
+    } else if (!desctiption) {
+      setDescriptionError('Please enter short description');
 
-    if (!desctiption) {
-      return setDescriptionError('Please enter short description');
-    }
-    else {
-      setDescriptionError('');
-    }
+    } else if (photoIds.length === 0) {
+      setDocError('Please upload at least one document');
+    } else if (videoIds.length == 0) {
+      setVideoError('Please upload a video');
+    } else {
+      try {
+        setLoading(true);
 
-    try {
-      setLoading(true);
-
-      let payload: any = {
-        servicesid: isServiceDetails?.service_id,
-        description: desctiption,
-      };
-
-      // PROFESSIONAL PAYLOAD
-      if (profile?.user?.service_provider_type === 'professional') {
-        payload = {
-          ...payload,
-          provider_quote_amount: amount,
-          offer_photoids: photoIds,
-          offer_videoids: videoIds,
+        let payload: any = {
+          servicesid: isServiceDetails?.service_id,
+          description: desctiption,
         };
+
+        // PROFESSIONAL PAYLOAD
+        if (profile?.user?.service_provider_type === 'professional') {
+          payload = {
+            ...payload,
+            provider_quote_amount: amount,
+            offer_photoids: photoIds,
+            offer_videoids: videoIds,
+          };
+        }
+
+        // NON-PROFESSIONAL PAYLOAD
+        if (profile?.user?.service_provider_type === 'non_professional') {
+          payload = {
+            ...payload,
+            offer_photos: photoIds.map(key => ({
+              storage_key: key,
+            })),
+            offer_videos: videoIds.map(key => ({
+              storage_key: key,
+            })),
+          };
+        }
+
+        const result: any = await API.Instance.post(
+          API.API_ROUTES.sendQuoteRequest,
+          payload
+        );
+
+        setLoading(false);
+
+        if (result?.status) {
+          props.navigation.navigate(SCREENS.Success.identifier, {
+            isFromHome: true,
+          });
+        } else {
+          SHOW_TOAST(result?.message || 'Failed to send quote', 'error');
+        }
+      } catch (e: any) {
+        setLoading(false);
+        SHOW_TOAST(e?.message || 'Something went wrong', 'error');
       }
-
-      // NON-PROFESSIONAL PAYLOAD
-      if (profile?.user?.service_provider_type === 'non_professional') {
-        payload = {
-          ...payload,
-          offer_photos: photoIds.map(key => ({
-            storage_key: key,
-          })),
-          offer_videos: videoIds.map(key => ({
-            storage_key: key,
-          })),
-        };
-      }
-
-      const result: any = await API.Instance.post(
-        API.API_ROUTES.sendQuoteRequest,
-        payload
-      );
-
-      setLoading(false);
-
-      if (result?.status) {
-        props.navigation.navigate(SCREENS.Success.identifier, {
-          isFromHome: true,
-        });
-      } else {
-        SHOW_TOAST(result?.message || 'Failed to send quote', 'error');
-      }
-    } catch (e: any) {
-      setLoading(false);
-      SHOW_TOAST(e?.message || 'Something went wrong', 'error');
     }
   }
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
         onBack={() => {
           props.navigation.goBack();
@@ -349,10 +373,15 @@ export default function AddQuote(props: any) {
                 { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
-                <Image
-                  style={styles(theme).informationIcon}
-                  source={IMAGES.service}
-                />
+                {isServiceDetails?.category_info?.category_name ?
+                  <Image
+                    style={[styles(theme).informationIcon, { tintColor: theme._1A3D51 }]}
+                    source={arrayIcons[isServiceDetails?.category_info?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
+                    resizeMode='cover'
+                  />
+                  :
+                  <View style={styles(theme).informationIcon} />
+                }
                 <Text
                   style={{
                     marginHorizontal: getScaleSize(8),
@@ -375,6 +404,7 @@ export default function AddQuote(props: any) {
                     alignSelf: 'center',
                   }}
                   size={getScaleSize(12)}
+                  numberOfLines={4}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
                   {isServiceDetails?.about_client?.address}
@@ -430,7 +460,7 @@ export default function AddQuote(props: any) {
         </View>
         {profile?.user?.service_provider_type === 'professional' &&
           <Input
-            placeholder={STRING.EnterQuoteAmount}
+            placeholder={`${isServiceDetails?.estimated_cost ? `€${isServiceDetails?.estimated_cost}` : '0'}`}
             placeholderTextColor={theme._D5D5D5}
             inputTitle={STRING.EnterQuoteAmount}
             inputColor={true}
@@ -469,7 +499,7 @@ export default function AddQuote(props: any) {
         </Text>
         <View style={styles(theme).imageUploadContent}>
           <TouchableOpacity
-            style={[styles(theme).uploadButton, { marginRight: getScaleSize(9) }]}
+            style={[styles(theme).uploadButton, { marginRight: getScaleSize(9), borderColor: docError ? theme._EF5350 : theme._818285 }]}
             activeOpacity={1}
             onPress={() => pickDocument(1)}>
             {doc1 ? (
@@ -488,7 +518,7 @@ export default function AddQuote(props: any) {
             )}
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9) }]}
+            style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9), borderColor: docError ? theme._EF5350 : theme._818285 }]}
             activeOpacity={1}
             onPress={() => pickDocument(2)}>
             {doc2 ? (
@@ -507,6 +537,14 @@ export default function AddQuote(props: any) {
             )}
           </TouchableOpacity>
         </View>
+        {docError &&
+          <Text
+            style={{ marginTop: getScaleSize(8) }}
+            size={getScaleSize(14)}
+            font={FONTS.Lato.Regular}
+            color={theme._EF5350}>{docError}
+          </Text>
+        }
         <Text
           style={{ marginTop: getScaleSize(20) }}
           size={getScaleSize(17)}
@@ -517,7 +555,7 @@ export default function AddQuote(props: any) {
         <TouchableOpacity
           style={[
             styles(theme).uploadButton,
-            { marginRight: getScaleSize(0), marginTop: getScaleSize(12) },
+            { marginRight: getScaleSize(0), marginTop: getScaleSize(12), borderColor: videoError ? theme._EF5350 : theme._818285 },
           ]}
           activeOpacity={1}
           onPress={pickVideo}>
@@ -539,10 +577,19 @@ export default function AddQuote(props: any) {
             </>
           }
         </TouchableOpacity>
+        {videoError &&
+          <Text
+            style={{ marginVertical: getScaleSize(8) }}
+            size={getScaleSize(14)}
+            font={FONTS.Lato.Regular}
+            color={theme._EF5350}>
+            {videoError}
+          </Text>
+        }
       </ScrollView>
       <Button
         title={STRING.SubmitQuote}
-        disabled={isLoading}
+        disabled={amount === '' || desctiption === '' || photoIds.length === 0 || videoIds.length === 0 ? true : false}
         style={{
           marginVertical: getScaleSize(24),
           marginHorizontal: getScaleSize(24),

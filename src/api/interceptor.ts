@@ -47,18 +47,14 @@ Instance.interceptors.request.use(
         }
         if (!DISABLE_API_LOGS) {
             console.log(`Config Header ${JSON.stringify(config?.headers)}`)
-            console.log(`Config Base URL ${JSON.stringify(config?.baseURL)} ${JSON.stringify(config?.url)}`)
+            console.log(`Config Base URL ${config?.method} ${JSON.stringify(config?.baseURL)} ${JSON.stringify(config?.url)}`)
             console.log(`Config Data ${JSON.stringify(config?.data)}`)
         }
 
         if (!config.headers.Authorization) {
             const userData: any = await Storage.get(Storage.USER_DETAILS)
-            console.log('userData==>', userData)
-
             const result = JSON.parse(userData)
-            console.log('result==>', result)
             const accessToken = result?.access_token
-
             if (accessToken) {
                 const isExpired = isTokenExpire(accessToken)
                 if (isExpired) {

@@ -17,10 +17,13 @@ function BottomBar(props: any) {
   const { userType } = useContext<any>(AuthContext);
 
   const isProfile = props?.route?.params?.isProfile ?? false;
+  const isValidationService = props?.route?.params?.isValidationService ?? false;
 
   function getInitialRouteName() {
     if (isProfile) {
       return TABS.Profile.identifier;
+    } else if (isValidationService) {
+      return TABS.Request.identifier;
     } else {
       return TABS.Home.identifier;
     }

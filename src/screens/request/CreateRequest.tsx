@@ -23,7 +23,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { CATEGORY_DATA, formatDecimalInput, getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { formatDecimalInput, getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -429,7 +429,7 @@ export default function CreateRequest(props: any) {
           is_professional: true,
           category_id: selectedCategoryItem?.id,
           sub_category_id: selectSubCategoryItem?.id,
-          description: description,
+          description: description.trim(),
           description_files: imageUrls,
           validation_amount: valuation,
           chosen_datetime: dateTime
@@ -439,7 +439,7 @@ export default function CreateRequest(props: any) {
           is_professional: false,
           category_id: selectedCategoryItem?.id,
           sub_category_id: selectSubCategoryItem?.id,
-          description: description,
+          description: description.trim(),
           description_files: imageUrls,
           chosen_datetime: dateTime,
           barter_product: {
@@ -676,6 +676,7 @@ export default function CreateRequest(props: any) {
               />
             )}
             {secondImage && (
+
               <Image
                 style={[styles(theme).photosView]}
                 source={{ uri: getPreviewUri(secondImage) }}
@@ -765,120 +766,137 @@ export default function CreateRequest(props: any) {
 
   function renderDescriptionView() {
     return (
-      <View style={[styles(theme).serviceProviderCotainer, { marginHorizontal: getScaleSize(22) }]}>
-        <Text
-          size={getScaleSize(24)}
-          font={FONTS.Lato.Bold}
-          color={theme.primary}>
-          {STRING.DescribeAboutService}
-        </Text>
-        <Text
-          style={{ marginTop: getScaleSize(12) }}
-          size={getScaleSize(16)}
-          font={FONTS.Lato.SemiBold}
-          color={theme._939393}>
-          {STRING.descriptionMessage}
-        </Text>
-        <Text
-          style={{ marginTop: getScaleSize(12) }}
-          size={getScaleSize(17)}
-          font={FONTS.Lato.Medium}
-          color={theme._424242}>
-          {STRING.EnterServicedescription}
-        </Text>
-        <View style={styles(theme).inputContainer}>
-          <TextInput
-            style={styles(theme).textInput}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={[styles(theme).serviceProviderCotainer, { marginHorizontal: getScaleSize(22) }]}>
+          <Text
+            size={getScaleSize(24)}
+            font={FONTS.Lato.Bold}
+            color={theme.primary}>
+            {STRING.DescribeAboutService}
+          </Text>
+          <Text
+            style={{ marginTop: getScaleSize(12) }}
+            size={getScaleSize(16)}
+            font={FONTS.Lato.SemiBold}
+            color={theme._939393}>
+            {STRING.descriptionMessage}
+          </Text>
+          <Input
+            placeholder={'search address'}
+            placeholderTextColor={theme._939393}
+            inputTitle={STRING.enter_address}
+            inputColor={true}
+            searchBox={IMAGES.search}
+            continerStyle={{marginTop: getScaleSize(12) }}
             value={description}
-            onChangeText={setDescription}
-            placeholder={STRING.Enterdescriptionhere}
-            placeholderTextColor="#999"
-            multiline={true}
-            numberOfLines={8}
-            textAlignVertical="top"
-            returnKeyType="default"
+            onChangeText={(text: any) => {
+              setDescription(text);
+            }}
           />
-        </View>
-        <Text
-          style={{ marginTop: getScaleSize(20) }}
-          size={getScaleSize(17)}
-          font={FONTS.Lato.Medium}
-          color={theme._424242}>
-          {STRING.UploadPhotosofaJob}
-        </Text>
-        <View style={styles(theme).imageUploadContent}>
-          <TouchableOpacity
-            style={[styles(theme).uploadButton, { marginRight: getScaleSize(9) }]}
-            activeOpacity={1}
-            onPress={() => {
-              pickImage('first');
-            }}>
-            {firstImage ? (
-              <Image
-                resizeMode='cover'
-                style={styles(theme).viewImage}
-                source={{ uri: getPreviewUri(firstImage) }}
-              />
-            ) : (
-              <>
+          <Text
+            style={{ marginTop: getScaleSize(12) }}
+            size={getScaleSize(17)}
+            font={FONTS.Lato.Medium}
+            color={theme._424242}>
+            {STRING.EnterServicedescription}
+          </Text>
+          <View style={styles(theme).inputContainer}>
+            <TextInput
+              style={styles(theme).textInput}
+              value={description}
+              onChangeText={(text: any) => {
+                if (text.startsWith(' ')) return;
+                setDescription(text);
+              }}
+              placeholder={STRING.Enterdescriptionhere}
+              placeholderTextColor="#999"
+              multiline={true}
+              numberOfLines={8}
+              textAlignVertical="top"
+              returnKeyType="default"
+            />
+          </View>
+          <Text
+            style={{ marginTop: getScaleSize(20) }}
+            size={getScaleSize(17)}
+            font={FONTS.Lato.Medium}
+            color={theme._424242}>
+            {STRING.UploadPhotosofaJob}
+          </Text>
+          <View style={styles(theme).imageUploadContent}>
+            <TouchableOpacity
+              style={[styles(theme).uploadButton, { marginRight: getScaleSize(9) }]}
+              activeOpacity={1}
+              onPress={() => {
+                pickImage('first');
+              }}>
+              {firstImage ? (
                 <Image
-                  style={styles(theme).attachmentIcon}
-                  source={IMAGES.upload_attachment}
+                  resizeMode='cover'
+                  style={styles(theme).viewImage}
+                  source={{ uri: getPreviewUri(firstImage) }}
                 />
-                <Text
-                  style={{ marginTop: getScaleSize(8) }}
-                  size={getScaleSize(15)}
-                  font={FONTS.Lato.Regular}
-                  color={theme._818285}>
-                  {STRING.upload_from_device}
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9) }]}
-            activeOpacity={1}
-            onPress={() => {
-              pickImage('second');
-            }}>
-            {secondImage ? (
-              <Image
-                resizeMode='cover'
-                style={styles(theme).viewImage}
-                source={{ uri: getPreviewUri(secondImage) }}
-              />
-            ) : (
-              <>
+              ) : (
+                <>
+                  <Image
+                    style={styles(theme).attachmentIcon}
+                    source={IMAGES.upload_attachment}
+                  />
+                  <Text
+                    style={{ marginTop: getScaleSize(8) }}
+                    size={getScaleSize(15)}
+                    font={FONTS.Lato.Regular}
+                    color={theme._818285}>
+                    {STRING.upload_from_device}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles(theme).uploadButton, { marginLeft: getScaleSize(9) }]}
+              activeOpacity={1}
+              onPress={() => {
+                pickImage('second');
+              }}>
+              {secondImage ? (
                 <Image
-                  style={styles(theme).attachmentIcon}
-                  source={IMAGES.upload_attachment}
+                  resizeMode='cover'
+                  style={styles(theme).viewImage}
+                  source={{ uri: getPreviewUri(secondImage) }}
                 />
-                <Text
-                  style={{ marginTop: getScaleSize(8) }}
-                  size={getScaleSize(15)}
-                  font={FONTS.Lato.Regular}
-                  color={theme._818285}>
-                  {STRING.upload_from_device}
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
+              ) : (
+                <>
+                  <Image
+                    style={styles(theme).attachmentIcon}
+                    source={IMAGES.upload_attachment}
+                  />
+                  <Text
+                    style={{ marginTop: getScaleSize(8) }}
+                    size={getScaleSize(15)}
+                    font={FONTS.Lato.Regular}
+                    color={theme._818285}>
+                    {STRING.upload_from_device}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+          <Text
+            style={{ marginTop: getScaleSize(8) }}
+            size={getScaleSize(18)}
+            font={FONTS.Lato.SemiBold}
+            color={theme._939393}>
+            {STRING.upload_message}
+          </Text>
+          <Text
+            style={{}}
+            size={getScaleSize(18)}
+            font={FONTS.Lato.SemiBold}
+            color={theme._939393}>
+            {STRING.you_can_also_upload_a_video}
+          </Text>
         </View>
-        <Text
-          style={{ marginTop: getScaleSize(8) }}
-          size={getScaleSize(18)}
-          font={FONTS.Lato.SemiBold}
-          color={theme._939393}>
-          {STRING.upload_message}
-        </Text>
-        <Text
-          style={{}}
-          size={getScaleSize(18)}
-          font={FONTS.Lato.SemiBold}
-          color={theme._939393}>
-          {STRING.you_can_also_upload_a_video}
-        </Text>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -908,7 +926,7 @@ export default function CreateRequest(props: any) {
             continerStyle={{ marginBottom: getScaleSize(22) }}
             value={productName}
             onChangeText={text => {
-              setProductName(text);
+              setProductName(text.trim());
             }}
             isError={productNameError}
           />
@@ -921,14 +939,15 @@ export default function CreateRequest(props: any) {
             continerStyle={{ marginBottom: getScaleSize(22) }}
             value={quantity.toString()}
             onChangeText={(text: any) => {
-              setQuantity(text);
+              const cleaned = text.replace(/[^0-9]/g, '');
+              setQuantity(cleaned === '' ? 0 : Number(cleaned));
             }}
             isError={quantityError}
             onPressQuantityRemove={() => {
-              setQuantity(quantity > 0 ? quantity - 1 : 0);
+              setQuantity(prev => (prev > 0 ? prev - 1 : 0));
             }}
             onPressQuantityAdd={() => {
-              setQuantity(quantity + 1);
+              setQuantity(prev => prev + 1);
             }}
           />
           <Text

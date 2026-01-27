@@ -42,7 +42,7 @@ export default function Signup(props: any) {
 
     async function onSignup() {
         if (!email) {
-            setEmailError(STRING.please_enter_your_email);
+            setEmailError(STRING.please_enter_your_email_mobile_number);
         } else {
             setEmailError('');
             let params = {}

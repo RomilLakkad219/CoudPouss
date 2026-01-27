@@ -67,7 +67,7 @@ export default function ExploreServiceRequest(props: any) {
       const result: any = await API.Instance.get(API.API_ROUTES.getProfessionalAllServices + `?page=${page}&limit=${PAGE_SIZE}`)
       if (result?.status) {
         console.log('result==>', result?.data?.data);
-        const newData = result?.data?.data ?? []
+        const newData = result?.data?.data?.open_services ?? []
         console.log('newData==>', newData);
         if (newData.length < PAGE_SIZE) {
           setHasMore(false);
@@ -97,11 +97,6 @@ export default function ExploreServiceRequest(props: any) {
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
         onBack={() => {
           props.navigation.goBack();
@@ -175,8 +170,8 @@ export default function ExploreServiceRequest(props: any) {
                   }}
                 >
                   <Text
-                    size={getScaleSize(13)}
-                    font={FONTS.Lato.Medium}
+                    size={getScaleSize(14)}
+                    font={FONTS.Lato.Regular}
                     color={theme._555555}>
                     {type}
                   </Text>
@@ -272,7 +267,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       alignItems: 'center',
       backgroundColor: theme.white,
       borderWidth: 1,
-      borderColor: '#BECFDA',
+      borderColor:  theme._BECFDA,
       borderRadius: getScaleSize(12),
       paddingHorizontal: getScaleSize(12),
       // paddingVertical: getScaleSize(4),
@@ -286,7 +281,7 @@ const styles = (theme: ThemeContextType['theme']) =>
    
     searchInput: {
       fontFamily: FONTS.Lato.Regular,
-      fontSize: getScaleSize(18),
+      fontSize: getScaleSize(14),
       color: theme.black,
       // marginLeft: getScaleSize(12),
       flex: 1.0,
@@ -297,8 +292,8 @@ const styles = (theme: ThemeContextType['theme']) =>
       paddingHorizontal: getScaleSize(16),
       marginLeft: getScaleSize(16),
       justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: '#BECFDA',
+      borderWidth: 0.7,
+      borderColor: theme._BECFDA,
       height: getScaleSize(53),
       flexDirection: 'row',
       alignItems: 'center',
@@ -321,10 +316,10 @@ const styles = (theme: ThemeContextType['theme']) =>
       elevation: 8,
     },
     dropdownItem: {
-      paddingVertical: getScaleSize(14),
+      paddingVertical: getScaleSize(13),
       paddingHorizontal: getScaleSize(16),
       borderBottomWidth: 1,
-      borderBottomColor: "#E5E5E5",
+      borderBottomColor: theme._D5D5D5,
       backgroundColor: theme.white
     },
   });

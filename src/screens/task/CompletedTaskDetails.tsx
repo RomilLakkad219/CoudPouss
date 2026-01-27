@@ -21,7 +21,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { arrayIcons, getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -57,11 +57,10 @@ export default function CompletedTaskDetails(props: any) {
     const cancelScheduledServicePopupRef = useRef<any>(null);
 
     const item = props?.route?.params?.item ?? {};
+    const serviceId = props?.route?.params?.serviceId ?? '';
 
     useEffect(() => {
-        if (item) {
-            getServiceDetails();
-        }
+        getServiceDetails()
     }, []);
 
     useEffect(() => {
@@ -73,7 +72,7 @@ export default function CompletedTaskDetails(props: any) {
     async function getServiceDetails() {
         try {
             const params = {
-                service_id: item?.id
+                service_id: serviceId ? serviceId : item?.id
             }
             setLoading(true);
             const result = await API.Instance.post(API.API_ROUTES.getServiceDetails, params);
@@ -107,10 +106,11 @@ export default function CompletedTaskDetails(props: any) {
             setLoading(false);
         }
     }
+
     async function removeFavoriteProfessional() {
         try {
             setLoading(true);
-            const result = await API.Instance.post(API.API_ROUTES.removeFavoriteProfessional + `/${serviceDetails?.provider?.id}`);
+            const result = await API.Instance.delete(API.API_ROUTES.removeFavoriteProfessional + `/${serviceDetails?.provider?.id}`);
             if (result.status) {
                 SHOW_TOAST(result?.data?.message ?? '', 'success')
                 getServiceDetails()
@@ -162,15 +162,8 @@ export default function CompletedTaskDetails(props: any) {
         }
     }
 
-
-
     return (
         <View style={styles(theme).container}>
-            <StatusBar
-                barStyle="dark-content"
-                backgroundColor={theme.white}
-                translucent={false}
-            />
             <Header
                 onBack={() => {
                     props.navigation.goBack();
@@ -242,10 +235,10 @@ export default function CompletedTaskDetails(props: any) {
                                 { marginTop: getScaleSize(12) },
                             ]}>
                             <View style={styles(theme).itemView}>
-                                {serviceDetails?.category_logo ?
+                                {serviceDetails?.category_name ?
                                     <Image
-                                        style={styles(theme).informationIcon}
-                                        source={{ uri: serviceDetails?.category_logo }}
+                                        style={[styles(theme).informationIcon, { tintColor: theme._1A3D51 }]}
+                                        source={arrayIcons[serviceDetails?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
                                         resizeMode='cover'
                                     />
                                     :
@@ -273,6 +266,7 @@ export default function CompletedTaskDetails(props: any) {
                                         alignSelf: 'center',
                                     }}
                                     size={getScaleSize(12)}
+                                    numberOfLines={4}
                                     font={FONTS.Lato.Medium}
                                     color={theme.primary}>
                                     {serviceDetails?.elder_address ?? '-'}
@@ -538,10 +532,16 @@ export default function CompletedTaskDetails(props: any) {
                                 showsHorizontalScrollIndicator={false}
                                 renderItem={({ item, index }) => {
                                     return (
-                                        <Image
-                                            style={[styles(theme).photosView]}
-                                            source={{ uri: item }}
-                                        />
+                                        <TouchableOpacity onPress={() => {
+                                            props.navigation.navigate(SCREENS.WebViewScreen.identifier, {
+                                                url: item,
+                                            })
+                                        }}>
+                                            <Image
+                                                style={[styles(theme).photosView]}
+                                                source={{ uri: item }}
+                                            />
+                                        </TouchableOpacity>
                                     );
                                 }}
                             />

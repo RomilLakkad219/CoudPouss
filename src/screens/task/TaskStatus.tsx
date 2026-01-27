@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
   View,
   StatusBar,
@@ -21,7 +21,7 @@ import {FONTS, IMAGES} from '../../assets';
 import {ThemeContext, ThemeContextType} from '../../context';
 
 //CONSTANT
-import {getScaleSize, useString} from '../../constant';
+import {getScaleSize, SHOW_TOAST, useString} from '../../constant';
 
 //COMPONENT
 import {
@@ -39,10 +39,40 @@ import {
 //PACKAGES
 import {useFocusEffect} from '@react-navigation/native';
 import {SCREENS} from '..';
+import { API } from '../../api';
 
 export default function TaskStatus(props: any) {
   const STRING = useString();
   const {theme} = useContext<any>(ThemeContext);
+
+  const item = props?.route?.params?.item ?? {};
+
+  const [isLoading, setLoading] = useState(false);
+  const [taskStatus, setTaskStatus] = useState<any>({});
+
+  useEffect(() => {
+    if (item) {
+      getTaskStatus();
+    }
+  }, []);
+
+  async function getTaskStatus() {
+    try {
+      setLoading(true);
+      const result = await API.Instance.get(API.API_ROUTES.getTaskStatus + `/${item?.service_request_id}`);
+      if (result.status) {
+        console.log('getServiceDetails==>', result?.data?.data)
+        setTaskStatus(result?.data?.data ?? {});
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+      console.log(error?.message)
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const statusData = [
     {
@@ -109,11 +139,6 @@ export default function TaskStatus(props: any) {
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
         onBack={() => {
           props.navigation.goBack();
@@ -133,12 +158,12 @@ export default function TaskStatus(props: any) {
           </Text>
           <View style={styles(theme).devider}></View>
           <View style={{marginTop: getScaleSize(32)}}>
-            {statusData.map((item, index) => (
+            {taskStatus?.task_status_timeline?.map((item: any, index: number) => (
               <StatusItem
-                key={item.id}
+                key={index}
                 item={item}
                 index={index}
-                isLast={index === statusData.length - 1}
+                isLast={index === taskStatus?.task_status_timeline?.length - 1}
               />
             ))}
           </View>

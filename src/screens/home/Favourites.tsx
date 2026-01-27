@@ -38,7 +38,6 @@ export default function Favourites(props: any) {
             const result = await API.Instance.get(API.API_ROUTES.getFavoriteProfessionals + `?page=${favoriteProfessionalsData?.page}&limit=${PAGE_SIZE}`);
             if (result.status) {
                 const newData = result?.data?.data?.results
-                console.log('newData==', newData)
                 if (newData.length < PAGE_SIZE) {
                     setFavoriteProfessionalsData((prev: any) => ({
                         ...prev,
@@ -79,6 +78,35 @@ export default function Favourites(props: any) {
         }
     };
 
+    async function removeFavoriteProfessional(id: any) {
+        try {
+            setFavoriteProfessionalsData((prev: any) => ({
+                ...prev,
+                isLoading: true,
+            }));
+            const result = await API.Instance.delete(API.API_ROUTES.removeFavoriteProfessional + `/${id}`);
+            if (result.status) {
+                SHOW_TOAST(result?.data?.message ?? '', 'success')
+                setFavoriteProfessionalsData(prev => ({
+                    ...prev,
+                    allRequests: prev.allRequests.filter(
+                        (item: any) => item?.provider?.id !== id
+                    ),
+                }));
+
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+        } finally {
+            setFavoriteProfessionalsData((prev: any) => ({
+                ...prev,
+                isLoading: false,
+            }));
+        }
+    }
+
 
     return (
         <View style={styles(theme).container}>
@@ -106,8 +134,7 @@ export default function Favourites(props: any) {
                             item={item}
                             itemContainer={styles(theme).itemContainer}
                             onPressFavorite={(item: any) => {
-                                console.log('item==', item)
-                                // getFavoriteProfessionals()
+                                removeFavoriteProfessional(item?.provider?.id)
                             }}
                         />
                     );

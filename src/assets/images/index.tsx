@@ -105,5 +105,16 @@ export const IMAGES = {
   serviceCancelledIcon: require('./serviceCancelledIcon.png'),
   search_icon: require('./search_icon.png'),
   arrow_left: require('./arrow_left.png'),
-  homeBanner: require('./pHomeBanner.png')
+  homeBanner: require('./pHomeBanner.png'),
+
+  homecare: require('./homecare.png'),
+  it: require('./it.png'),
+  pets: require('./pets.png'), 
+  childcare: require('./child_care.png'),
+  housekeeping: require('./housekeeping.png'),
+  moving: require('./moving.png'),
+  gardening: require('./gardening.png'),
+  diy: require('./diy.png'),
+  transportIcon: require('./transportIcon.png'),
+  personalCareIcon: require('./persononalCare.png'),
 };

@@ -40,7 +40,7 @@ export default function ResetPassword(props: any) {
 
     async function onResetPassword() {
         if (!email) {
-            setEmailError(STRING.please_enter_your_email);
+            setEmailError(STRING.please_enter_your_email_mobile_number);
         } else {
             setEmailError('');
             let params = {}

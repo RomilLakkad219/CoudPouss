@@ -6,6 +6,7 @@ import {
     Image,
     ScrollView,
     SafeAreaView,
+    Platform,
 } from 'react-native';
 
 //CONTEXT
@@ -38,6 +39,7 @@ export default function MyProfile(props: any) {
     const { profile, fetchProfile } = useContext(AuthContext)
 
     const bottomSheetRef = useRef<any>(null);
+    const inputHeight = Platform.OS == 'ios' ? getScaleSize(56) : getScaleSize(56)
 
     const [name, setName] = useState((profile?.user?.first_name ?? "") + " " + (profile?.user?.last_name ?? ""));
     const [nameError, setNameError] = useState('');
@@ -50,13 +52,9 @@ export default function MyProfile(props: any) {
     const [showCountryCode, setShowCountryCode] = useState(false);
     const [isLoading, setLoading] = useState(false);
     const [profileImage, setProfileImage] = useState<any>(null);
+    const [addressHeight, setAddressHeight] = useState(inputHeight);
 
-    function splitName(fullName: string) {
-        const parts = fullName.trim().split(" ");
-        const firstName = parts.shift() || "";
-        const lastName = parts.join(" ") || "";
-        return { firstName, lastName };
-    }
+    
 
     const pickImage = async () => {
         launchImageLibrary({ mediaType: 'photo' }, (response) => {
@@ -271,7 +269,18 @@ export default function MyProfile(props: any) {
                         inputColor={true}
                         value={address}
                         multiline={true}
-                        inputContainer={{ maxHeight: getScaleSize(200) }}
+                        numberOfLines={10}
+                        onContentSizeChange={(e) => {
+                            const newHeight = e.nativeEvent.contentSize.height;
+                            setAddressHeight(
+                              Math.min(getScaleSize(200), Math.max(inputHeight, newHeight))
+                            );
+                        }}
+                        inputContainer={{
+                            maxHeight: getScaleSize(200),
+                            height: addressHeight,
+                            minHeight: inputHeight, 
+                        }}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
                             setAddress(text);

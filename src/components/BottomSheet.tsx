@@ -54,7 +54,8 @@ export default function BottomSheet(props: BottomSheetProps) {
                             size={getScaleSize(22)}
                             font={FONTS.Lato.SemiBold}
                             align="center"
-                            color={theme._555555}>
+                            color={theme._555555}
+                            style={{ lineHeight: getScaleSize(30) }}>
                             {title}
                         </Text>
                     </View>

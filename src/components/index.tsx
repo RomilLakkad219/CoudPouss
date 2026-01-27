@@ -27,6 +27,7 @@ import SelectCountrySheet from './SelectCountrySheet'
 import BottomSheet from './BottomSheet'
 import ProgressView from './ProgressView'
 import CancelScheduledServicePopup from './CancelScheduledServicePopup'
+import ModelWebView from './ModelWebView'
 
 export {
     Header,
@@ -57,5 +58,6 @@ export {
     BottomSheet,
     SelectCountrySheet,
     ProgressView,
-    CancelScheduledServicePopup
+    CancelScheduledServicePopup,
+    ModelWebView
 }

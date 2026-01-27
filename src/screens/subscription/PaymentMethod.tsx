@@ -1,4 +1,4 @@
-import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 //CONTEXT
@@ -6,13 +6,15 @@ import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString, SHOW_TOAST } from '../../constant';
+import { getScaleSize, useString, SHOW_TOAST, openStripeCheckout } from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
 
 //COMPONENTS
 import { Header, Input, Text, Button } from '../../components';
+import { EventRegister } from 'react-native-event-listeners';
+import { API } from '../../api';
 
 
 export default function PaymentMethod(props: any) {
@@ -22,7 +24,8 @@ export default function PaymentMethod(props: any) {
     const planDetails: any = props?.route?.params?.planDetails ?? {};
     const { theme } = useContext<any>(ThemeContext);
 
-    const { myPlan } = useContext<any>(AuthContext);
+    const [isLoading, setLoading] = useState(false);
+    const [paymentDetails, setPaymentDetails] = useState<any>({});
 
     const paymentMethods = [
         { id: 1, title: 'Google Pay', icon: IMAGES.ic_google_pay },
@@ -30,6 +33,109 @@ export default function PaymentMethod(props: any) {
         { id: 3, title: 'Credit Card', icon: IMAGES.ic_credit_card },
     ]
 
+    useEffect(() => {
+        const parseParams = (url: string) => {
+            const queryString = url.split('?')[1] || '';
+            const params: Record<string, string> = {};
+
+            queryString.split('&').forEach(item => {
+                if (!item) return;
+                const [key, value] = item.split('=');
+                params[key] = decodeURIComponent(value || '');
+            });
+
+            return params;
+        };
+
+        Linking.getInitialURL().then((url: any) => {
+            if (!url) return;
+
+            if (url.includes('payment-success')) {
+                const params = parseParams(url);
+                const type = params.type;
+                if (type == 'subscription_payment') {
+                    Alert.alert('Payment successful');
+                    props.navigation.navigate(SCREENS.SubscriptionSuccessful.identifier, {
+                        planDetails: planDetails,
+                    });
+                }
+            }
+
+            if (url.includes('payment-cancel')) {
+                const params = parseParams(url);
+                const error = params.error || 'Payment cancelled';
+                const type = params.type;
+
+                if (type == 'subscription_payment') {
+                   
+                    Alert.alert(error ?? 'Payment cancelled');
+                }
+            }
+        });
+
+        const handleUrl = ({ url }: { url: string }) => {
+            console.log('Deep link:', url);
+            // ✅ PAYMENT SUCCESS
+            if (url.startsWith('coudpouss://payment-success')) {
+                const params = parseParams(url);
+                const type = params.type;
+
+                if (type == 'subscription_payment') {
+                    setTimeout(() => {
+                        props.navigation.navigate(SCREENS.SubscriptionSuccessful.identifier, {
+                            planDetails: planDetails,
+                        });
+                    }, 2000);
+                } else {
+
+                }
+                return;
+            }
+            // ❌ PAYMENT CANCEL
+            if (url.startsWith('coudpouss://payment-cancel')) {
+                const params = parseParams(url);
+                const error = params.error || 'Payment cancelled';
+                const type = params.type;
+
+                if (type == 'subscription_payment') {
+                    EventRegister.emit('subscriptionPaymentCancel', {
+                        message: error,
+                    });
+                }
+                return;
+            }
+        };
+
+        Linking.addEventListener('url', handleUrl);
+
+        return () => {
+            Linking.removeAllListeners('url')
+        };
+    }, []);
+
+    async function onPayment() {
+        openStripeCheckout('https://checkout.stripe.com/c/pay/cs_test_a1UTvrpr86juQMsToFj3JPKUE2gsspUACBifpcqduYESTNCrFcrdyWMpNp#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0V2JGTXRPaX1CdnZpakROTjBsQFc9YjFOdzNsU2poPXJkR3ZLQ1RdcEtoTXNoQ25naXNmf09MfXBxSjxvfHZgTE1hTkFIZGJGRkY8SHJBNTJfYWE3M3dQNTVWXGs3VG9CbycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl');
+return
+        try {
+            setLoading(true);
+            const params = {
+                plan_id: planDetails?.id,
+            }
+            const result = await API.Instance.post(API.API_ROUTES.subscriptionPayment, params);
+            if (result.status) {
+                console.log('paymentDetails==>', result?.data?.data)
+                setPaymentDetails(result?.data?.data ?? {});
+                const STRIPE_URL = result?.data?.data?.checkout_url ?? '';
+            } else {
+                SHOW_TOAST(result?.data?.message ?? '', 'error')
+            }
+        } catch (error: any) {
+            SHOW_TOAST(error?.message ?? '', 'error');
+            console.log(error?.message)
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <View style={styles(theme).container}>
@@ -126,9 +232,7 @@ export default function PaymentMethod(props: any) {
                     title={STRING.proceed_to_pay}
                     style={{ flex: 1.0 }}
                     onPress={() => {
-                        props.navigation.navigate(SCREENS.SubscriptionSuccessful.identifier,{
-                            planDetails: planDetails,
-                        });
+                        onPayment()
                     }}
                 />
             </View>

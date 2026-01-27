@@ -21,7 +21,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { arrayIcons, getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -34,6 +34,7 @@ import {
 //PACKAGES
 import { API } from '../../api';
 import moment from 'moment';
+import { SCREENS } from '..';
 
 export default function OpenRequestDetails(props: any) {
 
@@ -147,10 +148,10 @@ export default function OpenRequestDetails(props: any) {
                                 { marginTop: getScaleSize(12) },
                             ]}>
                             <View style={styles(theme).itemView}>
-                                {serviceDetails?.category_logo ?
+                                {serviceDetails?.category_name ?
                                     <Image
-                                        style={styles(theme).informationIcon}
-                                        source={{ uri: serviceDetails?.category_logo }}
+                                        style={[styles(theme).informationIcon, { tintColor: theme._1A3D51 }]}
+                                        source={arrayIcons[serviceDetails?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
                                         resizeMode='cover'
                                     />
                                     :
@@ -178,6 +179,7 @@ export default function OpenRequestDetails(props: any) {
                                         alignSelf: 'center',
                                     }}
                                     size={getScaleSize(12)}
+                                    numberOfLines={4}
                                     font={FONTS.Lato.Medium}
                                     color={theme.primary}>
                                     {'-'}
@@ -294,11 +296,17 @@ export default function OpenRequestDetails(props: any) {
                                 contentContainerStyle={{ gap: getScaleSize(16) }}
                                 renderItem={({ item, index }) => {
                                     return (
-                                        <Image
-                                            style={[styles(theme).photosView]}
-                                            resizeMode='cover'
-                                            source={{ uri: item }}
-                                        />
+                                        <TouchableOpacity onPress={() => {
+                                            props.navigation.navigate(SCREENS.WebViewScreen.identifier, {
+                                                url: item,
+                                            })
+                                        }}>
+                                            <Image
+                                                style={[styles(theme).photosView]}
+                                                resizeMode='cover'
+                                                source={{ uri: item }}
+                                            />
+                                        </TouchableOpacity>
                                     );
                                 }}
                             />

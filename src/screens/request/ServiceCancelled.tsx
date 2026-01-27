@@ -30,7 +30,7 @@ export default function ServiceCancelled(props: any) {
 
     useEffect(() => {
         if (item) {
-            console.log('item==>', item)
+           
         }
     }, [item]);
 
@@ -129,6 +129,7 @@ export default function ServiceCancelled(props: any) {
                                         alignSelf: 'center',
                                     }}
                                     size={getScaleSize(12)}
+                                    numberOfLines={4}
                                     font={FONTS.Lato.Medium}
                                     color={theme.primary}>
                                     {'Paris, 75001'}

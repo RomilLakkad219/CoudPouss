@@ -7,11 +7,12 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Linking,
 } from 'react-native';
 
 //ASSETS & CONSTANT
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { arrayIcons, getScaleSize, openStripeCheckout, SHOW_TOAST, useString } from '../../constant';
 
 //CONTEXT
 import { ThemeContext, ThemeContextType } from '../../context';
@@ -20,6 +21,7 @@ import { ThemeContext, ThemeContextType } from '../../context';
 import {
   AcceptBottomPopup,
   Header,
+  ModelWebView,
   PaymentBottomPopup,
   ProgressView,
   RejectBottomPopup,
@@ -36,6 +38,9 @@ import { API } from '../../api';
 
 //PACKAGES
 import moment from 'moment';
+import { EventRegister } from 'react-native-event-listeners';
+import { CommonActions } from '@react-navigation/native';
+
 
 export default function RequestDetails(props: any) {
   const STRING = useString();
@@ -51,11 +56,22 @@ export default function RequestDetails(props: any) {
   const [selectedCategory, setSelectedCategory] = useState(0);
   const [reason, setReason] = useState('');
   const [serviceAmount, setServiceAmount] = useState<any>({});
+  const [paymentDetails, setPaymentDetails] = useState<any>({});
+  const [visibleModelWebView, setVisibleModelWebView] = useState<boolean>(false);
 
 
   useEffect(() => {
     if (item) {
       getServiceDetails();
+    }
+  }, []);
+
+  useEffect(() => {
+    EventRegister.addEventListener('onPaymentCancel', (data: any) => {
+      SHOW_TOAST(data?.message ?? '', 'error')
+    });
+    return () => {
+      EventRegister.removeEventListener('onPaymentCancel')
     }
   }, []);
 
@@ -103,7 +119,7 @@ export default function RequestDetails(props: any) {
   async function removeFavoriteProfessional() {
     try {
       setLoading(true);
-      const result = await API.Instance.post(API.API_ROUTES.removeFavoriteProfessional + `/${serviceDetails?.provider?.id}`);
+      const result = await API.Instance.delete(API.API_ROUTES.removeFavoriteProfessional + `/${serviceDetails?.provider?.id}`);
       if (result.status) {
         SHOW_TOAST(result?.data?.message ?? '', 'success')
         getServiceDetails()
@@ -140,7 +156,16 @@ export default function RequestDetails(props: any) {
       if (result.status) {
         SHOW_TOAST(result?.data?.message ?? '', 'success')
         rejectRef.current.close();
-        props.navigation.goBack();
+        props?.navigation?.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{
+              name: SCREENS.BottomBar.identifier,
+              params: { isValidationService: true },
+            }
+            ],
+          }),
+        );
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
       }
@@ -161,26 +186,10 @@ export default function RequestDetails(props: any) {
       setLoading(true);
       const result = await API.Instance.put(API.API_ROUTES.onAcceptService, params);
       if (result.status) {
-        onConfirmPayment();
-      } else {
-        SHOW_TOAST(result?.data?.message ?? '', 'error')
-      }
-    } catch (error: any) {
-      SHOW_TOAST(error?.message ?? '', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onConfirmPayment() {
-    try {
-      setLoading(true);
-      const result = await API.Instance.post(API.API_ROUTES.confirmPayment + `/${serviceDetails?.service_id}`);
-      if (result.status) {
+        const STRIPE_URL = result?.data?.data?.checkout_url ?? '';
         paymentRef.current.close();
-        setTimeout(() => {
-          props.navigation.navigate(SCREENS.ServiceConfirmed.identifier, { item: serviceDetails })
-        }, 1000);
+        openStripeCheckout(STRIPE_URL);
+
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
       }
@@ -190,7 +199,6 @@ export default function RequestDetails(props: any) {
       setLoading(false);
     }
   }
-
 
   async function getServiceAmount() {
     try {
@@ -285,10 +293,10 @@ export default function RequestDetails(props: any) {
                 { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
-                {serviceDetails?.category_logo ?
+                {serviceDetails?.category_name ?
                   <Image
-                    style={styles(theme).informationIcon}
-                    source={{ uri: serviceDetails?.category_logo }}
+                    style={[styles(theme).informationIcon, { tintColor: theme._1A3D51 }]}
+                    source={arrayIcons[serviceDetails?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
                     resizeMode='cover'
                   />
                   :
@@ -313,9 +321,9 @@ export default function RequestDetails(props: any) {
                 <Text
                   style={{
                     marginHorizontal: getScaleSize(8),
-                    alignSelf: 'center',
                   }}
                   size={getScaleSize(12)}
+                  numberOfLines={4}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
                   {serviceDetails?.elder_address ?? '-'}
@@ -578,9 +586,15 @@ export default function RequestDetails(props: any) {
         }}
         proceedToPay={() => {
           onAcceptService()
-          // props.navigation.navigate(SCREENS.ServiceConfirmed.identifier, { item: serviceDetails })
         }}
       />
+      {/* <ModelWebView
+        visible={visibleModelWebView}
+        onRequestClose={() => {
+          setVisibleModelWebView(false);
+        }}
+        item={paymentDetails}
+      /> */}
       {isLoading && <ProgressView />}
     </View>
   );

@@ -1,5 +1,5 @@
 import React, { ReactElement, useContext, useEffect, useRef } from 'react';
-import { LogBox, Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Linking, LogBox, Platform, StatusBar, StyleSheet, View } from 'react-native';
 
 //CONTEXT
 import { ThemeProvider, AuthProvider, ThemeContext } from './src/context'
@@ -66,7 +66,9 @@ const { Navigator, Screen } = createStackNavigator();
 
 function App(): any {
 
-  // const toastRef = useRef<any>(null);  
+  // const toastRef = useRef<any>(null); 
+
+ 
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -79,7 +81,6 @@ function App(): any {
 
     return (
       <View style={styles.container}>
-        <StatusBar barStyle={currentTheme === ThemeName.Light ? "dark-content" : "light-content"} />
         <NavigationContainer>
           <Navigator
             screenOptions={{
@@ -107,9 +108,9 @@ function App(): any {
   return (
     <View style={{ flex: 1.0, }}>
       <ThemeProvider>
-          <AuthProvider>
-            {AppWrraper()}
-          </AuthProvider>
+        <AuthProvider>
+          {AppWrraper()}
+        </AuthProvider>
       </ThemeProvider>
     </View>
 

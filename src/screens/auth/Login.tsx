@@ -25,8 +25,8 @@ export default function Login(props: any) {
   const { setUser, setUserType, setProfile } = useContext<any>(AuthContext);
   const { theme } = useContext<any>(ThemeContext);
 
-  const [email, setEmail] = useState('Professionaltest41@yopmail.com');
-  const [password, setPassword] = useState('Test@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [show, setShow] = useState(true);
   const [passwordError, setPasswordError] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -35,19 +35,19 @@ export default function Login(props: any) {
   const [countryCode, setCountryCode] = useState('+91');
   const [isPhoneNumber, setIsPhoneNumber] = useState(false);
 
-  // useEffect(() => {
-  //   if (email.length >= 3) {
-  //     const isNumber = REGEX.phoneRegex.test(email);
-  //     setIsPhoneNumber(isNumber)
-  //   }
-  //   else {
-  //     setIsPhoneNumber(false)
-  //   }
-  // }, [email])
+  useEffect(() => {
+    if (email.length >= 3) {
+      const isNumber = REGEX.phoneRegex.test(email);
+      setIsPhoneNumber(isNumber)
+    }
+    else {
+      setIsPhoneNumber(false)
+    }
+  }, [email])
 
   async function onVerification() {
     if (!email) {
-      setEmailError(STRING.please_enter_your_email);
+      setEmailError(STRING.please_enter_your_email_mobile_number);
     } else if (!password) {
       setPasswordError(STRING.please_enter_your_password);
     } else {
@@ -111,7 +111,7 @@ export default function Login(props: any) {
     } catch (error: any) {
       SHOW_TOAST(error?.message ?? '', 'error');
       return null;
-    }finally{
+    } finally {
       setLoading(false);
     }
   }

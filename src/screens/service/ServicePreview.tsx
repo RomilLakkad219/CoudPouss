@@ -24,7 +24,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { arrayIcons, getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -96,11 +96,6 @@ export default function ServicePreview(props: any) {
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
         onBack={() => {
           props.navigation.goBack();
@@ -174,10 +169,10 @@ export default function ServicePreview(props: any) {
                 { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
-                {serviceDetails?.category_info?.category_logo_url ?
+                {serviceDetails?.category_info?.category_name ?
                   <Image
-                    style={styles(theme).informationIcon}
-                    source={{ uri: serviceDetails?.category_info?.category_logo_url }}
+                    style={[styles(theme).informationIcon, { tintColor: theme._1A3D51 }]}
+                    source={arrayIcons[serviceDetails?.category_info?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
                     resizeMode='cover'
                   />
                   :
@@ -206,7 +201,7 @@ export default function ServicePreview(props: any) {
                   }}
                   size={getScaleSize(12)}
                   font={FONTS.Lato.Medium}
-                  numberOfLines={2}
+                  numberOfLines={4}
                   color={theme.primary}>
                   {serviceDetails?.about_client?.address ?? '-'}
                 </Text>
@@ -308,11 +303,18 @@ export default function ServicePreview(props: any) {
                   return (
                     <>
                       {item ?
-                        <Image
-                          style={styles(theme).photosView}
-                          resizeMode='cover'
-                          source={{ uri: item }}
-                        />
+                        <TouchableOpacity onPress={() => {
+                          props.navigation.navigate(SCREENS.WebViewScreen.identifier, {
+                            url: item,
+                          })
+                        }}>
+                          <Image
+                            style={styles(theme).photosView}
+                            resizeMode='cover'
+                            source={{ uri: item }}
+                          />
+                        </TouchableOpacity>
+
                         :
                         <View style={[styles(theme).photosView, {
                           backgroundColor: 'gray'
@@ -353,15 +355,22 @@ export default function ServicePreview(props: any) {
           contentContainerStyle={{ gap: getScaleSize(16), marginBottom: getScaleSize(24) }}
           renderItem={({ item, index }) => {
             return (
-              <Image
-                style={styles(theme).photosView}
-                resizeMode='cover'
-                source={{ uri: item }}
-              />
+              <TouchableOpacity onPress={() => {
+                props.navigation.navigate(SCREENS.WebViewScreen.identifier, {
+                  url: item,
+                })
+              }}>
+                <Image
+                  style={styles(theme).photosView}
+                  resizeMode='cover'
+                  source={{ uri: item }}
+                /> 
+              </TouchableOpacity>
+
             );
           }}
         />
-      </ScrollView >
+      </ScrollView>
       <View
         style={[
           styles(theme).horizontalView,

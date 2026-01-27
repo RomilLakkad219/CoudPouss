@@ -54,6 +54,8 @@ const API_ROUTES = {
     getAllService: "userService/auth/get-selected-services",
     getTsakDetails: "quote_accept/service-provider",
     getRefreshToken: "userService/auth/refresh-token",
+    subscriptionPayment: "subscription_and_payment/subscription/select-plan",
+    getTaskStatus: "quote_accept/service-provider/task-status",
 }
 
 

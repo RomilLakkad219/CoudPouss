@@ -55,7 +55,7 @@ export default function ProfessionalHome(props: any) {
   console.log('profile==', profile)
 
   const [isLoading, setLoading] = useState(false);
-  const [serviceList, setServiceList] = useState([])
+  const [serviceList, setServiceList] = useState<any>([])
 
   useEffect(() => {
     getAllServices()
@@ -68,6 +68,7 @@ export default function ProfessionalHome(props: any) {
       setLoading(true);
       const result: any = await API.Instance.get(`${API.API_ROUTES.getProfessionalAllServices}?page=${page}&limit=${limit}`);
       if (result?.status) {
+        console.log('result==>', result?.data?.data)
         setServiceList(result.data.data ?? [])
       }
       else {
@@ -154,7 +155,7 @@ export default function ProfessionalHome(props: any) {
                 size={getScaleSize(40)}
                 font={FONTS.Lato.Bold}
                 color={theme.white}>
-                {props?.professionalConnectedCount ?? '0'}{' '}
+                {serviceList?.stats?.verified_providers_today?.count ?? '0'}{' '}
               </Text>
               <Text
                 size={getScaleSize(16)}
@@ -185,22 +186,24 @@ export default function ProfessionalHome(props: any) {
             {STRING.ExploreServiceRequests}
           </Text>
           <View style={{ flex: 1 }}></View>
-          <TouchableOpacity onPress={() => {
-            props.navigation.navigate(SCREENS.ExploreServiceRequest.identifier)
-          }}>
-            <Text
-              size={getScaleSize(14)}
-              font={FONTS.Lato.Medium}
-              align='center'
-              color={theme._2C6587}
-              style={{
-                marginTop: getScaleSize(28),
-              }}>
-              {STRING.ViewAll}
-            </Text>
-          </TouchableOpacity>
+          {serviceList?.open_services?.length > 0 && (
+            <TouchableOpacity onPress={() => {
+              props.navigation.navigate(SCREENS.ExploreServiceRequest.identifier)
+            }}>
+              <Text
+                size={getScaleSize(14)}
+                font={FONTS.Lato.Medium}
+                align='center'
+                color={theme._2C6587}
+                style={{
+                  marginTop: getScaleSize(28),
+                }}>
+                {STRING.ViewAll}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-        {serviceList?.map((item, index) => (
+        {(serviceList?.open_services?.length > 0 ? serviceList?.open_services : [])?.map((item: any, index: number) => (
           <ServiceRequest
             key={index}
             data={item}
@@ -218,6 +221,7 @@ export default function ProfessionalHome(props: any) {
             }}
           />
         ))}
+
         <View style={styles(theme).horizontalContainer}>
           <Text
             size={getScaleSize(20)}
@@ -228,30 +232,63 @@ export default function ProfessionalHome(props: any) {
             }}>
             {STRING.RecentTasks}
           </Text>
-          <Text
-            size={getScaleSize(16)}
-            font={FONTS.Lato.Regular}
-            onPress={() => { }}
-            style={{ alignSelf: 'center' }}
-            color={theme._999999}>
-            {STRING.ViewAll}
-          </Text>
+          {serviceList?.recent_tasks?.data?.length > 0 && (
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.Regular}
+              onPress={() => { }}
+              style={{ alignSelf: 'center' }}
+              color={theme._999999}>
+              {STRING.ViewAll}
+            </Text>
+          )}
         </View>
-        {['', ''].map(item => {
-          return (
-            <TaskItem
-              onPressItem={() => {
-                props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier);
-              }}
-              onPressStatus={() => {
-                props.navigation.navigate(SCREENS.TaskStatus.identifier);
-              }}
-              onPressChat={() => {
-                props.navigation.navigate(SCREENS.ChatDetails.identifier);
-              }}
-            />
-          );
-        })}
+        {serviceList?.recent_tasks?.data?.length > 0 ?
+          <>
+            {(serviceList?.recent_tasks?.data?.length > 0 ? serviceList?.recent_tasks?.data : [])?.map((item: any, index: number) => {
+              return (
+                <TaskItem
+                  key={index}
+                  item={item}
+                  onPressItem={() => {
+                    if (item?.task_status === 'pending') {
+                      props.navigation.navigate(SCREENS.OpenRequestDetails.identifier, {
+                        item: item
+                      });
+                    } else if (item?.task_status === 'accepted') {
+                      props.navigation.navigate(SCREENS.CompletedTaskDetails.identifier, {
+                        item: item
+                      });
+                    } props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier, {
+                      item: item
+                    });
+                   
+                  }}
+                  onPressStatus={() => {
+                    props.navigation.navigate(SCREENS.TaskStatus.identifier);
+                  }}
+                  onPressChat={() => {
+                    props.navigation.navigate(SCREENS.ChatDetails.identifier);
+                  }}
+                />
+              );
+            })}
+          </>
+          :
+          <View style={styles(theme).emptyView}>
+            <Image style={styles(theme).emptyImage} source={IMAGES.empty} />
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.Regular}
+              align="center"
+              color={theme._939393}
+              style={{
+                marginTop: getScaleSize(20),
+              }}>
+              {STRING.you_have_not_accepted_any_request_please_accept_a_request}
+            </Text>
+          </View>
+        }
       </ScrollView>
       {isLoading && <ProgressView />}
     </View>
@@ -291,7 +328,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       marginHorizontal: getScaleSize(22),
     },
     bannerView: {
-     
+
       height: ((Dimensions.get('window').width - getScaleSize(44)) * getScaleSize(124)) / getScaleSize(386),
       alignSelf: 'center',
       width: Dimensions.get('window').width - getScaleSize(44),
@@ -306,10 +343,21 @@ const styles = (theme: ThemeContextType['theme']) =>
       flexDirection: 'row',
       alignItems: 'center'
     },
-    textView:{
+    textView: {
       justifyContent: 'center',
       flex: 1.0,
       marginLeft: getScaleSize(135),
       marginRight: getScaleSize(30),
-    }
+    },
+    emptyView: {
+      flex: 1.0,
+      alignSelf: 'center',
+      justifyContent: 'center',
+      marginVertical: getScaleSize(26),
+    },
+    emptyImage: {
+      height: getScaleSize(217),
+      width: getScaleSize(184),
+      alignSelf: 'center',
+    },
   });

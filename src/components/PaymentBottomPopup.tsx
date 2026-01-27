@@ -198,7 +198,7 @@ const PaymentBottomPopup = (props: any) => {
                 font={FONTS.Lato.Bold}
                 color={theme.primary}
                 style={{ alignSelf: 'center' }}>
-                {STRING.No}
+                {STRING.cancel}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity

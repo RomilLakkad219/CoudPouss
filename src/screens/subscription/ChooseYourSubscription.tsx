@@ -59,7 +59,12 @@ export default function ChooseYourSubscription(props: any) {
         <View style={styles(theme).container}>
             <Header
                 onBack={() => {
-                    props.navigation.goBack();
+                    props.navigation.dispatch(
+                        CommonActions.reset({
+                            index: 0,
+                            routes: [{ name: SCREENS.BottomBar.identifier }],
+                        }),
+                    );
                 }}
                 screenName={STRING.choose_your_subscription}
             />
@@ -159,7 +164,7 @@ export default function ChooseYourSubscription(props: any) {
                     if (!selectedPlan) {
                         SHOW_TOAST(STRING.please_select_a_plan, 'error');
                     } else {
-                        props.navigation.navigate(SCREENS.SelectedPlanDetails.identifier,{
+                        props.navigation.navigate(SCREENS.SelectedPlanDetails.identifier, {
                             plan: selectedPlan
                         });
                     }

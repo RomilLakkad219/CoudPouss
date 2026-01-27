@@ -371,6 +371,8 @@ export const useString = () => {
     cancellation_not_possible: "Cancellation not possible",
     are_you_sure_you_want_to_logout: "Are you sure you want to\nlogout?",
     no_data_found: "No data found",
+    you_have_not_accepted_any_request_please_accept_a_request: "You have not accepted any request,\nplease accept a request",
+    please_enter_your_email_mobile_number: "Please enter your email/ mobile number",
   };
 };
 

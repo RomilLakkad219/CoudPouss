@@ -66,7 +66,7 @@ export default function RatingsReviewsItem(props: any) {
                 </Text>
             }
             <View style={styles(theme).likeView}>
-                <View style={styles(theme).flexView} >
+                <View style={styles(theme).flexView}>
                     <View style={styles(theme).flexView}>
                         <Image source={IMAGES.ic_thumbsDown} style={styles(theme).starIcon} />
                         <Text

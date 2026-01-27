@@ -13,7 +13,7 @@ import React, { useContext } from 'react';
 import { ThemeContext, ThemeContextType } from '../context';
 
 //CONSTANTS & ASSETS
-import { getScaleSize, useString } from '../constant';
+import { arrayIcons, getScaleSize, useString } from '../constant';
 import { FONTS, IMAGES } from '../assets';
 
 //COMPONENTS
@@ -46,10 +46,10 @@ function RequestItem(props: any) {
     }}>
       <View style={styles(theme).horizontalContainer}>
         <View style={styles(theme).imageContainer}>
-          {item?.category_logo ?
+          {item?.category_name ?
             <Image
-              source={{ uri: item?.category_logo }}
-              style={styles(theme).imageIcon}
+              source={arrayIcons[item?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
+              style={[styles(theme).imageIcon, { tintColor: theme.white }]}
               resizeMode="cover"
             />
             :
@@ -138,7 +138,7 @@ const styles = (theme: ThemeContextType['theme']) =>
   StyleSheet.create({
     container: {
       marginHorizontal: getScaleSize(24),
-      marginTop: getScaleSize(18),
+      marginBottom: getScaleSize(18),
       borderRadius: getScaleSize(16),
       backgroundColor: theme._EAF0F3,
       paddingHorizontal: getScaleSize(16),

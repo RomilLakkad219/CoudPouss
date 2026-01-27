@@ -1,7 +1,7 @@
 import { getScaleSize } from './scaleSize'
 import { useString } from './string'
 import { SHOW_TOAST ,SHOW_SUCCESS_TOAST} from './showToast'
-import { CATEGORY_DATA, SERVICES_DATA, formatDecimalInput } from './utils'
+import { formatDecimalInput, openStripeCheckout, arrayIcons } from './utils'
 import { Storage } from './storage'
 import { REGEX } from './regex'
 
@@ -10,9 +10,9 @@ export {
     useString,
     SHOW_TOAST,
     SHOW_SUCCESS_TOAST,
-    CATEGORY_DATA,
-    SERVICES_DATA,
     Storage,
+    arrayIcons,
     REGEX,
-    formatDecimalInput
+    formatDecimalInput,
+    openStripeCheckout
  }

@@ -10,6 +10,8 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Platform,
+  Alert,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -29,8 +31,9 @@ import {
   SearchComponent,
   RequestItem,
   FavouritesItem,
+  ProgressView,
 } from '../../components';
-import { CommonActions, useFocusEffect } from '@react-navigation/native';
+import { CommonActions, useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { SCREENS, TABS } from '..';
 import { API } from '../../api';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -48,16 +51,23 @@ export default function Home(props: any) {
 
   useFocusEffect(
     React.useCallback(() => {
-      StatusBar.setBackgroundColor(theme.primary);
-      StatusBar.setBarStyle('light-content');
+      if (Platform.OS === 'android') {
+        setTimeout(() => {
+          StatusBar.setBackgroundColor(theme.primary);
+          StatusBar.setBarStyle('light-content');
+        }, 600);
+      }
     }, []),
   );
 
+  const isFocused = useIsFocused();
   useEffect(() => {
-    getHomeData();
-    getFavoriteProfessionals()
-    getAllRequests()
-  }, []);
+    if (isFocused) {
+      getHomeData();
+      getFavoriteProfessionals()
+      getAllRequests()
+    }
+  }, [isFocused]);
 
   async function getHomeData() {
     try {
@@ -94,6 +104,21 @@ export default function Home(props: any) {
     }
   }
 
+  async function removeFavoriteProfessional(id: any) {
+    try {
+      setLoading(true);
+      const result = await API.Instance.delete(API.API_ROUTES.removeFavoriteProfessional + `/${id}`);
+      if (result.status) {
+        SHOW_TOAST(result?.data?.message ?? '', 'success')
+        getFavoriteProfessionals()
+      } else {
+        SHOW_TOAST(result?.data?.message ?? '', 'error')
+      }
+    } catch (error: any) {
+      SHOW_TOAST(error?.message ?? '', 'error');
+    } 
+  }
+
   async function getAllRequests() {
 
     try {
@@ -112,10 +137,13 @@ export default function Home(props: any) {
     }
   }
 
+
+
   return (
     <View style={styles(theme).container}>
       <StatusBar
         translucent={true}
+        animated
         backgroundColor={theme.primary}
         barStyle={'light-content'} />
       {/* HEADER */}
@@ -274,6 +302,7 @@ export default function Home(props: any) {
           style={{
             flexDirection: 'row',
             marginTop: getScaleSize(31),
+            marginBottom: getScaleSize(18),
             marginHorizontal: getScaleSize(22),
           }}>
           <Text
@@ -330,7 +359,7 @@ export default function Home(props: any) {
                 <View
                   style={{
                     flexDirection: 'row',
-                    marginTop: getScaleSize(31),
+                    marginTop: getScaleSize(13),
                     marginHorizontal: getScaleSize(22),
                   }}>
                   <Text
@@ -359,8 +388,7 @@ export default function Home(props: any) {
                           item={item}
                           itemContainer={{}}
                           onPressFavorite={(item: any) => {
-                            console.log('item==', item)
-                            // getFavoriteProfessionals()
+                            removeFavoriteProfessional(item?.provider?.id)
                           }}
                         />
                       </View>
@@ -385,8 +413,9 @@ export default function Home(props: any) {
             </Text>
           </View>
         )}
-        <View style={{ height: getScaleSize(32) }} />
+        <View style={{ height: getScaleSize(50) }} />
       </ScrollView>
+      {isLoading && <ProgressView />}
     </View>
   );
 }

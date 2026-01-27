@@ -210,7 +210,7 @@ export default function AdditionalDetails(props: any) {
                         props.navigation.dispatch(
                             CommonActions.reset({
                                 index: 0,
-                                routes: [{ name: SCREENS.BottomBar.identifier }],
+                                routes: [{ name: SCREENS.YearsOfExperience.identifier }],
                             }),
                         );
                     }} style={styles(theme).backButton}>

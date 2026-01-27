@@ -213,9 +213,12 @@ export default function Otp(props: any) {
                         <OTPTextInput
                             ref={otpInput}
                             inputCount={4}
-                            handleTextChange={(val: string) => setOtp(val)}
-                            tintColor={theme.primary} // border color when active
-                            offTintColor={theme._BFBFBF} // border color when inactive
+                            handleTextChange={(val: string) => {
+                                setOtp(val);
+                                setOtpError('');
+                            }}
+                            tintColor={otpError ? theme._EF5350 : theme.primary} // border color when active
+                            offTintColor={otpError ? theme._EF5350 : theme._BFBFBF} // border color when inactive
                             textInputStyle={styles(theme).textInput}
                         />
                         {otpError &&

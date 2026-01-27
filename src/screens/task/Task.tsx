@@ -34,20 +34,24 @@ export default function Task(props: any) {
   const STRING = useString();
   const { theme } = useContext<any>(ThemeContext);
 
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 5;
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [quateList, setQuateList] = useState<any[]>([]);
-  const [isLoading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [quateList, setQuateList] = useState<any>({
+    allQuateList: [],
+    selectedIndex: 0,
+    page: 1,
+    hasMore: true,
+    isLoading: true,
+    hasMoreLoading: false,
+  });
+
 
   function getStatus() {
-    if (selectedIndex === 0) {
+    if (quateList?.selectedIndex === 0) {
       return 'send';
-    } else if (selectedIndex === 1) {
+    } else if (quateList?.selectedIndex === 1) {
       return 'accepted';
-    } else if (selectedIndex === 2) {
+    } else if (quateList?.selectedIndex === 2) {
       return 'complete';
     }
   }
@@ -58,20 +62,29 @@ export default function Task(props: any) {
     if (isFocused) {
       getQuateList();
     }
-  }, [selectedIndex, page, isFocused]);
+  }, [quateList?.selectedIndex, quateList?.page, isFocused]);
 
   async function getQuateList() {
+    if (!quateList?.hasMore) return;
+
     try {
-      setLoading(true);
-      const result = await API.Instance.get(API.API_ROUTES.getQuateList + `?status=${getStatus()}&page=${page}&limit=${PAGE_SIZE}`);
+      const result = await API.Instance.get(API.API_ROUTES.getQuateList + `?status=${getStatus()}&page=${quateList?.page}&limit=${PAGE_SIZE}`);
       if (result.status) {
         const newData = result?.data?.data?.results ?? [];
         console.log('newData==>', newData)
         if (newData.length < PAGE_SIZE) {
-          setHasMore(false);
-          setQuateList((prev: any) => [...prev, ...newData]);
+          setQuateList((prev: any) => ({
+            ...prev,
+            hasMore: false,
+            allQuateList: [...prev?.allQuateList ?? [], ...newData],
+            isLoading: false,
+          }));
         } else {
-          setQuateList((prev: any) => [...prev, ...newData]);
+          setQuateList((prev: any) => ({
+            ...prev,
+            allQuateList: [...prev?.allQuateList ?? [], ...newData],
+            isLoading: false,
+          }));
         }
       } else {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
@@ -79,24 +92,90 @@ export default function Task(props: any) {
     } catch (error: any) {
       SHOW_TOAST(error?.message ?? '', 'error');
     } finally {
-      setLoading(false);
+      setQuateList((prev: any) => ({
+        ...prev,
+        isLoading: false,
+        hasMoreLoading: false,
+      }));
     }
   }
 
   const loadMore = () => {
-    if (!isLoading && hasMore) {
-      setPage(page + 1);
-      getQuateList();
+    if (!quateList?.isLoading && !quateList?.hasMoreLoading && quateList?.hasMore) {
+      setQuateList((prev: any) => ({
+        ...prev,
+        page: prev?.page + 1,
+        hasMore: true,
+        isLoading: true,
+        hasMoreLoading: true,
+      }));
     }
   };
 
+
+  function renderFlatList() {
+    if (quateList?.allQuateList?.length > 0) {
+      return (
+        <FlatList
+          data={quateList?.allQuateList}
+          contentContainerStyle={{ paddingBottom: getScaleSize(50), marginHorizontal: getScaleSize(22) }}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item: any, index: number) => index.toString()}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={
+            quateList?.hasMoreLoading ? <ActivityIndicator size="large" color={theme.primary} style={{ margin: 20 }} /> : null
+          }
+          renderItem={({ item, index }) => {
+            return (
+              <TaskItem
+                key={index}
+                item={item}
+                onPressItem={() => {
+                  props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier, {
+                    item: item
+                  });
+
+                }}
+                onPressStatus={() => {
+                  props.navigation.navigate(SCREENS.TaskStatus.identifier, {
+                    item: item
+                  });
+                }}
+                onPressChat={() => {
+                  props.navigation.navigate(SCREENS.ChatDetails.identifier);
+                }}
+              />
+            );
+          }}
+        />
+      );
+    } else if (quateList?.isLoading) {
+      return (
+        <ActivityIndicator size="large" color={theme.primary} style={{ margin: 20 }} />
+      );
+    } else {
+      return (
+        <View style={styles(theme).emptyView}>
+          <Image style={styles(theme).emptyImage} source={IMAGES.empty} />
+          <Text
+            size={getScaleSize(16)}
+            font={FONTS.Lato.SemiBold}
+            align="center"
+            color={theme._939393}
+            style={{
+              marginTop: getScaleSize(20),
+            }}>
+            {STRING.you_have_not_sent_any_quote_please_sent_a_quotes_to_the_service_request}
+          </Text>
+        </View>
+      )
+    }
+    return null;
+  }
+
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Text
         size={getScaleSize(24)}
         font={FONTS.Lato.Bold}
@@ -112,15 +191,21 @@ export default function Task(props: any) {
           style={styles(theme).tabItem}
           activeOpacity={1}
           onPress={() => {
-            setSelectedIndex(0);
-            setPage(1);
-            setQuateList([]);
+            setQuateList((prev: any) => ({
+              ...prev,
+              allQuateList: [],
+              selectedIndex: 0,
+              page: 1,
+              hasMore: true,
+              isLoading: true,
+              hasMoreLoading: false,
+            }));
           }}>
-          <View style={[styles(theme).tabItemContainer, { borderBottomWidth: selectedIndex === 0 ? 2 : 0 }]}>
+          <View style={[styles(theme).tabItemContainer, { borderBottomWidth: quateList?.selectedIndex === 0 ? 2 : 0 }]}>
             <Text
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
-              color={selectedIndex === 0 ? theme._2C6587 : theme._595959}
+              color={quateList?.selectedIndex === 0 ? theme._2C6587 : theme._595959}
               style={{}}>
               {'Quote Sent'}
             </Text>
@@ -130,15 +215,21 @@ export default function Task(props: any) {
           style={styles(theme).tabItem}
           activeOpacity={1}
           onPress={() => {
-            setSelectedIndex(1);
-            setPage(1);
-            setQuateList([]);
+            setQuateList((prev: any) => ({
+              ...prev,
+              allQuateList: [],
+              selectedIndex: 1,
+              page: 1,
+              hasMore: true,
+              isLoading: true,
+              hasMoreLoading: false,
+            }));
           }}>
-          <View style={[styles(theme).tabItemContainer, { borderBottomWidth: selectedIndex === 1 ? 2 : 0 }]}>
+          <View style={[styles(theme).tabItemContainer, { borderBottomWidth: quateList?.selectedIndex === 1 ? 2 : 0 }]}>
             <Text
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
-              color={selectedIndex === 1 ? theme._2C6587 : theme._595959}
+              color={quateList?.selectedIndex === 1 ? theme._2C6587 : theme._595959}
               style={{}}>
               {'Accepted'}
             </Text>
@@ -148,72 +239,29 @@ export default function Task(props: any) {
           style={styles(theme).tabItem}
           activeOpacity={1}
           onPress={() => {
-            setSelectedIndex(2);
-            setPage(1);
-            setQuateList([]);
+            setQuateList((prev: any) => ({
+              ...prev,
+              allQuateList: [],
+              selectedIndex: 2,
+              page: 1,
+              hasMore: true,
+              isLoading: true,
+              hasMoreLoading: false,
+            }));
           }}>
-          <View style={[styles(theme).tabItemContainer, { borderBottomWidth: selectedIndex === 2 ? 2 : 0 }]}>
+          <View style={[styles(theme).tabItemContainer, { borderBottomWidth: quateList?.selectedIndex === 2 ? 2 : 0 }]}>
             <Text
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
-              color={selectedIndex === 2 ? theme._2C6587 : theme._595959}
+              color={quateList?.selectedIndex === 2 ? theme._2C6587 : theme._595959}
               style={{}}>
               {'Completed'}
             </Text>
           </View>
         </TouchableOpacity>
       </View>
-      {isLoading ? (
-        <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: getScaleSize(20) }} />
-      ) : (
-        quateList.length > 0 ? (
-          <FlatList
-            data={quateList}
-            contentContainerStyle={{ paddingBottom: getScaleSize(50), marginHorizontal: getScaleSize(22) }}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item: any, index: number) => index.toString()}
-            onEndReached={loadMore}
-            onEndReachedThreshold={0.1}
-            ListFooterComponent={
-              isLoading ? <ActivityIndicator size="large" color={theme.primary} style={{ margin: 20 }} /> : null
-            }
-            renderItem={({ item, index }) => {
-              return (
-                <TaskItem
-                  key={index}
-                  item={item}
-                  onPressItem={() => {
-                    props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier, {
-                      item: item
-                    });
-                  }}
-                  onPressStatus={() => {
-                    props.navigation.navigate(SCREENS.TaskStatus.identifier);
-                  }}
-                  onPressChat={() => {
-                    props.navigation.navigate(SCREENS.ChatDetails.identifier);
-                  }}
-                />
-              );
-            }}
-          />
-        ) : (
-          <View style={styles(theme).emptyView}>
-            <Image style={styles(theme).emptyImage} source={IMAGES.empty} />
-            <Text
-              size={getScaleSize(16)}
-              font={FONTS.Lato.SemiBold}
-              align="center"
-              color={theme._939393}
-              style={{
-                marginTop: getScaleSize(20),
-              }}>
-              {STRING.you_have_not_sent_any_quote_please_sent_a_quotes_to_the_service_request}
-            </Text>
-          </View>
-        )
-      )}
-    </View>
+      {renderFlatList()}
+    </View >
   );
 }
 

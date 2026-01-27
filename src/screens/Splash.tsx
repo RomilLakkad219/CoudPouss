@@ -88,7 +88,7 @@ export default function Splash(props: any) {
             <SafeAreaView />
             <View style={styles(theme).statusBar}>
                 <StatusBar
-                    translucent={false}
+                    translucent={true}
                     backgroundColor={theme.primary}
                     barStyle={'light-content'} />
             </View>

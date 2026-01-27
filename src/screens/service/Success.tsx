@@ -23,7 +23,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { CATEGORY_DATA, getScaleSize, useString } from '../../constant';
+import { getScaleSize } from '../../constant';
 
 //COMPONENT
 import {

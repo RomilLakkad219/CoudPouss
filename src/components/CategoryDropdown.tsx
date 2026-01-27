@@ -6,7 +6,7 @@ import Text from './Text';
 import { getScaleSize } from '../constant/scaleSize';
 import { FONTS } from '../assets';
 import { ThemeContext, ThemeContextType } from '../context/ThemeProvider';
-import { useString } from '../constant';
+import { arrayIcons, useString } from '../constant';
 
 interface DropdownProps {
     container?: StyleProp<ViewStyle>;
@@ -32,8 +32,8 @@ const CategoryDropdown = (props: DropdownProps) => {
             <View style={styles(theme).item}>
                 <View style={styles(theme).iconLabelContainer}>
                     <Image
-                        source={{uri: item.category_logo}}
-                        style={[styles(theme).icon]}
+                        source={arrayIcons[item?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
+                        style={[styles(theme).icon, {tintColor: isSelected ? theme._2C6587 : theme._818285}]}
                         resizeMode='cover'
                     />
                     <Text
@@ -77,8 +77,11 @@ const CategoryDropdown = (props: DropdownProps) => {
                 renderLeftIcon={() => {
                     return (
                         <>
-                            {selectedItem?.category_logo &&
-                                <Image source={{uri: selectedItem?.category_logo}} style={[styles(theme).icon]} resizeMode='cover' />
+                            {selectedItem?.category_name &&
+                                <Image 
+                                source={arrayIcons[selectedItem?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any} 
+                                style={[styles(theme).icon, {tintColor: theme._2C6587}]} 
+                                resizeMode='cover' />
                             }
                         </> 
                     )

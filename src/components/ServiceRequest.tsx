@@ -8,7 +8,7 @@ import { FONTS, IMAGES, LIGHT_THEME_COLOR } from '../assets';
 import { ThemeContext, ThemeContextType } from '../context/ThemeProvider';
 
 //CONSTANT
-import { getScaleSize, useString } from '../constant';
+import { arrayIcons, getScaleSize, useString } from '../constant';
 
 //COMPONENT
 import Text from './Text';
@@ -104,14 +104,20 @@ export default function ServiceRequest(props: any) {
         <View
           style={[styles(theme).horizontalView, { marginTop: getScaleSize(12) }]}>
           <View style={styles(theme).itemView}>
-            <Image
-              style={styles(theme).informationIcon}
-              source={IMAGES.service}
-            />
+            {data?.category_info?.category_name?.name ?
+              <Image
+                style={[styles(theme).informationIcon, { tintColor: theme._1A3D51 }]}
+                source={arrayIcons[data?.category_info?.category_name?.name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
+                resizeMode='cover'
+              />
+              :
+              <View style={styles(theme).informationIcon} />
+            }
             <Text
               style={{
                 marginHorizontal: getScaleSize(8),
                 alignSelf: 'center',
+                flex: 1.0,
               }}
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
@@ -124,11 +130,12 @@ export default function ServiceRequest(props: any) {
             <Text
               style={{
                 marginHorizontal: getScaleSize(8),
-                alignSelf: 'center',
+
+                flex: 1.0,
               }}
               size={getScaleSize(14)}
               font={FONTS.Lato.Medium}
-              numberOfLines={2}
+              numberOfLines={4}
               color={theme._424242}>
               {data?.location}
             </Text>
@@ -137,7 +144,7 @@ export default function ServiceRequest(props: any) {
       </View>
       {profile?.user?.service_provider_type === 'professional' ?
         <View
-          style={[styles(theme).horizontalView, { marginTop: getScaleSize(24) }]}>
+          style={[styles(theme).horizontalView, { marginTop: getScaleSize(24), alignItems: 'center' }]}>
           <View style={{ flex: 1.0 }}>
             <Text
               size={getScaleSize(14)}
@@ -150,7 +157,7 @@ export default function ServiceRequest(props: any) {
               size={getScaleSize(27)}
               font={FONTS.Lato.ExtraBold}
               color={theme._2C6587}>
-              {`€${data?.estimated_cost === null ? "" : data?.estimated_cost}`}
+              {`€${parseFloat(data?.estimated_cost).toFixed(2)}`}
             </Text>
           </View>
           <TouchableOpacity
@@ -198,6 +205,7 @@ const styles = (theme: ThemeContextType['theme']) =>
       paddingVertical: getScaleSize(16),
       backgroundColor: '#EAF0F3',
       borderRadius: getScaleSize(20),
+      flex: 1.0,
     },
     imageContainer: {
       height: getScaleSize(163),
@@ -207,9 +215,11 @@ const styles = (theme: ThemeContextType['theme']) =>
     horizontalView: {
       flexDirection: 'row',
       marginTop: getScaleSize(16),
+      flex: 1.0,
     },
     verticalView: {
       marginTop: getScaleSize(7),
+      flex: 1.0,
     },
     informationIcon: {
       height: getScaleSize(25),
@@ -218,6 +228,7 @@ const styles = (theme: ThemeContextType['theme']) =>
     },
     itemView: {
       flexDirection: 'row',
+      alignItems: 'center',
       flex: 1.0,
     },
     quateContainer: {

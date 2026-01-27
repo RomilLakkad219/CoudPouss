@@ -22,6 +22,7 @@ import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
 //COMPONENT
 import {
   Header,
+  ProgressView,
   SearchComponent,
   Text,
 } from '../../components';
@@ -47,7 +48,7 @@ export default function Assistance(props: any) {
   const { theme } = useContext<any>(ThemeContext);
 
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
   const [bannerData, setBannerData] = useState<any>(null);
@@ -86,10 +87,6 @@ export default function Assistance(props: any) {
     try {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getHomeData + `?service_name=${service?.name}`);
-      setLoading(false);
-
-      console.log('MAIN CAT', JSON.stringify(result))
-
       if (result.status) {
         setCategoryList(result?.data?.data?.categories ?? []);
         if (result?.data?.data?.categories?.[0]?.id) {
@@ -100,7 +97,6 @@ export default function Assistance(props: any) {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
     } finally {
       setLoading(false);
@@ -111,8 +107,6 @@ export default function Assistance(props: any) {
     try {
       setLoading(true);
       const result = await API.Instance.get(API.API_ROUTES.getHomeData + `/${id}`);
-      setLoading(false);
-
       if (result.status) {
         console.log('subcategoryList==', JSON.stringify(result?.data?.data))
         setBannerData(result?.data?.data?.Banner ?? null);
@@ -122,7 +116,6 @@ export default function Assistance(props: any) {
         SHOW_TOAST(result?.data?.message ?? '', 'error')
       }
     } catch (error: any) {
-      setLoading(false);
       SHOW_TOAST(error?.message ?? '', 'error');
     } finally {
       setLoading(false);
@@ -175,16 +168,22 @@ export default function Assistance(props: any) {
         <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1000, backgroundColor: '#fff' }, animatedHeaderStyle]}>
           <>
             {bannerData ? (
-              <Image
-                style={styles(theme).bannerContainer}
-                resizeMode='cover'
-                source={{ uri: bannerData?.url }}
-              />
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  props.navigation.navigate(SCREENS.CreateRequest.identifier)
+                }}>
+                <Image
+                  style={styles(theme).bannerContainer}
+                  resizeMode='cover'
+                  source={{ uri: bannerData?.url }}
+                />
+              </TouchableOpacity>
             ) : (
               <View style={styles(theme).bannerContainer} />
             )}
             {categoryList.length > 1 && (
-              <View style={{ paddingBottom: getScaleSize(40), paddingTop: getScaleSize(20), backgroundColor: '#fff' }}>
+              <View style={{ paddingBottom: getScaleSize(20), paddingTop: getScaleSize(20), backgroundColor: '#fff' }}>
                 <FlatList
                   data={categoryList}
                   horizontal
@@ -241,18 +240,18 @@ export default function Assistance(props: any) {
             )}
           </>
         </Animated.View>
-        {filteredSubCategories.length > 0 ?
+        {subCategoryList &&subCategoryList.length > 0 && filteredSubCategories.length > 0 && loading === false ?
           <Animated.FlatList
             data={filteredSubCategories}
             numColumns={2}
-            contentContainerStyle={{ marginTop: getScaleSize(-20) }}
+            contentContainerStyle={{}}
             keyExtractor={(item: any, index: number) => index.toString()}
             showsVerticalScrollIndicator={false}
             columnWrapperStyle={{ paddingLeft: getScaleSize(8) }}
             onScroll={scrollHandler}
             scrollEventThrottle={16}
             ListHeaderComponent={() => {
-              return <View style={{ height:categoryList.length > 1 ? getScaleSize(324) : getScaleSize(230) }} />;
+              return <View style={{ height: categoryList.length > 1 ? getScaleSize(300) : getScaleSize(210) }} />;
             }}
             ListFooterComponent={() => {
               return <View style={{ height: getScaleSize(50) }} />;
@@ -300,11 +299,17 @@ export default function Assistance(props: any) {
           />
           :
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text size={getScaleSize(16)} font={FONTS.Lato.Bold} color={theme.primary}>No Data found</Text>
+            <Text
+              size={getScaleSize(16)}
+              font={FONTS.Lato.Bold}
+              color={theme.primary}>
+              {'No data found'}
+            </Text>
           </View>
         }
       </View>
-    </View>
+      {loading && <ProgressView />}
+    </View >
   );
 }
 

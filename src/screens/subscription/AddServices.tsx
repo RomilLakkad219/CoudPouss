@@ -6,7 +6,7 @@ import { AuthContext, ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT & ASSETS
 import { FONTS, IMAGES } from '../../assets';
-import { getScaleSize, useString, SHOW_TOAST, CATEGORY_DATA, SERVICES_DATA } from '../../constant';
+import { getScaleSize, useString, SHOW_TOAST} from '../../constant';
 
 //SCREENS
 import { SCREENS } from '..';
@@ -293,7 +293,7 @@ export default function AddServices(props: any) {
                 title={STRING.want_to_add_more_service_categories}
                 description={STRING.additional_category_you_add_will_incur_a_monthly_fee_of}
                 buttonTitle={STRING.proceed_to_pay}
-                secondButtonTitle={STRING.No}
+                secondButtonTitle={STRING.cancel}
                 onPressButton={() => {
                     setPaymentPopup(true);
                     bottomSheetRef.current.close();

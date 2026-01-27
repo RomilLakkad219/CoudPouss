@@ -7,6 +7,7 @@ import {
     Image,
     SafeAreaView,
     Dimensions,
+    Platform,
 } from 'react-native';
 
 //ASSETS
@@ -35,6 +36,7 @@ export default function EditProfile(props: any) {
     const STRING = useString();
     const { theme } = useContext<any>(ThemeContext);
     const { profile, fetchProfile } = useContext(AuthContext)
+    const inputHeight = Platform.OS == 'ios' ? getScaleSize(56) : getScaleSize(56)
 
     const [isLoading, setLoading] = useState(false);
     const [bio, setBio] = useState('')
@@ -58,6 +60,7 @@ export default function EditProfile(props: any) {
     const [secondImageURL, setSecondImageURL] = useState<any>(null);
     const [firstProductImageURL, setFirstProductImageURL] = useState<any>(null);
     const [secondProductImageURL, setSecondProductImageURL] = useState<any>(null);
+    const [addressHeight, setAddressHeight] = useState(inputHeight);
 
 
     console.log('profile==>', profile)
@@ -298,8 +301,18 @@ export default function EditProfile(props: any) {
                         inputColor={true}
                         value={address}
                         multiline={true}
-                        numberOfLines={4}
-                        inputContainer={styles(theme).inputContainerHeight90}
+                        numberOfLines={10}
+                        onContentSizeChange={(e) => {
+                            const newHeight = e.nativeEvent.contentSize.height;
+                            setAddressHeight(
+                                Math.min(getScaleSize(200), Math.max(inputHeight, newHeight))
+                            );
+                        }}
+                        inputContainer={{
+                            maxHeight: getScaleSize(200),
+                            height: addressHeight,
+                            minHeight: inputHeight,
+                        }}
                         continerStyle={{ marginBottom: getScaleSize(20) }}
                         onChangeText={text => {
                             setAddress(text);

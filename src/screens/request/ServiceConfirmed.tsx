@@ -21,7 +21,7 @@ import { FONTS, IMAGES } from '../../assets';
 import { ThemeContext, ThemeContextType } from '../../context';
 
 //CONSTANT
-import { getScaleSize, SHOW_TOAST, useString } from '../../constant';
+import { arrayIcons, getScaleSize, SHOW_TOAST, useString } from '../../constant';
 
 //COMPONENT
 import {
@@ -29,6 +29,7 @@ import {
   Button,
   Header,
   PaymentBottomPopup,
+  ProgressView,
   RejectBottomPopup,
   RequestItem,
   SearchComponent,
@@ -36,7 +37,7 @@ import {
 } from '../../components';
 
 //PACKAGES
-import { useFocusEffect } from '@react-navigation/native';
+import { CommonActions, useFocusEffect } from '@react-navigation/native';
 import { SCREENS } from '..';
 import { API } from '../../api';
 import moment from 'moment';
@@ -46,6 +47,7 @@ export default function ServiceConfirmed(props: any) {
   const { theme } = useContext<any>(ThemeContext);
 
   const item = props?.route?.params?.item ?? {};
+  const serviceId = props?.route?.params?.serviceId ?? '';
 
   const [isLoading, setLoading] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState<any>({});
@@ -57,7 +59,7 @@ export default function ServiceConfirmed(props: any) {
   async function getServiceAmount() {
     try {
       const params = {
-        service_id: item?.service_id,
+        service_id: serviceId ? serviceId : item?.service_id,
       }
       setLoading(true);
       const result = await API.Instance.post(API.API_ROUTES.getServicePaymentDetails, params);
@@ -76,14 +78,17 @@ export default function ServiceConfirmed(props: any) {
 
   return (
     <View style={styles(theme).container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.white}
-        translucent={false}
-      />
       <Header
         onBack={() => {
-          props.navigation.goBack();
+          props?.navigation?.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: SCREENS.BottomBar.identifier,
+                params: { isValidationService: true },
+               }
+              ],
+            }),
+          );
         }}
         screenName={STRING.ServiceConfirmed}
       />
@@ -148,10 +153,15 @@ export default function ServiceConfirmed(props: any) {
                 { marginTop: getScaleSize(12) },
               ]}>
               <View style={styles(theme).itemView}>
+                {paymentDetails?.category_name ?
                 <Image
-                  style={styles(theme).informationIcon}
-                  source={IMAGES.service}
-                />
+                    style={[styles(theme).informationIcon, { tintColor: theme._1A3D51 }]}
+                    source={arrayIcons[paymentDetails?.category_name?.toLowerCase() as keyof typeof arrayIcons] ?? arrayIcons['diy'] as any}
+                    resizeMode='cover'
+                  />
+                  :
+                  <View style={styles(theme).informationIcon} />
+                }
                 <Text
                   style={{
                     marginHorizontal: getScaleSize(8),
@@ -174,6 +184,7 @@ export default function ServiceConfirmed(props: any) {
                     alignSelf: 'center',
                   }}
                   size={getScaleSize(12)}
+                  numberOfLines={4}
                   font={FONTS.Lato.Medium}
                   color={theme.primary}>
                   {paymentDetails?.elder_address ?? '-'}
@@ -264,11 +275,11 @@ export default function ServiceConfirmed(props: any) {
               styles(theme).horizontalView,
               { marginTop: getScaleSize(16) },
             ]}>
-              {paymentDetails?.provider_profile_url ?
-                <Image
-                  style={styles(theme).profilePicView}
-                  source={{ uri: paymentDetails?.provider_profile_url }}
-                />
+            {paymentDetails?.provider_profile_url ?
+              <Image
+                style={styles(theme).profilePicView}
+                source={{ uri: paymentDetails?.provider_profile_url }}
+              />
               :
               <Image
                 style={styles(theme).profilePicView}
@@ -329,9 +340,11 @@ export default function ServiceConfirmed(props: any) {
         title={STRING.Trackservice}
         style={{ marginHorizontal: getScaleSize(22), marginBottom: getScaleSize(16) }}
         onPress={() => {
-          props.navigation.navigate(SCREENS.ProfessionalTaskDetails.identifier, { serviceId: item?.service_id });
+          props.navigation.navigate(SCREENS.CompletedTaskDetails.identifier,
+            { serviceId: serviceId ? serviceId : item?.service_id });
         }}
       />
+      {isLoading && <ProgressView />}
     </View>
   );
 }
